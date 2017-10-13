@@ -1,0 +1,37 @@
+# Docker Compose file for development
+
+version: '3'
+services:
+  app:
+    build: .
+    command: 'node_modules/.bin/nodemon'
+    depends_on:
+      - mysql
+      - redis
+    volumes: # TODO: use in-container files instead in production (?)
+      - .:/usr/src/e-gov-jabar
+      - /usr/src/e-gov-jabar/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development # TODO: change this to 'production' on production
+      PMKDATA_API_PORT: 3000
+      PMKDATA_API_SECRET: "[ e-gov_jabar_secret ]" # TODO: change this on production
+      MYSQL_HOST: mysql
+      MYSQL_USER: egov-jabar
+      MYSQL_PASSWORD: "[ mysql_password ]" # TODO: change this to a strong password on production, must match with mysql
+      MYSQL_DATABASE: egov-jabar
+      REDIS_HOST: redis
+      REDIS_PORT: 6379 # Using default redis image port
+    restart: 'no' # TODO: change this to 'always' on production
+  mysql:
+    image: "mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: "[ mysql_root_password ]" # TODO: change this to a strong password on production, for administration purposes
+      MYSQL_DATABASE: egov-jabar
+      MYSQL_USER: egov-jabar
+      MYSQL_PASSWORD: "[ mysql_password ]" # TODO: change this to a strong password on production, must match with app
+    restart: on-failure # TODO: change this to 'always' on production
+  redis:
+    image: "redis:alpine"
+    restart: on-failure # TODO: change this to 'always' on production

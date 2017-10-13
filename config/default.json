@@ -1,0 +1,36 @@
+{
+  "port": 3000,
+  "secret": "[ Insert secret here ]",
+
+  "knex": {
+    "client": "mysql",
+    "connection": {
+        "host"     : "127.0.0.1",
+        "user"     : "pmkdata",
+        "password" : "pmkdata",
+        "database" : "pmkdata",
+        "charset"  : "utf8"
+    },
+    "debug": false
+  },
+
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379
+  },
+
+  "winston": {
+    "console": {
+      "level": "debug",
+      "prettyPrint": true,
+      "colorize": true,
+      "silent": false,
+      "timestamp": true
+    }
+  },
+
+  "publicUserRegistration": true,
+  "publicStudentRegistration": true,
+  
+  "routePrefix": "/api"
+}

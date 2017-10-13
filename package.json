@@ -1,0 +1,64 @@
+{
+    "name": "pmkdata-api",
+    "version": "0.0.1",
+    "description": "e-Traditional",
+    "main": "server.js",
+    "scripts": {
+        "lint": "semistandard",
+        "test": "NODE_ENV=test mocha \"app/**/*.spec.js\"",
+        "docs": "rimraf docs && jsdoc -c jsdoc.conf",
+        "migrate": "knex migrate:latest",
+        "rollback": "knex migrate:rollback",
+        "seed": "knex seed:run"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nathanchrs/pmkdata-api.git"
+    },
+    "author": "dataFreaks",
+    "license": "Private",
+    "bugs": {
+        "url": "https://github.com/nathanchrs/pmkdata-api/issues"
+    },
+    "homepage": "https://github.com/nathanchrs/pmkdata-api#readme",
+    "dependencies": {
+        "ajv": "^5.1.5",
+        "api-error-handler": "^1.0.0",
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.17.2",
+        "config": "^1.26.1",
+        "connect-redis": "^3.3.0",
+        "express": "^4.15.3",
+        "express-session": "^1.15.3",
+        "fs-readdir-recursive": "^1.0.0",
+        "http-errors": "^1.6.1",
+        "knex": "^0.13.0",
+        "lodash": "^4.17.4",
+        "method-override": "^2.3.9",
+        "mysql": "^2.13.0",
+        "passport": "^0.3.2",
+        "passport-local": "^1.0.0",
+        "redis": "^2.7.1",
+        "winston": "^2.3.1"
+    },
+    "devDependencies": {
+        "chai": "^4.0.2",
+        "chai-as-promised": "^7.0.0",
+        "chai-http": "^3.0.0",
+        "jsdoc": "^3.4.3",
+        "jsdoc-route-plugin": "^0.1.0",
+        "mocha": "^3.4.2",
+        "nodemon": "^1.11.0",
+        "rimraf": "^2.6.1",
+        "semistandard": "^11.0.0",
+        "sinon": "^2.3.5",
+        "sinon-chai": "^2.11.0",
+        "sqlite3": "^3.1.9"
+    },
+    "semistandard": {
+        "env": {
+            "mocha": true,
+            "node": true
+        }
+    }
+}

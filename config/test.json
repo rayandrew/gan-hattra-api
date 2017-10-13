@@ -1,0 +1,36 @@
+{
+  "port": 3000,
+  "secret": "[ Insert secret here ]",
+
+  "knex": {
+    "client": "sqlite3",
+    "connection": {
+      "filename": ":memory:"
+    },
+    "pool": {
+      "min": 1,
+      "max": 1,
+      "disposeTimeout": 360000000,
+      "idleTimeoutMillis": 360000000
+    },
+    "debug": false,
+    "useNullAsDefault": true
+  },
+
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379
+  },
+
+  "winston": {
+    "console": {
+      "level": "debug",
+      "prettyPrint": true,
+      "colorize": true,
+      "silent": false,
+      "timestamp": true
+    }
+  },
+
+  "routePrefix": "/api"
+}
