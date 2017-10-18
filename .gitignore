@@ -80,3 +80,9 @@ typings/
 
 # mac files
 .DS_Store
+
+# sketch file
+.sketch
+
+# vs code
+.vscode
