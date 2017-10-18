@@ -14,6 +14,12 @@ const isOwnerOrSupervisor = auth.createMiddlewareFromPredicate((user, req) => {
   return (user.username === req.params.username) || auth.predicates.isSupervisor(user);
 });
 
+/** custom username generator */
+const usernameGenerator = (pred, name) => {
+  const nameArr = name.split(' ').map(val => val.toLowerCase());
+  return (pred + '_' + nameArr.join('')).substring(0, 255);
+}
+
 /**
  * Get a list of users.
  * @name Get users
@@ -33,7 +39,7 @@ router.get('/users', validators.listUsers, (req, res, next) => {
  * @route {GET} /users
  */
 router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
-  return queries.searchUsers(req.query.search)
+  return queries.searchUsers(req.query.search, req.query.category)
     .then((result) => {
       return res.json(result);
     })
@@ -47,13 +53,27 @@ router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
  */
 router.post('/users', validators.createUser, (req, res, next) => { // TODO: email/captcha validation
   const publicUserRegistration = config.get('publicUserRegistration');
-  const isSupervisor = auth.predicates.isSupervisor(req.user);
-  if (!isSupervisor && !publicUserRegistration) return next(new errors.Forbidden());
+  const isAdmin = auth.predicates.isAdmin(req.user);
 
-  if (!isSupervisor) {
+  if (!isAdmin && !publicUserRegistration) return next(new errors.Forbidden());
+
+  req.body.status = 'active';
+
+  if (auth.predicates.isProvinsi(req.user)) {
+    if(!req.body.username) req.body.username = usernameGenerator('kota', req.body.nama); 
+    req.body.role = 'kota';
+  } else if (auth.predicates.isKota(req.user)) {
+    if(!req.body.username) req.body.username = usernameGenerator('pusk', req.body.nama);
+    req.body.role = 'puskesmas';
+  } else if (auth.predicates.isPuskesmas(req.user)) {
+    if(!req.body.username) req.body.username = usernameGenerator('kestrad', req.body.nama);
+    req.body.role = 'kestrad';
+  } else {
     req.body.role = 'user';
     req.body.status = 'awaiting_validation';
   }
+
+  if(!req.body.password) req.body.password = req.body.username;
 
   return queries.createUser(req.body)
     .then((insertedUser) => {

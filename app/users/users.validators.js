@@ -15,12 +15,16 @@ const schemas = {
     'type': 'object',
     'properties': {
       'username': commonSchemas.username,
+      'nama': commonSchemas.varchar(25),
       'password': commonSchemas.password,
       'status': commonSchemas.userStatus,
       'role': commonSchemas.role,
       'email': commonSchemas.email
     },
-    'required': ['username', 'email', 'password']
+    'anyOf': [
+      {'required': ['username', 'password']},
+      {'required': ['nama']}
+    ]
   },
 
   updateUser: {

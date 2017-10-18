@@ -1,6 +1,6 @@
 {
-  "port": "PMKDATA_API_PORT",
-  "secret": "PMKDATA_API_SECRET",
+  "port": "EGOV_API_PORT",
+  "secret": "EGOV_API_SECRET",
 
   "knex": {
     "connection": {
@@ -16,5 +16,5 @@
     "port": "REDIS_PORT"
   },
 
-  "routePrefix": "PMKDATA_API_ROUTE_PREFIX"
+  "routePrefix": "EGOV_API_ROUTE_PREFIX"
 }

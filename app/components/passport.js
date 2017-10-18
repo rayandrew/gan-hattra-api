@@ -11,7 +11,7 @@ const bcrypt = require('bcryptjs');
 const errors = require('http-errors');
 const auth = require('./auth.js');
 
-const userColumns = ['id', 'username', 'nim', 'email', 'password', 'role', 'status', 'created_at', 'updated_at'];
+const userColumns = ['username', 'email', 'password', 'role', 'status', 'created_at', 'updated_at'];
 const userColumnsWithoutPassword = userColumns.filter(column => column !== 'password');
 
 passport.use(new LocalStrategy(

@@ -32,11 +32,11 @@ module.exports = {
       .pageAndSort(page, perPage, sort, userSortableColumns.map(column => 'users.' + column));
   },
 
-  searchUsers: (search) => {
-    return knex.select(['users.id as id', 'users.username as username', 'name', 'department', 'year'])
+  searchUsers: (search, category) => {
+    return knex.select(['username', 'nama'])
       .from('users')
-      .leftJoin('students', 'users.nim', 'students.nim')
-      .search(search, ['name', 'username'])
+      .leftJoin(category)
+      .search(search, ['nama', 'username'])
       .limit(20);
   },
 
@@ -49,17 +49,13 @@ module.exports = {
     return query.first()
       .then((existingUsers) => {
         if (existingUsers) {
-          if (existingUsers.username === newUser.username) {
-            throw new errors.Conflict('Username already exists.');
-          } else {
-            throw new errors.Conflict('There is already a user for this NIM.');
-          }
+          throw new errors.Conflict('Username already exists.');
         }
         return bcrypt.hash(newUser.password, BCRYPT_STRENGTH);
       })
       .then((hash) => {
         newUser.password = hash;
-        return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, { id: insertedIds[0], password: '' }));
+        return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, { password: '' }));
       });
   },
 

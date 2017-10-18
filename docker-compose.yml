@@ -15,8 +15,8 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: development # TODO: change this to 'production' on production
-      PMKDATA_API_PORT: 3000
-      PMKDATA_API_SECRET: "[ e-gov_jabar_secret ]" # TODO: change this on production
+      EGOV_API_PORT: 3000
+      EGOV_API_SECRET: "[ e-gov_jabar_secret ]" # TODO: change this on production
       MYSQL_HOST: mysql
       MYSQL_USER: egov-jabar
       MYSQL_PASSWORD: "[ mysql_password ]" # TODO: change this to a strong password on production, must match with mysql
@@ -35,3 +35,13 @@ services:
   redis:
     image: "redis:alpine"
     restart: on-failure # TODO: change this to 'always' on production
+  myadmin:
+    image: "phpmyadmin/phpmyadmin"
+    ports:
+        - "1000:80"
+    environment:
+        - PMA_ARBITRARY=1
+        - PMA_HOST=mysql
+    restart: unless-stopped
+    depends_on:
+        - mysql
