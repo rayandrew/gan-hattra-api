@@ -8,16 +8,16 @@
 const errors = require('http-errors');
 
 const predicates = {
-  isAdmin: (user) => (user && user.role && user.role === 'admin'),
-  isProvinsi: (user) => (user && user.role && user.role === 'provinsi'),
-  isKota: (user) => (user && user.role && user.role === 'kota'),
-  isPuskesmas: (user) => (user && user.role && user.role === 'puskesmas'),
-  isKestrad: (user) => (user && user.role && user.role === 'kestrad'),
-  isUser: (user) => (user && user.role && user.role === 'user'),
+    isAdmin: (user) => (user && user.role && user.role === 'admin'),
+    isProvinsi: (user) => (user && user.role && user.role === 'provinsi'),
+    isKota: (user) => (user && user.role && user.role === 'kota'),
+    isPuskesmas: (user) => (user && user.role && user.role === 'puskesmas'),
+    isKestrad: (user) => (user && user.role && user.role === 'kestrad'),
+    isUser: (user) => (user && user.role && user.role === 'user'),
 
-  isActive: (user) => (user && user.status && user.status === 'active'),
-  isAwaitingValidation: (user) => (user && user.status && user.status === 'awaiting-validation'),
-  isDisabled: (user) => (user && user.status && user.status === 'disabled')
+    isActive: (user) => (user && user.status && user.status === 'active'),
+    isAwaitingValidation: (user) => (user && user.status && user.status === 'awaiting-validation'),
+    isDisabled: (user) => (user && user.status && user.status === 'disabled')
 };
 
 /**
@@ -32,46 +32,56 @@ const predicates = {
  * @returns An Express middleware corresponding to the given predicate.
  */
 const createMiddlewareFromPredicate = (predicate) => {
-  return function (req, res, next) {
-    if (!req.user) return next(new errors.Unauthorized());
-    return Promise.resolve(predicate(req.user, req))
-      .then((predicateResult) => {
-        if (!predicateResult) throw new errors.Forbidden();
-        return next();
-      })
-      .catch(next);
-  };
+    return function(req, res, next) {
+        if (!req.user) return next(new errors.Unauthorized());
+        return Promise.resolve(predicate(req.user, req))
+            .then((predicateResult) => {
+                if (!predicateResult) throw new errors.Forbidden();
+                return next();
+            })
+            .catch(next);
+    };
 };
 
 /* Common middleware for authorization check */
 const middleware = {
 
-  /**
-   * Middleware that checks whether the user is logged in. Throws a HTTP Unauthorized (401) error otherwise.
-   */
-  isLoggedIn: (req, res, next) => {
-    if (!req.user) return next(new errors.Unauthorized('Not logged in.'));
-    return next();
-  },
+    /**
+     * Middleware that checks whether the user is logged in. Throws a HTTP Unauthorized (401) error otherwise.
+     */
+    isLoggedIn: (req, res, next) => {
+        if (!req.user) return next(new errors.Unauthorized('Not logged in.'));
+        return next();
+    },
 
-  /**
-   * Middleware that checks whether the user is a supervisor.
-   */
-  isSupervisor: createMiddlewareFromPredicate(predicates.isSupervisor),
+    /**
+     * Middleware that checks whether the user is a supervisor.
+     */
+    isSupervisor: createMiddlewareFromPredicate(predicates.isSupervisor),
 
-  /**
-   * Middleware that checks whether the user is an admin.
-   */
-  isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
+    /**
+     * Middleware that checks whether the user is an admin.
+     */
+    isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
 
-  /**
-   * Middleware that checks whether the user is an user.
-   */
-  isUser: createMiddlewareFromPredicate(predicates.isUser)
+    /**
+     * Middleware that checks whether the user is an user.
+     */
+    isUser: createMiddlewareFromPredicate(predicates.isUser),
+
+    /**
+     * Middleware that checks whether the user is Provinsi or higher (admin).
+     */
+    isProvinsiOrHigher: createMiddlewareFromPredicate(predicates.isProvinsiOrHigher),
+
+    /**
+     * Middleware that checks whether the user is Kota or higher (admin).
+     */
+    isKotaOrHigher: createMiddlewareFromPredicate(predicates.isKotaOrHigher)
 };
 
 module.exports = {
-  predicates: predicates,
-  createMiddlewareFromPredicate: createMiddlewareFromPredicate,
-  middleware: middleware
+    predicates: predicates,
+    createMiddlewareFromPredicate: createMiddlewareFromPredicate,
+    middleware: middleware
 };
