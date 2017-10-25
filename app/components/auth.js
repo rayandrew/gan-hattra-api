@@ -7,6 +7,7 @@
 
 const errors = require('http-errors');
 
+
 const predicates = {
   isAdmin: (user) => (user && user.role && user.role === 'admin'),
   isProvinsi: (user) => (user && user.role && user.role === 'provinsi'),

@@ -4,7 +4,6 @@ var knex = require('../components/knex.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-
 const BCRYPT_STRENGTH = 8;
 
 function ensureOldPasswordIsCorrect (username, password) {

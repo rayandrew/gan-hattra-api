@@ -6,7 +6,6 @@ const validators = require('./kota.validators.js');
 const errors = require('http-errors');
 const queries = require('./kota.queries.js');
 const config = require('config');
-
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing user is this user or (provinsi and higher). */

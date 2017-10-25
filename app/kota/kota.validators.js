@@ -3,7 +3,6 @@
 const _ = require('lodash');
 const validation = require('../components/validation.js');
 const commonSchemas = require('../common/schemas.js');
-
 const schemas = {
   listKota: {
     'type': 'object',
