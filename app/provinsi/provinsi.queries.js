@@ -2,26 +2,11 @@
 
 var knex = require('../components/knex.js');
 const errors = require('http-errors');
-const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 const user = require('../users/users.queries.js');
 
-const BCRYPT_STRENGTH = 8;
-
-function ensureOldPasswordIsCorrect (username, password) {
-  return knex.first('username', 'password').from('users').where('username', username)
-    .then(function (user) {
-      if (!user) throw new errors.Unauthorized('Wrong username or password.');
-      return bcrypt.compare(password, user.password);
-    })
-    .then((result) => {
-      if (!result) throw new errors.Unauthorized('Wrong username or password.');
-      return Promise.resolve();
-    });
-}
-
-const provinsiColumns = ['username', 'nama', 'nama_dinas', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
-//const provinsiAssignableColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
+const provinsiColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
+const provinsiUpdatableColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
 const provinsiSearchableColumns = ['username', 'nama','nama_dinas', 'kepala_dinas'];
 //const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
 
@@ -45,23 +30,16 @@ module.exports = {
   },
 
   getProvinsi: (username) => {
-    return knex.select(userColumns)
+    return knex.select(provinsiColumns)
       .from('user_provinsi')
       .where('username', username)
       .first();
   },
 
-  updateProvinsi: (username, userUpdates, requireOldPasswordCheck = true, oldPassword = '') => {
+  updateProvinsi: (username, userUpdates) => {
     let promises = Promise.resolve();
-
-    return promises
-      .then((userUpdates) => {
-        return knex('user_provinsi').update(userUpdates).where('username', username);
-      });
-  },
-
-  deleteProvinsi: (username) => {
-    return knex('user_provinsi').delete().where('username', username);
+    userUpdates = _.pick(userUpdates, provinsiUpdatableColumns);
+    userUpdates.updated_at = new Date();
+    return knex('user_provinsi').update(userUpdates).where('username', username);
   }
-
 };
