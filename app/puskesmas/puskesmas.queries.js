@@ -63,7 +63,7 @@ module.exports = {
         let promises = Promise.resolve();
 
         return promises
-            .then((userUpdates) => {
+            .then((puskesmasUpdates) => {
                 return knex('user_puskesmas').update(puskesmasUpdates).where('username', username);
             });
     },
