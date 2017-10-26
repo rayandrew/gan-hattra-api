@@ -4,7 +4,6 @@ var knex = require('../components/knex.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-const user = require('../users/users.queries.js');
 
 const BCRYPT_STRENGTH = 8;
 
@@ -24,10 +23,6 @@ module.exports = {
             .from('user_kestrad')
             .search(search, ['nama', 'user_kestrad'])
             .limit(20);
-    },
-
-    createKestrad: (newKestrad) => {
-        return user.createUser(newKestrad);
     },
 
     getSpecificKestrad: (username) => {
@@ -75,9 +70,5 @@ module.exports = {
             .then((kestradUpdates) => {
                 return knex('user_kestrad').update(kestradUpdates).where('username', username);
             });
-    },
-
-    deleteKestrad: (username) => {
-        return knex('user_kestrad').delete().where('username', username);
     }
 };
