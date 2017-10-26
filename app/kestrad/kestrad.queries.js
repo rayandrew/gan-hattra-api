@@ -68,12 +68,12 @@ module.exports = {
             .first();
     },
 
-    updateKestrad: (username, userUpdates) => {
+    updateKestrad: (username, kestradUpdates) => {
         let promises = Promise.resolve();
 
         return promises
-            .then((userUpdates) => {
-                return knex('user_kestrad').update(userUpdates).where('username', username);
+            .then((kestradUpdates) => {
+                return knex('user_kestrad').update(kestradUpdates).where('username', username);
             });
     },
 
