@@ -25,28 +25,16 @@ describe('Puskesmas handling', function() {
     });
 
     describe('Puskesmas handling', function() {
-        let createNewPuskesmas = {
+        let dataPuskesmas = {
             'username': 'raydreww',
             'email': 'raydreww@gmail.com',
             'password': 'hello123'
         };
 
-        it('should return 201 after creating Puskesmas', (done) => {
-            chai.request(routes).post('/api/puskesmas').send(createNewPuskesmas).end((err, res) => {
-                expect(err).to.be.falsy;
-                expect(res).to.have.status(201);
-                expect(res).to.be.a('object');
-                expect(res.body).to.be.a('object');
-                expect(res.body).to.haveOwnProperty('created_at');
-                expect(res.body.username).to.equal('raydreww');
-                done();
-            });
-        });
-
         it('should not get list of puskesmas if kota or higher is not logged in', (done) => {
-            chai.request(routes).post('/api/puskesmas').send(createNewPuskesmas).end((err, res) => {
+            chai.request(routes).post('/api/puskesmas').send(dataPuskesmas).end((err, res) => {
                 expect(err).to.be.falsy;
-                chai.request(routes).get('/api/puskesmas/' + createNewPuskesmas.username).end((err, resfromget) => {
+                chai.request(routes).get('/api/puskesmas/' + dataPuskesmas.username).end((err, resfromget) => {
                     expect(err).to.be.falsy;
                     expect(resfromget).to.have.status(401);
                     expect(resfromget.body.message).to.equal('Unauthorized');

@@ -9,7 +9,7 @@ const queries = require('./puskesmas.queries.js');
 const config = require('config');
 const router = express.Router();
 
-/** Custom auth middleware that checks whether the accessing user is this user's owner or a supervisor. */
+/** Custom auth middleware that checks whether the accessing puskesmas is this puskesmas's owner or a supervisor. */
 const isOwnerOrKotaAndHigher = auth.createMiddlewareFromPredicate((user, req) => {
     return (user.username === req.params.username) || auth.predicates.isKotaOrHigher(user);
 });
@@ -21,14 +21,14 @@ const usernameGenerator = (pred, name) => {
 }
 
 /**
- * Get a list of users.
- * @name Get users
- * @route {GET} /users
+ * Get a list of puskesmas.
+ * @name Get puskesmas
+ * @route {GET} /puskesmas
  */
 router.get('/puskesmas', validators.listPuskesmas, auth.middleware.isKotaOrHigher, (req, res, next) => {
     const isAdmin = auth.predicates.isAdmin(req.user);
     if (isAdmin) {
-        return queries.listPuskesnas(req.query.search, req.query.page, req.query.perPage, req.query.sort)
+        return queries.listPuskesmas(req.query.search, req.query.page, req.query.perPage, req.query.sort)
             .then((puskesmas) => {
                 return res.json(puskesmas);
             })
@@ -51,9 +51,9 @@ router.get('/puskesmas', validators.listPuskesmas, auth.middleware.isKotaOrHighe
 });
 
 /**
- * Get a list of users for searching.
- * @name Search users
- * @route {GET} /users
+ * Get a list of puskesmas for searching.
+ * @name Search puskesmas
+ * @route {GET} /puskesmas/search
  */
 router.get('/puskesmas/search', auth.middleware.isLoggedIn, (req, res, next) => {
     return queries.searchPuskesmas(req.query.search, req.query.category)
@@ -64,9 +64,9 @@ router.get('/puskesmas/search', auth.middleware.isLoggedIn, (req, res, next) => 
 });
 
 /**
- * Get specific user information for the specified username.
- * @name Get user info.
- * @route {GET} /users/:username
+ * Get specific puskesmas information for the specified username.
+ * @name Get puskesmas info.
+ * @route {GET} /puskesmas/:username
  */
 router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
     return queries.getSpesificPuskesmas(req.params.username)
@@ -78,9 +78,9 @@ router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
 });
 
 /**
- * Updates user information for the given username.
- * @name Update user
- * @route {PATCH} /users/:username
+ * Updates puskesmas information for the given username.
+ * @name Update puskesmas
+ * @route {PATCH} /puskesmas/:username
  */
 router.patch('/puskesmas/:username', validators.updatePuskesmas, isOwnerOrKotaAndHigher, (req, res, next) => {
     let puskesmasUpdates = {
@@ -99,9 +99,9 @@ router.patch('/puskesmas/:username', validators.updatePuskesmas, isOwnerOrKotaAn
 });
 
 /**
- * Delete the specified user.
- * @name Delete user
- * @route {DELETE} /users/:username
+ * Delete the specified puskesmas.
+ * @name Delete puskesmas
+ * @route {DELETE} /puskesmas/:username
  */
 router.delete('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
     return queries.deletePuskesmas(req.params.username)
