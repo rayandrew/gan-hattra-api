@@ -24,6 +24,13 @@ const kotaSearchableColumns = ['nama_provinsi', 'nama', 'nama_dinas', 'kepala_di
 const kotaSortableColumns = ['username', 'nama_dinas', 'kepala_dinas', 'alamat'];
 
 module.exports = {
+  listKota: (search, page, perPage, sort) => {
+    return knex.select(kotaColumns.map(column => 'user_kota.' + column + ' as ' + column))
+      .from('user_kota')
+      .search(search, kotaSearchableColumns.map(column => 'user_kota.' + column))
+      .pageAndSort(page, perPage, sort, kotaSortableColumns.map(column => 'user_kota.' + column));
+  },
+
   getSpecificKota: (username) => {
     return knex.select(kotaColumns)
       .from('user_kota')
@@ -35,19 +42,6 @@ module.exports = {
     return knex.select(kotaColumns)
       .from('user_kota')
       .where('nama_provinsi', username)
-  },
-
-  listKota: (search, page, perPage, sort) => {
-    return knex.select(kotaColumns.map(column => 'user_kota.' + column + ' as ' + column))
-      .from('user_kota')
-      .search(search, kotaSearchableColumns.map(column => 'user_kota.' + column))
-      .pageAndSort(page, perPage, sort, kotaSortableColumns.map(column => 'user_kota.' + column));
-  },
-
-  getKota: (username) => {
-    return knex.select(kotaColumns)
-      .from('user_kota')
-      .limit(20)
   },
 
   updateKota: (username, kotaUpdates) => {

@@ -9,19 +9,6 @@ const schemas = {
     'properties': Object.assign({}, commonSchemas.pagingAndSortingProperties, commonSchemas.searchingProperties)
   }, 
 
-  createKota: {
-    'type': 'object',
-    'properties': {
-      'username': commonSchemas.username,
-      'nama_dinas': commonSchemas.varchar(25),
-      'kepala_dinas': commonSchemas.varchar(25),
-      'alamat': commonSchemas.text
-    },
-    'anyOf': [
-      {'required': ['username']}
-    ]
-  },
-
   updateKota: {
     'type': 'object',
     'properties': {

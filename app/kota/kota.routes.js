@@ -14,21 +14,6 @@ const isOwnerOrProvinsiAndHigher = auth.createMiddlewareFromPredicate((user, req
 });
 
 /**
- * Get a specific kota information for the specific kota.
- * @name Get kota info
- * @route {GET} /kota/:username
- */
-
-router.get('/kota/:username', isOwnerOrProvinsiAndHigher, (req, res, next) => {
-  return queries.getSpecificKota(req.params.username)
-    .then((kota) => {
-      if(!kota) return next(new errors.NotFound('Kota not found.'));
-      return res.json(kota);
-    })
-    .catch(next);
-});
-
-/**
  * Get all kota information
  * @name Get all kota
  * @route {GET} /kota 
@@ -49,6 +34,21 @@ router.get('/kota', validators.listKota, auth.middleware.isProvinsiOrHigher, (re
     })
     .catch(next);
   }
+});
+
+/**
+ * Get a specific kota information for the specific kota.
+ * @name Get kota info
+ * @route {GET} /kota/:username
+ */
+
+router.get('/kota/:username', isOwnerOrProvinsiAndHigher, (req, res, next) => {
+  return queries.getSpecificKota(req.params.username)
+    .then((kota) => {
+      if(!kota) return next(new errors.NotFound('Kota not found.'));
+      return res.json(kota);
+    })
+    .catch(next);
 });
 
 /**
