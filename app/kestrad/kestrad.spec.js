@@ -9,7 +9,7 @@ const expect = chai.expect;
 const routes = require('../app');
 const knex = require('../components/knex');
 
-describe('Puskesmas handling', function() {
+describe('Kestrad handling', function() {
     beforeEach((done) => {
         knex.migrate.rollback()
             .then(() => knex.migrate.latest())
