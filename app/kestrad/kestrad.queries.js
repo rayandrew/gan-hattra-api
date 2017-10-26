@@ -5,10 +5,10 @@ const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 
-const BCRYPT_STRENGTH = 8;
-
-const kestradColumns = ['username', 'nama_puskesmas', 'nama', 'nama_dinas', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
-const kestradSearchableColumns = ['username', 'nama_dinas', 'kepala_dinas'];
+const kestradColumns = ['username', 'nama_puskesmas', 'nama', 'penanggung_jawab', 'jumlah_pegawai', 'alamat', 'kecamatan', 'verified', 'tanggal_verifikasi'
+    'created_at', 'updated_at'
+];
+const kestradSearchableColumns = ['username', 'nama_puskesmas', 'nama'];
 
 module.exports = {
     listKestrad: (search, page, perPage, sort) => {
@@ -40,7 +40,7 @@ module.exports = {
     },
 
     getKestradsForKota: (username) => {
-        return knex.select(puskesmasColumns)
+        return knex.select(kestradColumns)
             .from('user_kestrad')
             .innerJoin('user_puskesmas', 'user_kestrad.nama_puskesmas', 'user_puskesmas.username')
             .innerJoin('user_kota', 'user_puskesmas.nama_kota', 'user_kota.username')
@@ -48,7 +48,7 @@ module.exports = {
     },
 
     getKestradForProvinsi: (username) => {
-        return knex.select(puskesmasColumns)
+        return knex.select(kestradColumns)
             .from('user_kestrad')
             .innerJoin('user_puskesmas', 'user_kestrad.nama_puskesmas', 'user_puskesmas.username')
             .innerJoin('user_kota', 'user_puskesmas.nama_kota', 'user_kota.username')
