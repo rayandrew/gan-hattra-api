@@ -87,32 +87,8 @@ module.exports = {
       .first();
   },
 
-  // updateUser: (username, userUpdates, requireOldPasswordCheck = true, oldPassword = '') => {
-  //   let promises = Promise.resolve();
-
-  //   if (userUpdates.password) {
-  //     if (requireOldPasswordCheck) {
-  //       promises = promises.then(() => {
-  //         return ensureOldPasswordIsCorrect(oldPassword);
-  //       });
-  //     }
-
-  //     promises = promises.then(() => {
-  //       return bcrypt.hash(userUpdates.password, BCRYPT_STRENGTH);
-  //     });
-  //   }
-
-    // userUpdates = _.pick(userUpdates, userAssignableColumns);
-    // userUpdates.updated_at = new Date();
-
-    // return promises
-    //   .then((hash) => {
-    //     userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
-    //     return knex('users').update(userUpdates).where('username', username);
-    //   });
-  // },
   updateUser: (username, userUpdates) => {
-    const role = knex.select('role').from('users').where('username', username);
+    //const role = knex.select('role').from('users').where('username', username);
     let promises = Promise.resolve();
     if(userUpdates.password) {
       promises = promises.then(() => {
@@ -121,24 +97,27 @@ module.exports = {
     }
     userUpdates = _.pick(userUpdates, userAssignableColumns);
     userUpdates.updated_at = new Date();
-    if(role === 'admin') {
-      return promises
+    return knex.select('role').from('users').where('username', username)
+    .then(result => {
+      const { role } = result;
+      if(role === 'admin') {
+        return promises
+          .then((hash) => {
+            userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
+            return knex('users').update(userUpdates).where('username', username);
+          });
+      } else {
+        return promises
         .then((hash) => {
           userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
-          return knex('users').update(userUpdates).where('username', username);
+          return knex('users').update(userUpdates).where('username', username).then(() => {
+            knex(role).update(userUpdates).where('username', username);
+          });
         });
-    } else {
-      return promises
-      .then((hash) => {
-        userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
-        return knex('users').update(userUpdates).where('username', username).then(() => {
-          knex(role).update(userUpdates).where('username', username);
-        });
-      });
-    }
+      }
+    });
   },
   
-//TEST IT OUT
   deleteUser: (username) => {
     return knex.select('role').from('users').where('username', username).first()
     .then(result => {

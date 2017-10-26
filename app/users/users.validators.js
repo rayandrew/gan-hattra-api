@@ -31,7 +31,6 @@ const schemas = {
     'type': 'object',
     'properties': {
       'email': commonSchemas.email,
-      'role': commonSchemas.role,
       'password': commonSchemas.password,
       'status': commonSchemas.userStatus
     }

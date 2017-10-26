@@ -89,7 +89,6 @@ router.post('/users', validators.createUser, auth.middleware.isLoggedIn, (req, r
 router.patch('/users/:username?', validators.updateUser, auth.middleware.isAdmin, (req, res, next) => {
   let userUpdates = {
     email: req.body.email,
-    role: req.body.role,
     password: req.body.password,
     status: req.body.status
   }
