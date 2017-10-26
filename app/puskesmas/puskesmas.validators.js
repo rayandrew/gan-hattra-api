@@ -17,8 +17,7 @@ const schemas = {
             'username': commonSchemas.username,
             'nama_kota': commonSchemas.varchar(25),
             'nama': commonSchemas.varchar(25),
-            'nama_dinas': commonSchemas.varchar(25),
-            'kepala_dinas': commonSchemas.varchar(25),
+            'kepala_dinas': commonSchemas.varchar(),
             'alamat': commonSchemas.text
         },
         'anyOf': [

@@ -4,11 +4,8 @@ var knex = require('../components/knex.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-const user = require('../users/users.queries.js');
 
-const BCRYPT_STRENGTH = 8;
-
-const puskesmasColumns = ['username', 'nama_kota', 'nama', 'nama_dinas', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
+const puskesmasColumns = ['username', 'nama_kota', 'nama', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
 const puskesmasSearchableColumns = ['username', 'nama_dinas', 'kepala_dinas'];
 
 module.exports = {
@@ -24,10 +21,6 @@ module.exports = {
             .from('user_puskesmas')
             .search(search, ['nama', 'user_puskesmas'])
             .limit(20);
-    },
-
-    createPuskesmas: (newPusekesmas) => {
-        return user.createUser(newPusekesmas);
     },
 
     getSpecificPuskesmas: (username) => {
@@ -66,9 +59,5 @@ module.exports = {
             .then((puskesmasUpdates) => {
                 return knex('user_puskesmas').update(puskesmasUpdates).where('username', username);
             });
-    },
-
-    deletePuskesmas: (username) => {
-        return knex('user_puskesmas').delete().where('username', username);
     }
 };

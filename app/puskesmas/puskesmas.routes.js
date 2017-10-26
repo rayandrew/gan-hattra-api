@@ -3,7 +3,6 @@
 const express = require('express');
 const auth = require('../components/auth.js');
 const validators = require('./puskesmas.validators.js');
-const validatorUser = require('../users/users.validators.js');
 const errors = require('http-errors');
 const queries = require('./puskesmas.queries.js');
 const config = require('config');
@@ -25,7 +24,7 @@ const usernameGenerator = (pred, name) => {
  * @name Get puskesmas
  * @route {GET} /puskesmas
  */
-router.get('/puskesmas', validators.listPuskesmas, auth.middleware.isKotaOrHigher, (req, res, next) => {
+router.get('/puskesmas', auth.middleware.isKotaOrHigher, validators.listPuskesmas, (req, res, next) => {
     const isAdmin = auth.predicates.isAdmin(req.user);
     if (isAdmin) {
         return queries.listPuskesmas(req.query.search, req.query.page, req.query.perPage, req.query.sort)
@@ -56,7 +55,7 @@ router.get('/puskesmas', validators.listPuskesmas, auth.middleware.isKotaOrHighe
  * @route {GET} /puskesmas/search
  */
 router.get('/puskesmas/search', auth.middleware.isLoggedIn, (req, res, next) => {
-    return queries.searchPuskesmas(req.query.search, req.query.category)
+    return queries.searchPuskesmas(req.query.search)
         .then((result) => {
             return res.json(result);
         })
@@ -69,7 +68,7 @@ router.get('/puskesmas/search', auth.middleware.isLoggedIn, (req, res, next) => 
  * @route {GET} /puskesmas/:username
  */
 router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
-    return queries.getSpesificPuskesmas(req.params.username)
+    return queries.getSpecificPuskesmas(req.params.username)
         .then((user) => {
             if (!user) return next(new errors.NotFound('User not found.'));
             return res.json(user);
@@ -82,7 +81,7 @@ router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
  * @name Update puskesmas
  * @route {PATCH} /puskesmas/:username
  */
-router.patch('/puskesmas/:username', validators.updatePuskesmas, isOwnerOrKotaAndHigher, (req, res, next) => {
+router.patch('/puskesmas/:username', isOwnerOrKotaAndHigher, validators.updatePuskesmas, (req, res, next) => {
     let puskesmasUpdates = {
         nama_kota: req.body.nama_kota,
         nama: req.body.nama,
@@ -92,19 +91,6 @@ router.patch('/puskesmas/:username', validators.updatePuskesmas, isOwnerOrKotaAn
     };
 
     return queries.updatePuskesmas(req.params.username, userUpdates)
-        .then((affectedRowCount) => {
-            return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-});
-
-/**
- * Delete the specified puskesmas.
- * @name Delete puskesmas
- * @route {DELETE} /puskesmas/:username
- */
-router.delete('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
-    return queries.deletePuskesmas(req.params.username)
         .then((affectedRowCount) => {
             return res.json({ affectedRowCount: affectedRowCount });
         })
