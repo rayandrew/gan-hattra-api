@@ -40,6 +40,7 @@ module.exports = {
     getPuskesmasForKota: (username) => {
         return knex.select(puskesmasColumns)
             .from('user_puskesmas')
+            .innerJoin('user_kota', 'user_puskesmas.nama_kota', 'user_kota.username')
             .where('nama_kota', username)
     },
 
@@ -58,12 +59,12 @@ module.exports = {
             .first();
     },
 
-    updatePuskesmas: (username, userUpdates) => {
+    updatePuskesmas: (username, puskesmasUpdates) => {
         let promises = Promise.resolve();
 
         return promises
             .then((userUpdates) => {
-                return knex('user_puskesmas').update(userUpdates).where('username', username);
+                return knex('user_puskesmas').update(puskesmasUpdates).where('username', username);
             });
     },
 
