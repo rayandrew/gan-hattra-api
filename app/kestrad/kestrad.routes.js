@@ -75,7 +75,7 @@ router.get('/kestrad/search', auth.middleware.isLoggedIn, (req, res, next) => {
  * @route {GET} /kestrad/:username
  */
 router.get('/kestrad/:username', isOwnerOrPuskesmasAndHigher, (req, res, next) => {
-    return queries.getSpesificKestrad(req.params.username)
+    return queries.getSpecificKestrad(req.params.username)
         .then((user) => {
             if (!user) return next(new errors.NotFound('User not found.'));
             return res.json(user);
