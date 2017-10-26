@@ -10,7 +10,7 @@ exports.seed = (knex, Promise) => {
                     email: 'puskesmas_tasik@e-gov.id',
                     password: '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
                     role: 'puskesmas',
-                    status: 'active'
+                    status: 'disabled'
                 } // Password: admin
             ];
             return Promise.all([
