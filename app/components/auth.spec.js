@@ -35,7 +35,9 @@ describe('Auth', function () {
     });
 
     it('should pass HTTP 403 if user.role is not admin', function (done) {
-      auth.middleware.isAdmin({ user: { role: 'supervisor' } }, {}, function (err) {
+      auth.middleware.isAdmin({ user: { role: 'supervisor' } }, {}, function (
+        err
+      ) {
         expect(err.status).to.be.equal(403);
         done();
       });
