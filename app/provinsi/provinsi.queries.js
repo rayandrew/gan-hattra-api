@@ -5,9 +5,9 @@ const errors = require('http-errors');
 const _ = require('lodash');
 const user = require('../users/users.queries.js');
 
-const provinsiColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const provinsiUpdatableColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const provinsiSearchableColumns = ['username', 'nama','nama_dinas', 'kepala_dinas'];
+const provinsiColumns = ['username', 'nama_dinas', 'kepala_dinas', 'alamat'];
+const provinsiUpdatableColumns = ['nama_dinas', 'kepala_dinas', 'alamat'];
+const provinsiSearchableColumns = ['nama_dinas', 'kepala_dinas', 'alamat'];
 //const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
 
 module.exports = {
@@ -18,10 +18,10 @@ module.exports = {
       .pageAndSort(page, perPage, sort, provinsiColumns.map(column => 'user_provinsi.' + column));
   },
 
-  searchProvinsi: (search, category) => {
-    return knex.select(['username', 'nama'])
+  searchProvinsi: (search) => {
+    return knex.select(provinsiSearchableColumns)
       .from('user_provinsi')
-      .search(search, ['nama', 'username'])
+      .search(search, ['nama_dinas', 'kepala_dinas', 'alamat'])
       .limit(20);
   },
 
@@ -30,7 +30,7 @@ module.exports = {
   },
 
   getProvinsi: (username) => {
-    return knex.select(provinsiColumns)
+    return knex.select(provinsiSearchableColumns)
       .from('user_provinsi')
       .where('username', username)
       .first();
