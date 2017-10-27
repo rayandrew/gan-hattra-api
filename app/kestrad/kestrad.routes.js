@@ -103,4 +103,26 @@ router.patch('/kestrad/:username', isOwnerOrPuskesmasAndHigher, validators.updat
         .catch(next);
 });
 
+/**
+ * Updates kestrad verification for the given username.
+ * @name Update kestrad verification
+ * @route {PATCH} /kestrad/verification/:username
+ */
+router.patch('/kestrad/verification/:username', isOwnerOrPuskesmasAndHigher, validators.updateKestrad, (req, res, next) => {
+    let kestradUpdates = {
+        verified: req.kestrad.verified,
+        tanggal_verifikasi: req.kestrad.tanggal_verifikasi
+    };
+
+    if (req.body.verification) {
+        return queries.updateKestrad(req.params.username, userUpdates)
+            .then((affectedRowCount) => {
+                return res.json({ affectedRowCount: affectedRowCount });
+            })
+            .catch(next);
+    } else {
+        return next(new errors('Kestrad verification unauthorized'));
+    }
+});
+
 module.exports = router;

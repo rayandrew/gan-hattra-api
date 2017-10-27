@@ -9,7 +9,7 @@ exports.up = (knex, Promise) => {
             table.string('alamat');
             table.string('kecamatan');
             table.string('verified');
-            table.date('tanggal_verifikasi');
+            table.datetime('tanggal_verifikasi');
             table.timestamps();
         })
     ]);

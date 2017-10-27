@@ -2,12 +2,9 @@
 
 var knex = require('../components/knex.js');
 const errors = require('http-errors');
-const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 
-const kestradColumns = ['username', 'nama_puskesmas', 'nama', 'penanggung_jawab', 'jumlah_pegawai', 'alamat', 'kecamatan', 'verified', 'tanggal_verifikasi'
-    'created_at', 'updated_at'
-];
+const kestradColumns = ['username', 'nama_puskesmas', 'nama', 'penanggung_jawab', 'jumlah_pegawai', 'alamat', 'kecamatan', 'verified', 'tanggal_verifikasi', 'created_at', 'updated_at'];
 const kestradSearchableColumns = ['username', 'nama_puskesmas', 'nama'];
 
 module.exports = {

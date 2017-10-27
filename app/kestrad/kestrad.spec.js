@@ -73,9 +73,9 @@ describe('Kestrad handling', function() {
             });
         });
 
-        //delete /kestrad/:username
-        it('should not delete kestrad if user is not logged in', (done) => {
-            chai.request(routes).delete('/api/kestrad/' + kestrad.username).end((err, resfromget) => {
+        //patch /kestrad/verification/:username
+        it('should not update kestrad information if user is not logged in', (done) => {
+            chai.request(routes).patch('/api/kestrad/' + kestrad.username).send({ verification: 'true' }).end((err, resfromget) => {
                 expect(err).to.be.false;
                 expect(resfromget).to.have.status(401);
                 expect(resfromget.body.message).to.equal('Unauthorized');
