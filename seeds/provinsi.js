@@ -18,7 +18,6 @@ exports.seed = (knex, Promise) => {
     .then(() => {
       let provinsi = [{
         username: 'test1',
-        nama: 'test1',
         nama_dinas: 'test1',
         kepala_dinas: 'test1',
         alamat: 'test1'
