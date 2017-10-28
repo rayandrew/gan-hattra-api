@@ -33,16 +33,16 @@ module.exports = {
     getPuskesmasForKota: (username) => {
         return knex.select(puskesmasColumns)
             .from('user_puskesmas')
-            .innerJoin('user_kota', 'user_puskesmas.nama_kota', 'user_kota.username')
-            .where('nama_kota', username)
+            .innerJoin('user_kota', 'user_puskesmas.username_kota', 'user_kota.username')
+            .where('username_kota', username)
     },
 
     getPuskesmasForProvinsi: (username) => {
         return knex.select(puskesmasColumns)
             .from('user_puskesmas')
-            .innerJoin('user_kota', 'user_puskesmas.nama_kota', 'user_kota.username')
-            .innerJoin('user_provinsi', 'user_kota.nama_provinsi', 'user_provinsi.username')
-            .where('nama_provinsi', username);
+            .innerJoin('user_kota', 'user_puskesmas.username_kota', 'user_kota.username')
+            .innerJoin('user_provinsi', 'user_kota.username_provinsi', 'user_provinsi.username')
+            .where('username_provinsi', username);
     },
 
     getPuskesmas: (username) => {
