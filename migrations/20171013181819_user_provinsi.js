@@ -5,8 +5,7 @@ exports.up = (knex, Promise) => {
         .string('username')
         .primary()
         .references('users.username');
-      table.string('nama').unique();
-      table.string('nama_dinas');
+      table.string('nama_provinsi').unique();
       table.string('kepala_dinas');
       table.string('alamat');
       table.timestamps();

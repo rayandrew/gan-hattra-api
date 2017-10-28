@@ -14,11 +14,12 @@ const predicates = {
   isPuskesmas: user => user && user.role && user.role === 'puskesmas',
   isKestrad: user => user && user.role && user.role === 'kestrad',
   isUser: user => user && user.role && user.role === 'user',
-
   isActive: user => user && user.status && user.status === 'active',
   isAwaitingValidation: user =>
     user && user.status && user.status === 'awaiting-validation',
-  isDisabled: user => user && user.status && user.status === 'disabled'
+  isDisabled: user => user && user.status && user.status === 'disabled',
+  isProvinsiOrHigher: user =>
+    user && user.role && (user.role === 'admin' || user.role === 'provinsi')
 };
 
 /**
@@ -67,7 +68,19 @@ const middleware = {
   /**
    * Middleware that checks whether the user is an user.
    */
-  isUser: createMiddlewareFromPredicate(predicates.isUser)
+  isUser: createMiddlewareFromPredicate(predicates.isUser),
+
+  /**
+   * Middleware that checks whether the user is an user.
+   */
+  isProvinsi: createMiddlewareFromPredicate(predicates.isProvinsi),
+
+  /**
+   * Middleware that checks whether the user is Provinsi or higher (admin).
+   */
+  isProvinsiOrHigher: createMiddlewareFromPredicate(
+    predicates.isProvinsiOrHigher
+  )
 };
 
 module.exports = {

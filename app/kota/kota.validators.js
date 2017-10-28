@@ -5,7 +5,7 @@ const validation = require('../components/validation.js');
 const commonSchemas = require('../common/schemas.js');
 
 const schemas = {
-  listUsers: {
+  listKota: {
     type: 'object',
     properties: Object.assign(
       {},
@@ -14,25 +14,12 @@ const schemas = {
     )
   },
 
-  createUser: {
+  updateKota: {
     type: 'object',
     properties: {
-      username: commonSchemas.username,
       nama: commonSchemas.varchar(25),
-      password: commonSchemas.password,
-      role: commonSchemas.role,
-      email: commonSchemas.email,
-      status: commonSchemas.userStatus
-    },
-    anyOf: [{ required: ['username', 'password'] }, { required: ['nama'] }]
-  },
-
-  updateUser: {
-    type: 'object',
-    properties: {
-      email: commonSchemas.email,
-      password: commonSchemas.password,
-      status: commonSchemas.userStatus
+      kepala_dinas: commonSchemas.varchar(25),
+      alamat: commonSchemas.text
     }
   }
 };
