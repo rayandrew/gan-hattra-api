@@ -15,7 +15,7 @@ const schemas = {
         'type': 'object',
         'properties': {
             'username': commonSchemas.username,
-            'nama_puskesmas': commonSchemas.varchar(),
+            'username_puskesmas': commonSchemas.varchar(),
             'nama': commonSchemas.varchar(),
             'kepala_dinas': commonSchemas.varchar(),
             'alamat': commonSchemas.text
