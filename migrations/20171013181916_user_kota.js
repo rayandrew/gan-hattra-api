@@ -3,9 +3,8 @@ exports.up = (knex, Promise) => {
     return Promise.all([
       knex.schema.createTable('user_kota', table => {
         table.string('username').primary().references('users.username');
-        table.string('nama_provinsi').references('user_provinsi.nama');
-        table.string('nama').unique();
-        table.string('nama_dinas');
+        table.string('username_provinsi').references('user_provinsi.username');
+        table.string('nama_kota').unique();
         table.string('kepala_dinas');
         table.string('alamat');
         table.timestamps();

@@ -23,7 +23,7 @@ const userColumns = ['username', 'email', 'password', 'role', 'status', 'created
 const userAssignableColumns = ['username', 'email', 'password', 'role', 'status'];
 const userSearchableColumns = ['username', 'email'];
 const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
-const specificUserColumns = ['username', 'nama_provinsi', 'nama_kota', 'nama_puskesmas', 'nama_dinas', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
+const specificUserColumns = ['username', 'nama_provinsi', 'nama_kota', 'nama_puskesmas', 'nama', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
 
 module.exports = {
   listUsers: (search, page, perPage, sort) => {
@@ -33,13 +33,12 @@ module.exports = {
       .pageAndSort(page, perPage, sort, userSortableColumns.map(column => 'users.' + column));
   },
 
-  searchUsers: (search, category) => {
-    return knex.select(['username', 'nama'])
+  searchUsers: (search) => {
+    return knex.select(['username'])
       .from('users')
-      .leftJoin(category)
-      .search(search, ['nama', 'username'])
+      .search(search, ['username'])
       .limit(20);
-  },
+     },
 
   createUser: (newUser, parent) => {
     let query = knex.select('username').from('users').where('username', newUser.username);
@@ -58,20 +57,20 @@ module.exports = {
       })
       .then((hash) => {
         newUser.password = hash;
-        if(newUser.role !== 'admin' || newUser.role !== 'user') {
+        if(newUser.role !== 'admin' && newUser.role !== 'user') {
           if(newUser.role === 'provinsi') {
             return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, {password: ''}))
             .then(() => knex('user_provinsi').insert(specificUser))
           } else if(newUser.role === 'kota') {
-            specificUser.nama_provinsi = knex.select('nama').from('user_provinsi').where('username', parent);
+            specificUser.username_provinsi = parent;
             return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, {password: ''}))
             .then(() => knex('user_kota').insert(specificUser));
           } else if(newUser.role === 'puskesmas') {
-            specificUser.nama_kota = knex.select('nama').from('user_kota').where('username', parent);
+            specificUser.username_kota = parent;
             return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, {password: ''}))
             .then(() => knex('user_puskesmas').insert(specificUser));
           } else {
-            specificUser.nama_puskesmas = knex.select('nama').from('user_puskesmas').where('username', parent);
+            specificUser.username_puskesmas = parent;
             return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, {password: ''}))
             .then(() => knex('user_kestrad').insert(specificUser));
           }
@@ -80,6 +79,7 @@ module.exports = {
         }
       });
   },
+
   getUser: (username) => {
     return knex.select(userColumns)
       .from('users')
@@ -88,7 +88,6 @@ module.exports = {
   },
 
   updateUser: (username, userUpdates) => {
-    //const role = knex.select('role').from('users').where('username', username);
     let promises = Promise.resolve();
     if(userUpdates.password) {
       promises = promises.then(() => {

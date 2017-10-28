@@ -20,8 +20,21 @@ const usernameGenerator = (pred, name) => {
  * @name Get users
  * @route {GET} /users
  */
-router.get('/users', validators.listUsers, auth.middleware.isAdmin, (req, res, next) => {
+router.get('/users', auth.middleware.isAdmin,  validators.listUsers, (req, res, next) => {
   return queries.listUsers(req.query.search, req.query.page, req.query.perPage, req.query.sort)
+    .then((result) => {
+      return res.json(result);
+    })
+    .catch(next);
+});
+
+/**
+ * Get a list of users for searching.
+ * @name Search users
+ * @route {GET} /users/search
+ */
+router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
+  return queries.searchUsers(req.query.search)
     .then((result) => {
       return res.json(result);
     })
@@ -47,7 +60,7 @@ router.get('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
  * @name Create user
  * @route {POST} /users
  */
-router.post('/users', validators.createUser, auth.middleware.isLoggedIn, (req, res, next) => { // TODO: email/captcha validation
+router.post('/users', auth.middleware.isLoggedIn,  validators.createUser, (req, res, next) => { // TODO: email/captcha validation
   const publicUserRegistration = config.get('publicUserRegistration');
   const isAdmin = auth.predicates.isAdmin(req.user);
 
@@ -86,7 +99,7 @@ router.post('/users', validators.createUser, auth.middleware.isLoggedIn, (req, r
  * @name Update user
  * @route {PATCH} /users/:username
  */
-router.patch('/users/:username?', validators.updateUser, auth.middleware.isAdmin, (req, res, next) => {
+router.patch('/users/:username?', auth.middleware.isAdmin, validators.updateUser, (req, res, next) => {
   let userUpdates = {
     email: req.body.email,
     password: req.body.password,

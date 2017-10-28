@@ -18,7 +18,7 @@ const isOwnerOrProvinsiAndHigher = auth.createMiddlewareFromPredicate((user, req
  * @name Get all kota
  * @route {GET} /kota 
  */
-router.get('/kota', validators.listKota, auth.middleware.isProvinsiOrHigher, (req, res, next) => {
+router.get('/kota',auth.middleware.isProvinsiOrHigher, validators.listKota, (req, res, next) => {
   const isAdmin = auth.predicates.isAdmin(req.user);
   if(isAdmin) {
     return queries.listKota(req.query.search, req.query.page, req.query.perPage, req.query.sort)
@@ -37,11 +37,23 @@ router.get('/kota', validators.listKota, auth.middleware.isProvinsiOrHigher, (re
 });
 
 /**
+ * Get a list of kota for searching.
+ * @name Search users
+ * @route {GET} /users/search
+ */
+router.get('/kota/search', auth.middleware.isProvinsiOrHigher, (req, res, next) => {
+  return queries.searchUsers(req.query.search)
+    .then((result) => {
+      return res.json(result);
+    })
+    .catch(next);
+});
+
+/**
  * Get a specific kota information for the specific kota.
  * @name Get kota info
  * @route {GET} /kota/:username
  */
-
 router.get('/kota/:username', isOwnerOrProvinsiAndHigher, (req, res, next) => {
   return queries.getSpecificKota(req.params.username)
     .then((kota) => {

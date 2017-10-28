@@ -18,10 +18,10 @@ function ensureOldPasswordIsCorrect (username, password) {
     });
 }
 
-const kotaColumns = ['username', 'nama_provinsi', 'nama', 'nama_dinas', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
-const kotaUpdateableColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const kotaSearchableColumns = ['nama_provinsi', 'nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const kotaSortableColumns = ['username', 'nama_dinas', 'kepala_dinas', 'alamat'];
+const kotaColumns = ['username', 'username_provinsi', 'nama', 'kepala_dinas', 'alamat', 'created_at', 'updated_at'];
+const kotaUpdateableColumns = ['nama', 'kepala_dinas', 'alamat'];
+const kotaSearchableColumns = ['username', 'username_provinsi', 'nama', 'kepala_dinas', 'alamat'];
+const kotaSortableColumns = ['username', 'kepala_dinas', 'alamat'];
 
 module.exports = {
   listKota: (search, page, perPage, sort) => {
@@ -29,6 +29,13 @@ module.exports = {
       .from('user_kota')
       .search(search, kotaSearchableColumns.map(column => 'user_kota.' + column))
       .pageAndSort(page, perPage, sort, kotaSortableColumns.map(column => 'user_kota.' + column));
+  },
+
+  searchUsers: (search) => {
+    return knex.select(kotaSearchableColumns)
+      .from('user_kota')
+      .search(search, ['username'])
+      .limit(20);
   },
 
   getSpecificKota: (username) => {
@@ -41,14 +48,12 @@ module.exports = {
   getKotaForProvinsi: (username) => {
     return knex.select(kotaColumns)
       .from('user_kota')
-      .where('nama_provinsi', username)
+      .where('username_provinsi', username)
   },
 
   updateKota: (username, kotaUpdates) => {
-    let promises = Promise.resolve();
     kotaUpdates = _.pick(kotaUpdates, kotaUpdateableColumns);
     kotaUpdates.updated_at = new Date();
-
     return knex('user_kota').update(kotaUpdates).where('username', username);
   }
 };
