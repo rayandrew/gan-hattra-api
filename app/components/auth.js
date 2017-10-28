@@ -7,18 +7,19 @@
 
 const errors = require('http-errors');
 
-
 const predicates = {
-  isAdmin: (user) => (user && user.role && user.role === 'admin'),
-  isProvinsi: (user) => (user && user.role && user.role === 'provinsi'),
-  isKota: (user) => (user && user.role && user.role === 'kota'),
-  isPuskesmas: (user) => (user && user.role && user.role === 'puskesmas'),
-  isKestrad: (user) => (user && user.role && user.role === 'kestrad'),
-  isUser: (user) => (user && user.role && user.role === 'user'),
-  isActive: (user) => (user && user.status && user.status === 'active'),
-  isAwaitingValidation: (user) => (user && user.status && user.status === 'awaiting-validation'),
-  isDisabled: (user) => (user && user.status && user.status === 'disabled'),
-  isProvinsiOrHigher: (user) => (user && user.role && (user.role === 'admin' || user.role === 'provinsi')),
+  isAdmin: user => user && user.role && user.role === 'admin',
+  isProvinsi: user => user && user.role && user.role === 'provinsi',
+  isKota: user => user && user.role && user.role === 'kota',
+  isPuskesmas: user => user && user.role && user.role === 'puskesmas',
+  isKestrad: user => user && user.role && user.role === 'kestrad',
+  isUser: user => user && user.role && user.role === 'user',
+  isActive: user => user && user.status && user.status === 'active',
+  isAwaitingValidation: user =>
+    user && user.status && user.status === 'awaiting-validation',
+  isDisabled: user => user && user.status && user.status === 'disabled',
+  isProvinsiOrHigher: user =>
+    user && user.role && (user.role === 'admin' || user.role === 'provinsi')
 };
 
 /**
@@ -32,11 +33,11 @@ const predicates = {
  *   Accepts a sync and async (returns a promise) function for predicate.
  * @returns An Express middleware corresponding to the given predicate.
  */
-const createMiddlewareFromPredicate = (predicate) => {
+const createMiddlewareFromPredicate = predicate => {
   return function (req, res, next) {
     if (!req.user) return next(new errors.Unauthorized());
     return Promise.resolve(predicate(req.user, req))
-      .then((predicateResult) => {
+      .then(predicateResult => {
         if (!predicateResult) throw new errors.Forbidden();
         return next();
       })
@@ -46,7 +47,6 @@ const createMiddlewareFromPredicate = (predicate) => {
 
 /* Common middleware for authorization check */
 const middleware = {
-
   /**
    * Middleware that checks whether the user is logged in. Throws a HTTP Unauthorized (401) error otherwise.
    */
@@ -73,13 +73,14 @@ const middleware = {
   /**
    * Middleware that checks whether the user is an user.
    */
-  isProvinsi : createMiddlewareFromPredicate(predicates.isProvinsi),
+  isProvinsi: createMiddlewareFromPredicate(predicates.isProvinsi),
 
   /**
    * Middleware that checks whether the user is Provinsi or higher (admin).
    */
-  isProvinsiOrHigher: createMiddlewareFromPredicate(predicates.isProvinsiOrHigher)
-  
+  isProvinsiOrHigher: createMiddlewareFromPredicate(
+    predicates.isProvinsiOrHigher
+  )
 };
 
 module.exports = {
