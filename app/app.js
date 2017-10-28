@@ -5,7 +5,7 @@
  * @module app/app
  */
 
-console.log(':: pmkdata-api ::');
+console.log(':: gan-hattra-api ::');
 console.log('NODE_ENV: %s\n', process.env.NODE_ENV);
 
 /* Load dependencies */
@@ -46,15 +46,17 @@ app.use(passport.session());
 winston.log('verbose', 'Loading and applying routes...');
 
 const routeDirectory = global.appDirectory;
-listFiles(routeDirectory).filter(file => file.endsWith('.routes.js')).forEach((file) => {
-  const routerPath = path.join(routeDirectory, file);
-  const router = require(routerPath);
-  if (!router.baseRoute) router.baseRoute = '/';
-  const completeRoute = config.get('routePrefix') + router.baseRoute;
+listFiles(routeDirectory)
+  .filter(file => file.endsWith('.routes.js'))
+  .forEach(file => {
+    const routerPath = path.join(routeDirectory, file);
+    const router = require(routerPath);
+    if (!router.baseRoute) router.baseRoute = '/';
+    const completeRoute = config.get('routePrefix') + router.baseRoute;
 
-  winston.log('verbose', 'Using route %s...', completeRoute);
-  app.use(completeRoute, router);
-});
+    winston.log('verbose', 'Using route %s...', completeRoute);
+    app.use(completeRoute, router);
+  });
 
 /* Apply Express error handler */
 

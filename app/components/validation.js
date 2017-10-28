@@ -14,13 +14,12 @@ const ajv = new Ajv({
 });
 
 module.exports = {
-
   /**
    * Creates an [Express](https://expressjs.com/) middleware that validates req.body (or req.param, on a GET request) using the given JSON schema.
    * @param {object} schema - a JSON schema object that will be used for the validator.
    * @returns {function} -  an Express middleware function.
    */
-  createValidator: (schema) => {
+  createValidator: schema => {
     const validate = ajv.compile(schema);
     return (req, res, next) => {
       let dataToValidate;
@@ -31,10 +30,11 @@ module.exports = {
       }
       let valid = validate(dataToValidate);
       if (!valid) {
-        return next(new errors.UnprocessableEntity('Validation error.', validate.errors));
+        return next(
+          new errors.UnprocessableEntity('Validation error.', validate.errors)
+        );
       }
       return next();
     };
   }
-
 };

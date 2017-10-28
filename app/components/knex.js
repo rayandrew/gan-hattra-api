@@ -23,7 +23,10 @@ const knex = Knex(config.get('knex'));
  *        Permitted operators are the same as Knex where operators
  *        except 'contains', which is the same as the 'like' operator but with '%' wildcards before and after the filter value.
  */
-Object.getPrototypeOf(Knex.Client.prototype).filter = function (filterQuery, filters) {
+Object.getPrototypeOf(Knex.Client.prototype).filter = function (
+  filterQuery,
+  filters
+) {
   return this.where(function () {
     let query = this;
     for (let filterName in filters) {
@@ -46,17 +49,28 @@ Object.getPrototypeOf(Knex.Client.prototype).filter = function (filterQuery, fil
  * @param search {string} Search string
  * @param searchFields {array} Field names to search in
  */
-Object.getPrototypeOf(Knex.Client.prototype).search = function (search, searchFields) {
+Object.getPrototypeOf(Knex.Client.prototype).search = function (
+  search,
+  searchFields
+) {
   return this.where(function () {
     let query = this;
     if (search) {
       let first = true;
       for (let searchFieldIndex in searchFields) {
         if (first) {
-          query = query.where(searchFields[searchFieldIndex], 'like', '%' + search + '%');
+          query = query.where(
+            searchFields[searchFieldIndex],
+            'like',
+            '%' + search + '%'
+          );
           first = false;
         } else {
-          query = query.orWhere(searchFields[searchFieldIndex], 'like', '%' + search + '%');
+          query = query.orWhere(
+            searchFields[searchFieldIndex],
+            'like',
+            '%' + search + '%'
+          );
         }
       }
     }
@@ -74,9 +88,14 @@ Object.getPrototypeOf(Knex.Client.prototype).search = function (search, searchFi
  *        If it is not given, all fields will be sortable.
  * Inspired by [this gist](https://gist.github.com/htmlpack/e9c6b6c3c22736aa6a1e8473311b115b).
  */
-Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPage, sort, sortableFields) {
+Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (
+  page,
+  perPage,
+  sort,
+  sortableFields
+) {
   let query = this;
-  sort = (sort && typeof sort === 'string') ? sort.split(/\s*,\s*/) : []; // Split comma-delimited values
+  sort = sort && typeof sort === 'string' ? sort.split(/\s*,\s*/) : []; // Split comma-delimited values
   let sortFields = [];
   if (!_.isArray) sortableFields = false;
   for (let i = 0; i < sort.length; i++) {
@@ -88,7 +107,10 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPa
       sortDirection = 'desc';
     }
     if (!sortableFields || _.includes(sortableFields, sortField)) {
-      sortFields.push({ field: sortField, direction: sortDirection === 'desc' ? 'descending' : 'ascending' });
+      sortFields.push({
+        field: sortField,
+        direction: sortDirection === 'desc' ? 'descending' : 'ascending'
+      });
       query = query.orderBy(sortField, sortDirection);
     }
   }
@@ -98,22 +120,24 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPa
   perPage = +perPage || 20;
   let offset = (page - 1) * perPage;
 
-  return Promise.all(
-    [
-      knex.from(query.clone().as('query')).count('* as count').first(), // WARNING: need to find some way to get a Knex instance from the current query instead.
-      query.offset(offset).limit(perPage)
-    ]).then(function (values) {
-      let totalCount = values[0].count;
-      let rows = values[1];
-      return {
-        data: rows,
-        currentPage: page,
-        perPage: perPage,
-        lastPage: Math.ceil(totalCount / perPage),
-        totalCount: totalCount,
-        sort: sortFields
-      };
-    });
+  return Promise.all([
+    knex
+      .from(query.clone().as('query'))
+      .count('* as count')
+      .first(), // WARNING: need to find some way to get a Knex instance from the current query instead.
+    query.offset(offset).limit(perPage)
+  ]).then(function (values) {
+    let totalCount = values[0].count;
+    let rows = values[1];
+    return {
+      data: rows,
+      currentPage: page,
+      perPage: perPage,
+      lastPage: Math.ceil(totalCount / perPage),
+      totalCount: totalCount,
+      sort: sortFields
+    };
+  });
 };
 
 /** An instance of [Knex](http://knexjs.org/), initialized using the options in the `knex` section of the app configuration. */

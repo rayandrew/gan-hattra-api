@@ -27,14 +27,19 @@ router.get('/session', auth.middleware.isLoggedIn, (req, res) => {
  * @bodyparam password {string} The password entered.
  * @return {object} The current user information if login is successful, HTTP 401 otherwise.
  */
-router.post('/session', validators.createSession, passport.authenticate('local'), (req, res) => {
-  return res.json(req.user);
-});
+router.post(
+  '/session',
+  validators.createSession,
+  passport.authenticate('local'),
+  (req, res) => {
+    return res.json(req.user);
+  }
+);
 
 /* Logout */
 router.delete('/session', (req, res) => {
   req.logout();
-  return res.json({ 'message': 'Logged out successfully.' });
+  return res.json({ message: 'Logged out successfully.' });
 });
 
 module.exports = router;
