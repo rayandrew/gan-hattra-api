@@ -4,7 +4,8 @@ exports.seed = (knex, Promise) => {
       {
         username: 'admin',
         email: 'admin@e-gov.id',
-        password: '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+        password: 
+          '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
         role: 'admin',
         status: 'active'
       } // Password: admin

@@ -5,10 +5,10 @@ exports.seed = (knex, Promise) => {
       let users = [{
         username: 'test1',
         email: 'test1@gmail.com',
-        password: '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+        password: '$2a$08$iDpnuw9dllsMi5DFKGGIte5zl7HB4OHX4ChFCZDpkxODQlOAxj8Ny',
         role: 'provinsi',
         status: 'active'
-      } // Password: admin
+      } // Password: password
       ];
       return Promise.all([
         // Inserts seed entries
@@ -18,7 +18,7 @@ exports.seed = (knex, Promise) => {
     .then(() => {
       let provinsi = [{
         username: 'test1',
-        nama_dinas: 'test1',
+        nama_provinsi: 'test1',
         kepala_dinas: 'test1',
         alamat: 'test1'
       }];
