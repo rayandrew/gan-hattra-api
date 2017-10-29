@@ -83,9 +83,8 @@ router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
  */
 router.patch('/puskesmas/:username', isOwnerOrKotaAndHigher, validators.updatePuskesmas, (req, res, next) => {
     let puskesmasUpdates = {
-        nama_kota: req.body.nama_kota,
+        username_kota: req.body.nama_kota,
         nama: req.body.nama,
-        nama_dinas: req.body.nama_dinas,
         kepala_dinas: req.body.kepala_dinas,
         alamat: req.body.alamat
     };
