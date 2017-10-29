@@ -14,7 +14,7 @@ const schemas = {
   updateProvinsi: {
     'type': 'object',
     'properties': {
-      'nama_dinas': commonSchemas.varchar(),
+      'nama_provinsi': commonSchemas.varchar(),
       'kepala_dinas': commonSchemas.varchar(),
       'alamat': commonSchemas.text
     }

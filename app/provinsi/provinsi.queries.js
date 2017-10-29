@@ -5,9 +5,9 @@ const errors = require('http-errors');
 const _ = require('lodash');
 const user = require('../users/users.queries.js');
 
-const provinsiColumns = ['username', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const provinsiUpdatableColumns = ['nama_dinas', 'kepala_dinas', 'alamat'];
-const provinsiSearchableColumns = ['nama_dinas', 'kepala_dinas', 'alamat'];
+const provinsiColumns = ['username', 'nama_provinsi', 'kepala_dinas', 'alamat'];
+const provinsiUpdatableColumns = ['nama_provinsi', 'kepala_dinas', 'alamat'];
+const provinsiSearchableColumns = ['nama_provinsi', 'kepala_dinas', 'alamat'];
 //const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
 
 module.exports = {
@@ -21,7 +21,7 @@ module.exports = {
   searchProvinsi: (search) => {
     return knex.select(provinsiSearchableColumns)
       .from('user_provinsi')
-      .search(search, ['nama_dinas', 'kepala_dinas', 'alamat'])
+      .search(search, ['nama_provinsi', 'kepala_dinas', 'alamat'])
       .limit(20);
   },
 
