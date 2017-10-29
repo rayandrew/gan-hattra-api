@@ -1,7 +1,6 @@
 exports.seed = (knex, Promise) => {
-    // Deletes ALL existing entries
     let provinsiQuery = () => {
-        return knex('user_provinsi').del()
+        return knex('user_provinsi')
             .then(() => {
                 let users = [{
                         username: 'jawa_barat_provinsi',
@@ -31,7 +30,7 @@ exports.seed = (knex, Promise) => {
     };
 
     let kotaQuery = () => {
-        return knex('user_kota').del()
+        return knex('user_kota')
             .then(() => {
                 let users = [{
                         username: 'tasik_kota',
@@ -62,7 +61,7 @@ exports.seed = (knex, Promise) => {
     };
 
     let puskesmasQuery = () => {
-        return knex('user_puskesmas').del()
+        return knex('user_puskesmas')
             .then(() => {
                 let users = [{
                         username: 'puskesmas_tasik',

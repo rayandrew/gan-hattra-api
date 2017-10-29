@@ -1,8 +1,8 @@
 exports.up = (knex, Promise) => {
     return Promise.all([
         knex.schema.createTable('user_kota', table => {
-            table.string('username').primary().references('users.username');
-            table.string('username_provinsi').references('user_provinsi.nama');
+            table.string('username').primary().references('users.username').onDelete('CASCADE');
+            table.string('username_provinsi').references('user_provinsi.nama').onDelete('CASCADE');
             table.string('nama').unique();
             table.string('kepala_dinas');
             table.string('alamat');
