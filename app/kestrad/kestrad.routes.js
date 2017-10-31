@@ -13,6 +13,11 @@ const isOwnerOrPuskesmasAndHigher = auth.createMiddlewareFromPredicate((user, re
     return (user.username === req.params.username) || auth.predicates.isPuskesmasOrHigher(user);
 });
 
+/** Custom auth middleware that checks whether the accessing kestrad is this kestrad's owner or a supervisor. */
+const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate((user, req) => {
+    return (user.username === req.params.username) || auth.predicates.isKestradOrHigher(user);
+});
+
 /** custom username generator */
 const usernameGenerator = (pred, name) => {
     const nameArr = name.split(' ').map(val => val.toLowerCase());

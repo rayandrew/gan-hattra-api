@@ -82,7 +82,12 @@ const middleware = {
     /**
      * Middleware that checks whether the user is Puskesmas or higher (admin).
      */
-    isPuskesmasOrHigher: createMiddlewareFromPredicate(predicates.isPuskesmasOrHigher)
+    isPuskesmasOrHigher: createMiddlewareFromPredicate(predicates.isPuskesmasOrHigher),
+
+    /**
+     * Middleware that checks whether the user is Puskesmas or higher (admin).
+     */
+    isKestradOrHigher: createMiddlewareFromPredicate(predicates.isKestradOrHigher)
 };
 
 module.exports = {
