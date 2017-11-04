@@ -151,8 +151,8 @@ router.get('/kestrad/:username/layanan', isOwnerOrPuskesmasAndHigher, (req, res,
  */
 router.patch('/kestrad/:username/layanana/verification', isOwnerOrPuskesmasAndHigher, validators.updateKestrad, (req, res, next) => {
     let layananUpdates = {
-        verified: req.layanan.verified,
-        tanggal_verifikasi: req.layanan.tanggal_verified
+        verified: req.body.layanan.verified,
+        tanggal_verifikasi: req.body.layanan.tanggal_verified
     };
 
     if (req.body.verification) {
