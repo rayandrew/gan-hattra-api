@@ -101,7 +101,7 @@ router.patch('/kestrad/:username', isOwnerOrPuskesmasAndHigher, validators.updat
         alamat: req.body.alamat
     };
 
-    return queries.updateKestrad(req.params.username, userUpdates)
+    return queries.updateKestrad(req.params.username, kestradUpdates)
         .then((affectedRowCount) => {
             return res.json({ affectedRowCount: affectedRowCount });
         })
@@ -111,22 +111,58 @@ router.patch('/kestrad/:username', isOwnerOrPuskesmasAndHigher, validators.updat
 /**
  * Updates kestrad verification for the given username.
  * @name Update kestrad verification
- * @route {PATCH} /kestrad/verification/:username
+ * @route {PATCH} /kestrad/:username/verification
  */
-router.patch('/kestrad/verification/:username', isOwnerOrPuskesmasAndHigher, validators.updateKestrad, (req, res, next) => {
+router.patch('/kestrad/:username/verification', isOwnerOrPuskesmasAndHigher, validators.updateKestrad, (req, res, next) => {
     let kestradUpdates = {
         verified: req.kestrad.verified,
         tanggal_verifikasi: req.kestrad.tanggal_verifikasi
     };
 
     if (req.body.verification) {
-        return queries.updateKestrad(req.params.username, userUpdates)
+        return queries.updateKestrad(req.params.username, kestradUpdates)
             .then((affectedRowCount) => {
                 return res.json({ affectedRowCount: affectedRowCount });
             })
             .catch(next);
     } else {
         return next(new errors('Kestrad verification unauthorized'));
+    }
+});
+
+/**
+ * Get layanan kestrad information for the specified username.
+ * @name Get layanan kestrad info.
+ * @route {GET} /kestrad/:username/layanan
+ */
+router.get('/kestrad/:username/layanan', isOwnerOrPuskesmasAndHigher, (req, res, next) => {
+    return queries.getLayananKestrad(req.params.username)
+        .then((user) => {
+            if (!user) return next(new errors.NotFound('User not found.'));
+            return res.json(user);
+        })
+        .catch(next);
+});
+
+/**
+ * Updates layanan kestrad verification for the given username.
+ * @name Update layanan kestrad verification
+ * @route {PATCH} /kestrad/:username/layanana/verification
+ */
+router.patch('/kestrad/:username/layanana/verification', isOwnerOrPuskesmasAndHigher, validators.updateKestrad, (req, res, next) => {
+    let layananUpdates = {
+        verified: req.layanan.verified,
+        tanggal_verifikasi: req.layanan.tanggal_verified
+    };
+
+    if (req.body.verification) {
+        return queries.updateLayanan(req.params.username, layananUpdates)
+            .then((affectedRowCount) => {
+                return res.json({ affectedRowCount: affectedRowCount });
+            })
+            .catch(next);
+    } else {
+        return next(new errors('Layanan Kestrad verification unauthorized'));
     }
 });
 
