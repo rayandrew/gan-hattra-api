@@ -70,11 +70,14 @@ describe('User handling', function () {
     });
 
     it('should not delete user if user is not logged in', done => {
-      chai
-        .request(routes)
-        .post('/api/users')
-        .send(createNewUser)
-        .end((err, res) => {
+          expect(err).to.be.null;
+          chai
+            .request(routes)
+            .get('/api/users/' + createNewUser.username)
+            .end((errfromget, resfromget) => {
+              expect(errfromget).to.be.null;
+              expect(resfromget).to.have.status(200);
+              expect(res.body.username).to.equal('raydreww');
           expect(err).to.be.false;
           chai
             .request(routes)
