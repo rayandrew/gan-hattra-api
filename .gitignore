@@ -80,6 +80,8 @@ typings/
 
 # mac files
 .DS_Store
+.ds_store
+.DS_STORE
 
 # sketch file
 .sketch

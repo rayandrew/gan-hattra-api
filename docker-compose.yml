@@ -8,6 +8,7 @@ services:
     depends_on:
       - mysql
       - redis
+      - rethinkdb
     volumes: # TODO: use in-container files instead in production (?)
       - .:/usr/src/e-gov-jabar
       - /usr/src/e-gov-jabar/node_modules
@@ -45,3 +46,9 @@ services:
     restart: unless-stopped
     depends_on:
         - mysql
+  rethinkdb:
+    image: rethinkdb
+    restart: on-failure
+    ports:
+        - "28015:28015"
+        - "1001:8080"

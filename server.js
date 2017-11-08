@@ -14,15 +14,55 @@ const app = require('./app/app.js');
 
 /** The port to use for the application. Obtained from configuration, normalized, then stored in the app object. */
 const port = normalizePort(config.get('port'));
-app.set('port', port);
 
 /** The HTTP server. */
-var server = http.createServer(app);
+const server = http.createServer(app).listen(port);
 
 // Listen on provided port, on all network interfaces.
-server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+io = require('socket.io').listen(server);
+
+const { conn, rethink } = require('./app/components/rethinkdb');
+const _ = require('lodash');
+io.on('connection', socket => {
+  socket.on('notication_request', username => {
+    conn.then(connection => {
+      rethink
+        .table('notifications')
+        .filter({ username })
+        .withFields('notifications')
+        .changes()
+        .run(connection)
+        .then(cursor => {
+          cursor.each((err, row) => {
+            if (err) throw err;
+            io.emit('notification_updated', _.last(row.new_val.notifications));
+          });
+        })
+        .catch(err => winston.error(error));
+    });
+  });
+
+  socket.on('feedback_request', username => {
+    conn.then(connection => {
+      rethink
+        .table('feedbacks')
+        .filter({ username })
+        .withFields('feedbacks')
+        .changes()
+        .run(connection)
+        .then(cursor => {
+          cursor.each((err, row) => {
+            if (err) throw err;
+            io.emit('feedback_updated', _.last(row.new_val.feedbacks));
+          });
+        })
+        .catch(err => winston.error(error));
+    });
+  });
+});
 
 /**
  * Normalize a port into a number, string, or false.
@@ -33,12 +73,12 @@ function normalizePort (val) {
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
-        // named pipe
+    // named pipe
     return val;
   }
 
   if (port >= 0) {
-        // port number
+    // port number
     return port;
   }
 
@@ -54,11 +94,9 @@ function onError (error) {
     throw error;
   }
 
-  const bind = typeof port === 'string'
-        ? 'Pipe ' + port
-        : 'Port ' + port;
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
-    // Handle specific listen errors with friendly messages
+  // Handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
       console.error(bind + ' requires elevated privileges');
@@ -76,8 +114,6 @@ function onError (error) {
  */
 function onListening () {
   const addr = server.address();
-  const bind = typeof addr === 'string'
-        ? 'pipe ' + addr
-        : 'port ' + addr.port;
+  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   console.log('<<< Listening on ' + bind + ' >>>');
 }
