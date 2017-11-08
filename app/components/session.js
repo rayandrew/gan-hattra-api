@@ -8,7 +8,10 @@ const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const config = require('config');
 const redisClient = require('./redis.js');
-const sessionStore = new RedisStore({ client: redisClient, prefix: 'mang-kestrad:session:' });
+const sessionStore = new RedisStore({
+  client: redisClient,
+  prefix: 'gan-hattra:session:'
+});
 
 /**
  * An [Express](https://expressjs.com/) middleware which enables session support using a Redis session store,

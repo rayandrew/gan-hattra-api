@@ -16,5 +16,13 @@
     "port": "REDIS_PORT"
   },
 
+  "rethinkdb": {
+    "host"     : "RETHINKDB_HOST",
+    "port"     : "RETHINKDB_PORT",
+    "user"     : "RETHINKDB_USER",
+    "password" : "RETHINKDB_PASSWORD",
+    "db": "RETHINKDB_DB"
+  },
+
   "routePrefix": "EGOV_API_ROUTE_PREFIX"
 }
