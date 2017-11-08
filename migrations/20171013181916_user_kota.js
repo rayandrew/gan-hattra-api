@@ -1,21 +1,18 @@
-
 exports.up = (knex, Promise) => {
     return Promise.all([
-      knex.schema.createTable('user_kota', table => {
-        table.string('username').primary().references('users.username');
-        table.string('nama_provinsi').references('user_provinsi.nama_provinsi');
-        table.string('nama').unique();
-        table.string('nama_dinas');
-        table.string('kepala_dinas');
-        table.string('alamat');
-        table.timestamps();
-      })
+        knex.schema.createTable('user_kota', table => {
+            table.string('username').primary().references('users.username').onDelete('CASCADE');
+            table.string('username_provinsi').references('user_provinsi.nama').onDelete('CASCADE');
+            table.string('nama').unique();
+            table.string('kepala_dinas');
+            table.string('alamat');
+            table.timestamps();
+        })
     ]);
-  };
-  
-  exports.down = (knex, Promise) => {
+};
+
+exports.down = (knex, Promise) => {
     return Promise.all([
-      knex.schema.dropTable('user_kota')
+        knex.schema.dropTable('user_kota')
     ]);
-  };
-  
+};

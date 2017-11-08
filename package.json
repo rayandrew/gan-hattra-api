@@ -1,26 +1,27 @@
 {
-    "name": "pmkdata-api",
+    "name": "gan-hattra-api",
     "version": "0.0.1",
     "description": "e-Traditional",
     "main": "server.js",
     "scripts": {
-        "lint": "semistandard",
+        "lint": "prettier-semistandard server.js knexfile.js app/**/*.js scripts/**/*.js seeds/**/*.js migrations/**/*.js",
         "test": "NODE_ENV=test mocha \"app/**/*.spec.js\"",
         "docs": "rimraf docs && jsdoc -c jsdoc.conf",
         "migrate": "knex migrate:latest",
+        "rethink": "node ./scripts/rethink.migrate.js",
         "rollback": "knex migrate:rollback",
         "seed": "knex seed:run"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/nathanchrs/pmkdata-api.git"
+        "url": "git+https://github.com/rayandrews/gan-hattra-api.git"
     },
     "author": "dataFreaks",
-    "license": "Private",
+    "license": "MIT",
     "bugs": {
-        "url": "https://github.com/nathanchrs/pmkdata-api/issues"
+        "url": "https://github.com/rayandrews/gan-hattra-api/issues"
     },
-    "homepage": "https://github.com/nathanchrs/pmkdata-api#readme",
+    "homepage": "https://github.com/rayandrews/gan-hattra-api#readme",
     "dependencies": {
         "ajv": "^5.1.5",
         "api-error-handler": "^1.0.0",
@@ -28,6 +29,7 @@
         "body-parser": "^1.17.2",
         "config": "^1.26.1",
         "connect-redis": "^3.3.0",
+        "cors": "^2.8.4",
         "express": "^4.15.3",
         "express-session": "^1.15.3",
         "fs-readdir-recursive": "^1.0.0",
@@ -39,6 +41,9 @@
         "passport": "^0.3.2",
         "passport-local": "^1.0.0",
         "redis": "^2.7.1",
+        "rethinkdb": "^2.3.3",
+        "socket.io": "^2.0.4",
+        "uuid": "^3.1.0",
         "winston": "^2.3.1"
     },
     "devDependencies": {
@@ -49,8 +54,8 @@
         "jsdoc-route-plugin": "^0.1.0",
         "mocha": "^3.4.2",
         "nodemon": "^1.11.0",
+        "prettier-semistandard": "^0.1.1",
         "rimraf": "^2.6.1",
-        "semistandard": "^11.0.0",
         "sinon": "^2.3.5",
         "sinon-chai": "^2.11.0",
         "sqlite3": "^3.1.9"
@@ -59,6 +64,9 @@
         "env": {
             "mocha": true,
             "node": true
-        }
+        },
+        "ignore": [
+            "node_modules"
+        ]
     }
 }
