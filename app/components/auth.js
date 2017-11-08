@@ -55,16 +55,21 @@ const middleware = {
     return next();
   },
 
-  /**
-   * Middleware that checks whether the user is a supervisor.
-   */
-  isSupervisor: createMiddlewareFromPredicate(predicates.isSupervisor),
+    /**
+     * Middleware that checks whether the user is an admin.
+     */
+    isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
 
-  /**
-   * Middleware that checks whether the user is an admin.
-   */
-  isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
+    /**
+     * Middleware that checks whether the user is an user.
+     */
+    isUser: createMiddlewareFromPredicate(predicates.isUser),
 
+
+    /**
+     * Middleware that checks whether the user is Kota or higher (admin).
+     */
+    isKotaOrHigher: createMiddlewareFromPredicate(predicates.isKotaOrHigher)
   /**
    * Middleware that checks whether the user is an user.
    */
@@ -84,7 +89,7 @@ const middleware = {
 };
 
 module.exports = {
-  predicates: predicates,
-  createMiddlewareFromPredicate: createMiddlewareFromPredicate,
-  middleware: middleware
+    predicates: predicates,
+    createMiddlewareFromPredicate: createMiddlewareFromPredicate,
+    middleware: middleware
 };
