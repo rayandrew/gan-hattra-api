@@ -9,58 +9,81 @@ const config = require('config');
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing puskesmas is this puskesmas's owner or a supervisor. */
-const isOwnerOrKotaAndHigher = auth.createMiddlewareFromPredicate((user, req) => {
-    return (user.username === req.params.username) || auth.predicates.isKotaOrHigher(user);
-});
+const isOwnerOrKotaAndHigher = auth.createMiddlewareFromPredicate(
+  (user, req) => {
+    return (
+      user.username === req.params.username ||
+      auth.predicates.isKotaOrHigher(user)
+    );
+  }
+);
 
 /** custom username generator */
 const usernameGenerator = (pred, name) => {
-    const nameArr = name.split(' ').map(val => val.toLowerCase());
-    return (pred + '_' + nameArr.join('')).substring(0, 255);
-}
+  const nameArr = name.split(' ').map(val => val.toLowerCase());
+  return (pred + '_' + nameArr.join('')).substring(0, 255);
+};
 
 /**
  * Get a list of puskesmas.
  * @name Get puskesmas
  * @route {GET} /puskesmas
  */
-router.get('/puskesmas', auth.middleware.isKotaOrHigher, validators.listPuskesmas, (req, res, next) => {
+router.get(
+  '/puskesmas',
+  auth.middleware.isKotaOrHigher,
+  validators.listPuskesmas,
+  (req, res, next) => {
     const isAdmin = auth.predicates.isAdmin(req.user);
     if (isAdmin) {
-        return queries.listPuskesmas(req.query.search, req.query.page, req.query.perPage, req.query.sort)
-            .then((puskesmas) => {
-                return res.json(puskesmas);
-            })
-            .catch(next);
+      return queries
+        .listPuskesmas(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort
+        )
+        .then(puskesmas => {
+          return res.json(puskesmas);
+        })
+        .catch(next);
     } else if (auth.predicates.isProvinsi(req.user)) {
-        return queries.getPuskesmasForProvinsi(req.user.username)
-            .then((puskesmas) => {
-                if (!puskesmas) return next(new errors.NotFound('Puskesmas not found'));
-                return res.json(puskesmas);
-            })
-            .catch(next);
+      return queries
+        .getPuskesmasForProvinsi(req.user.username)
+        .then(puskesmas => {
+          if (!puskesmas) { return next(new errors.NotFound('Puskesmas not found')); }
+          return res.json(puskesmas);
+        })
+        .catch(next);
     } else {
-        return queries.getPuskesmasForKota(req.user.username)
-            .then((puskesmas) => {
-                if (!puskesmas) return next(new errors.NotFound('Puskesmas not found'));
-                return res.json(puskesmas);
-            })
-            .catch(next);
+      return queries
+        .getPuskesmasForKota(req.user.username)
+        .then(puskesmas => {
+          if (!puskesmas) { return next(new errors.NotFound('Puskesmas not found')); }
+          return res.json(puskesmas);
+        })
+        .catch(next);
     }
-});
+  }
+);
 
 /**
  * Get a list of puskesmas for searching.
  * @name Search puskesmas
  * @route {GET} /puskesmas/search
  */
-router.get('/puskesmas/search', auth.middleware.isLoggedIn, (req, res, next) => {
-    return queries.searchPuskesmas(req.query.search)
-        .then((result) => {
-            return res.json(result);
-        })
-        .catch(next);
-});
+router.get(
+  '/puskesmas/search',
+  auth.middleware.isLoggedIn,
+  (req, res, next) => {
+    return queries
+      .searchPuskesmas(req.query.search)
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+);
 
 /**
  * Get specific puskesmas information for the specified username.
@@ -68,12 +91,13 @@ router.get('/puskesmas/search', auth.middleware.isLoggedIn, (req, res, next) => 
  * @route {GET} /puskesmas/:username
  */
 router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
-    return queries.getSpecificPuskesmas(req.params.username)
-        .then((user) => {
-            if (!user) return next(new errors.NotFound('User not found.'));
-            return res.json(user);
-        })
-        .catch(next);
+  return queries
+    .getSpecificPuskesmas(req.params.username)
+    .then(user => {
+      if (!user) return next(new errors.NotFound('User not found.'));
+      return res.json(user);
+    })
+    .catch(next);
 });
 
 /**
@@ -81,19 +105,25 @@ router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
  * @name Update puskesmas
  * @route {PATCH} /puskesmas/:username
  */
-router.patch('/puskesmas/:username', isOwnerOrKotaAndHigher, validators.updatePuskesmas, (req, res, next) => {
+router.patch(
+  '/puskesmas/:username',
+  isOwnerOrKotaAndHigher,
+  validators.updatePuskesmas,
+  (req, res, next) => {
     let puskesmasUpdates = {
-        username_kota: req.body.nama_kota,
-        nama: req.body.nama,
-        kepala_dinas: req.body.kepala_dinas,
-        alamat: req.body.alamat
+      username_kota: req.body.nama_kota,
+      nama: req.body.nama,
+      kepala_dinas: req.body.kepala_dinas,
+      alamat: req.body.alamat
     };
 
-    return queries.updatePuskesmas(req.params.username, userUpdates)
-        .then((affectedRowCount) => {
-            return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-});
+    return queries
+      .updatePuskesmas(req.params.username, userUpdates)
+      .then(affectedRowCount => {
+        return res.json({ affectedRowCount: affectedRowCount });
+      })
+      .catch(next);
+  }
+);
 
 module.exports = router;

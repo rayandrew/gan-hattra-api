@@ -48,7 +48,7 @@ passport.use(
               );
             }
             if (!auth.predicates.isActive(user)) {
-              return done(new errors.Unauthorized('Account inactive.'));
+              return done(new errors.Forbidden('Account inactive.'));
             }
             return done(null, user);
           });

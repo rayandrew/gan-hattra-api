@@ -1,5 +1,0 @@
-get /puskesmas
-get /puskesmas/search
-get /puskesmas/:username
-patch /puskesmas/:username
-delete puskesmas/:username

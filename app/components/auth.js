@@ -47,52 +47,56 @@ const createMiddlewareFromPredicate = predicate => {
 
 /* Common middleware for authorization check */
 const middleware = {
-    /**
+  /**
      * Middleware that checks whether the user is logged in. Throws a HTTP Unauthorized (401) error otherwise.
      */
-    isLoggedIn: (req, res, next) => {
-        if (!req.user) return next(new errors.Unauthorized('Not logged in.'));
-        return next();
-    },
+  isLoggedIn: (req, res, next) => {
+    if (!req.user) return next(new errors.Unauthorized('Not logged in.'));
+    return next();
+  },
 
-    /**
+  /**
      * Middleware that checks whether the user is a supervisor.
      */
-    isSupervisor: createMiddlewareFromPredicate(predicates.isSupervisor),
+  isSupervisor: createMiddlewareFromPredicate(predicates.isSupervisor),
 
-    /**
+  /**
      * Middleware that checks whether the user is an admin.
      */
-    isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
+  isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
 
-    /**
+  /**
      * Middleware that checks whether the user is an user.
      */
-    isUser: createMiddlewareFromPredicate(predicates.isUser),
+  isUser: createMiddlewareFromPredicate(predicates.isUser),
 
-    /**
+  /**
      * Middleware that checks whether the user is Provinsi or higher (admin).
      */
-    isProvinsiOrHigher: createMiddlewareFromPredicate(predicates.isProvinsiOrHigher),
+  isProvinsiOrHigher: createMiddlewareFromPredicate(
+    predicates.isProvinsiOrHigher
+  ),
 
-    /**
+  /**
      * Middleware that checks whether the user is Kota or higher (admin).
      */
-    isKotaOrHigher: createMiddlewareFromPredicate(predicates.isKotaOrHigher),
+  isKotaOrHigher: createMiddlewareFromPredicate(predicates.isKotaOrHigher),
 
-    /**
+  /**
      * Middleware that checks whether the user is Puskesmas or higher (admin).
      */
-    isPuskesmasOrHigher: createMiddlewareFromPredicate(predicates.isPuskesmasOrHigher),
+  isPuskesmasOrHigher: createMiddlewareFromPredicate(
+    predicates.isPuskesmasOrHigher
+  ),
 
-    /**
+  /**
      * Middleware that checks whether the user is Puskesmas or higher (admin).
      */
-    isKestradOrHigher: createMiddlewareFromPredicate(predicates.isKestradOrHigher)
+  isKestradOrHigher: createMiddlewareFromPredicate(predicates.isKestradOrHigher)
 };
 
 module.exports = {
-    predicates: predicates,
-    createMiddlewareFromPredicate: createMiddlewareFromPredicate,
-    middleware: middleware
+  predicates: predicates,
+  createMiddlewareFromPredicate: createMiddlewareFromPredicate,
+  middleware: middleware
 };

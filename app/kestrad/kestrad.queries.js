@@ -4,232 +4,312 @@ var knex = require('../components/knex.js');
 const errors = require('http-errors');
 const _ = require('lodash');
 
-const kestradColumns = ['username', 'username_puskesmas', 'nama', 'penanggung_jawab', 'jumlah_pegawai', 'alamat', 'kecamatan', 'verified', 'tanggal_verifikasi', 'created_at', 'updated_at'];
+const kestradColumns = [
+  'username',
+  'username_puskesmas',
+  'nama',
+  'penanggung_jawab',
+  'alamat',
+  'kecamatan',
+  'created_at',
+  'updated_at'
+];
 const kestradSearchableColumns = ['username', 'username_puskesmas', 'nama'];
-const layananColumns = ['id_layanan', 'id_subkategori', 'nama_layanan', 'verified', 'tanggal_verified'];
-const subkategoriColumns = ['id_subkategori', 'id_kategori', 'nama_subkategori'];
-const kategoriColumns = ['id_kategori', 'username', 'nama_kategori'];
+const layananColumns = [
+  'id_layanan',
+  'id_subkategori',
+  'nama_layanan',
+  'verified',
+  'tanggal_verified'
+];
+const hattraColumns = [
+  'id_hattra',
+  'id_layanan',
+  'nama_hattra',
+  'ijin_hattra',
+  'verifed',
+  'tanggal_verified'
+];
 
 module.exports = {
-    listKestrad: (search, page, perPage, sort) => {
-        return knex.select(kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column))
-            .from('user_kestrad')
-            .search(search, kestradSearchableColumns.map(column => 'user_kestrad.' + column))
-            .pageAndSort(page, perPage, sort, kestradColumns.map(column => 'user_kestrad.' + column));
-    },
+  listKestrad: (search, page, perPage, sort) => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        kestradColumns.map(column => 'user_kestrad.' + column)
+      );
+  },
 
-    searchKestrad: (search) => {
-        return knex.select(['user_kestrad', 'nama'])
-            .from('user_kestrad')
-            .search(search, ['nama', 'user_kestrad'])
-            .limit(20);
-    },
+  listKestradByPuskesmas: (search, page, perPage, sort, user) => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .where('username_puskesmas', user)
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        kestradColumns.map(column => 'user_kestrad.' + column)
+      );
+  },
 
-    getSpecificKestrad: (username) => {
-        return knex.select(kestradColumns)
-            .from('user_kestrad')
-            .where('username', username)
-            .first();
-    },
+  listKestradByKota: (search, page, perPage, sort, user) => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .innerJoin(
+        'user_puskesmas',
+        'user_kestrad.username_puskesmas',
+        'user_puskesmas.username'
+      )
+      .where('username_kota', user)
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        kestradColumns.map(column => 'user_kestrad.' + column)
+      );
+  },
 
-    getKestradForPuskesmas: (username) => {
-        return knex.select(kestradColumns)
-            .from('user_kestrad')
-            .innerJoin('user_puskesmas', 'user_kestrad.username_puskesmas', 'user_puskesmas.username')
-            .where('username_puskesmas', username)
-    },
+  listKestradByProvinsi: (search, page, perPage, sort, user) => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .innerJoin(
+        'user_puskesmas',
+        'user_kestrad.username_puskesmas',
+        'user_puskesmas.username'
+      )
+      .innerJoin(
+        'user_kota',
+        'user_puskesmas.username_kota',
+        'user_kota.username'
+      )
+      .where('username_provinsi', user)
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        kestradColumns.map(column => 'user_kestrad.' + column)
+      );
+  },
 
-    getKestradsForKota: (username) => {
-        return knex.select(kestradColumns)
-            .from('user_kestrad')
-            .innerJoin('user_puskesmas', 'user_kestrad.username_puskesmas', 'user_puskesmas.username')
-            .innerJoin('user_kota', 'user_puskesmas.username_kota', 'user_kota.username')
-            .where('username_kota', username)
-    },
+  searchKestrad: search => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .limit(20);
+  },
 
-    getKestradForProvinsi: (username) => {
-        return knex.select(kestradColumns)
-            .from('user_kestrad')
-            .innerJoin('user_puskesmas', 'user_kestrad.username_puskesmas', 'user_puskesmas.username')
-            .innerJoin('user_kota', 'user_puskesmas.username_kota', 'user_kota.username')
-            .innerJoin('user_provinsi', 'user_kota.username_provinsi', 'user_provinsi.username')
-            .where('username_provinsi', username);
-    },
+  searchKestradForPuskesmas: (search, username) => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .where('username_puskesmas', username)
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .limit(20);
+  },
 
-    getKestrad: (username) => {
-        return knex.select(kestradColumns)
-            .from('user_kestrad')
-            .where('username', username)
-            .first();
-    },
+  searchKestradForKota: (search, username) => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .innerJoin(
+        'user_puskesmas',
+        'user_kestrad.username_puskesmas',
+        'user_puskesmas.username'
+      )
+      .where('user_puskesmas.username_kota', username)
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .limit(20);
+  },
 
-    updateKestrad: (username, kestradUpdates) => {
-        let promises = Promise.resolve();
+  searchKestradForProvinsi: (search, username) => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .innerJoin(
+        'user_puskesmas',
+        'user_kestrad.username_puskesmas',
+        'user_puskesmas.username'
+      )
+      .innerJoin(
+        'user_kota',
+        'user_puskesmas.username_kota',
+        'user_kota.username'
+      )
+      .where('user_kota.username_provinsi', username)
+      .search(
+        search,
+        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+      )
+      .limit(20);
+  },
 
-        return promises
-            .then((kestradUpdates) => {
-                return knex('user_kestrad').update(kestradUpdates).where('username', username);
-            });
-    },
+  getKestradByUsername: username => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .where('username', username)
+      .first();
+  },
 
-    getKategoriKestrad: (username) => {
-        return knex.select(kategoriColumns)
-            .from('kategori')
-            .where('username', username);
-    },
+  getKestradForPuskesmas: username => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .innerJoin(
+        'user_puskesmas',
+        'user_kestrad.username_puskesmas',
+        'user_puskesmas.username'
+      )
+      .where('username_puskesmas', username);
+  },
 
-    getSubKategoriKestrad: (username) => {
-        return knex.select(subkategoriColumns)
-            .from('subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where('username', username);
-    },
+  getKestradForKota: username => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .innerJoin(
+        'user_puskesmas',
+        'user_kestrad.username_puskesmas',
+        'user_puskesmas.username'
+      )
+      .innerJoin(
+        'user_kota',
+        'user_puskesmas.username_kota',
+        'user_kota.username'
+      )
+      .where('username_kota', username);
+  },
 
-    getLayananKestrad: (username) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where('username', username);
-    },
+  getKestradForProvinsi: username => {
+    return knex
+      .select(
+        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column)
+      )
+      .from('user_kestrad')
+      .innerJoin(
+        'user_puskesmas',
+        'user_kestrad.username_puskesmas',
+        'user_puskesmas.username'
+      )
+      .innerJoin(
+        'user_kota',
+        'user_puskesmas.username_kota',
+        'user_kota.username'
+      )
+      .innerJoin(
+        'user_provinsi',
+        'user_kota.username_provinsi',
+        'user_provinsi.username'
+      )
+      .where('username_provinsi', username);
+  },
 
-    getSpesificKategoriKestrad: (username, kategori) => {
-        return knex.select(kategoriColumns)
-            .from('kategori')
-            .where({
-                'username': username,
-                'nama_kategori': kategori
-            });
-    },
+  updateKestrad: (username, kestradUpdates) => {
+    let promises = Promise.resolve();
 
-    getSpesifikSubKategoriByKategori: (username, kategori) => {
-        return knex.select(subkategoriColumns)
-            .from('subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_kategori': kategori
-            });
-    },
+    return promises.then(kestradUpdates => {
+      return knex('user_kestrad')
+        .update(kestradUpdates)
+        .where('username', username);
+    });
+  },
 
-    getSpesifikSubKategoriBySubategori: (username, subkategori) => {
-        return knex.select(subkategoriColumns)
-            .from('subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_subkategori': subkategori
-            });
-    },
+  getLayananKestrad: username => {
+    return knex
+      .select(
+        layananColumns.map(column => 'layanan.' + column + ' as ' + column)
+      )
+      .from('layanan')
+      .innerJoin(
+        'subkategori',
+        'layanan.id_subkategori',
+        'subkategori.id_subkategori'
+      )
+      .innerJoin('kategori', 'kategori.id_kategori', 'subkategori.id_kategori')
+      .where('username_kestrad', username);
+  },
 
-    getSpesifikLayananByKategori: (username, kategori) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_kategori': kategori
-            });
-    },
+  getHattraLayanan: id => {
+    return knex
+      .select(hattraColumns.map(column => 'hattra.' + column + ' as ' + column))
+      .from('hattra')
+      .innerJoin('layanan', 'layanan.id_layanan', 'hattra.id_layanan')
+      .where('hattra.id_layanan', id);
+  },
 
-    getSpesifikLayananBySubkategori: (username, subkategori) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_subkategori': subkategori
-            });
-    },
+  updateLayanan: (username, layananUpdate) => {
+    let promises = Promise.resolve();
 
-    getSpesifikLayananByLayanan: (username, layanan) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_layanan': layanan
-            });
-    },
+    idLayanan = knex
+      .select('id_layanan')
+      .from('layanan')
+      .innerJoin(
+        'subkategori',
+        'layanan.id_subkategori',
+        'subkategori.id_subkategori'
+      )
+      .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
+      .where('username', username);
 
-    getSubKategoriByKategoriAndSubkategori: (username, kategori, subkategori) => {
-        return knex.select(subkategoriColumns)
-            .from('subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_kategori': kategori,
-                'nama_subkategori': subkategori
-            });
-    },
-
-    getLayananByKategoriAndSubkategori: (username, kategori, subkategori) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_kategori': kategori,
-                'nama_subkategori': subkategori
-            });
-    },
-
-    getLayananByKategoriAndLayanan: (username, kategori, layanan) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_kategori': kategori,
-                'nama_layanan': layanan
-            });
-    },
-
-    getLayananBySubkategoriAndLayanan: (username, subkategori, layanan) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_subkategori': subkategori,
-                'nama_layanan': layanan
-            });
-    },
-
-    getSpesificLayananByAll: (username, kategori, subkategori, layanan) => {
-        return knex.select(layananColumns)
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where({
-                'username': username,
-                'nama_kategori': kategori,
-                'nama_subkategori': subkategori,
-                'nama_layanan': layanan
-            });
-    },
-
-    updateLayanan: (username, layananUpdate) => {
-        let promises = Promise.resolve();
-
-        idLayanan = knex.select('id_layanan')
-            .from('layanan')
-            .innerJoin('subkategori', 'layanan.id_subkategori', 'subkategori.id_subkategori')
-            .innerJoin('kategori', 'subkategori.id_kategori', 'kategori.id_kategori')
-            .where('username', username);
-
-        return promises
-            .then((idLayanan, layananUpdate) => {
-                return knex('layanan')
-                    .update(layananUpdate)
-                    .where('id_layanan', idLayanan);
-            });
-    }
-
+    return promises.then((idLayanan, layananUpdate) => {
+      return knex('layanan')
+        .update(layananUpdate)
+        .where('id_layanan', idLayanan);
+    });
+  }
 };

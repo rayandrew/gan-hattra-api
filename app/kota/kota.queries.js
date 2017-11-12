@@ -75,11 +75,23 @@ module.exports = {
       .first();
   },
 
-  getKotaForProvinsi: username => {
+  getKotaForProvinsi: (search, page, perPage, sort, username) => {
     return knex
-      .select(kotaColumns)
+      .select(
+        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column)
+      )
       .from('user_kota')
-      .where('username_provinsi', username);
+      .where('user_kota.username_provinsi', username)
+      .search(
+        search,
+        kotaSearchableColumns.map(column => 'user_kota.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        kotaSortableColumns.map(column => 'user_kota.' + column)
+      );
   },
 
   updateKota: (username, kotaUpdates) => {

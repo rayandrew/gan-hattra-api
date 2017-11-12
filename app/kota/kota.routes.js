@@ -43,7 +43,13 @@ router.get(
         .catch(next);
     } else {
       return queries
-        .getKotaForProvinsi(req.user.username)
+        .getKotaForProvinsi(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort,
+          req.user.username
+        )
         .then(kota => {
           if (!kota) return next(new errors.NotFound('Kota not found'));
           return res.json(kota);
