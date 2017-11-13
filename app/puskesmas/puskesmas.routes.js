@@ -51,7 +51,9 @@ router.get(
       return queries
         .getPuskesmasForProvinsi(req.user.username)
         .then(puskesmas => {
-          if (!puskesmas) { return next(new errors.NotFound('Puskesmas not found')); }
+          if (!puskesmas) {
+            return next(new errors.NotFound('Puskesmas not found'));
+          }
           return res.json(puskesmas);
         })
         .catch(next);
@@ -59,7 +61,9 @@ router.get(
       return queries
         .getPuskesmasForKota(req.user.username)
         .then(puskesmas => {
-          if (!puskesmas) { return next(new errors.NotFound('Puskesmas not found')); }
+          if (!puskesmas) {
+            return next(new errors.NotFound('Puskesmas not found'));
+          }
           return res.json(puskesmas);
         })
         .catch(next);

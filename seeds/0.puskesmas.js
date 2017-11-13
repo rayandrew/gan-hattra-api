@@ -54,7 +54,7 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let kota = [
           {
-            username: 'tasik_kota',
+            username: 'kota_tasik',
             username_provinsi: 'jawa_barat',
             nama: 'tasik',
             kepala_dinas: 'Adrian',
