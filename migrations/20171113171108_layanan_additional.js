@@ -1,10 +1,10 @@
 exports.up = (knex, Promise) => {
   return Promise.all([
-    knex.schema.createTable('user_puskesmas_additional', table => {
+    knex.schema.createTable('layanan_additional', table => {
       table
         .string('username')
         .primary()
-        .references('user_puskesmas.username')
+        .references('user_kestrad.username')
         .onDelete('CASCADE');
       table
         .string('username_provinsi')
@@ -14,9 +14,14 @@ exports.up = (knex, Promise) => {
         .string('username_kota')
         .references('user_kota.username')
         .onDelete('CASCADE');
-      table.integer('count_kestrad').defaultTo(0);
-      table.integer('count_layanan_verified').defaultTo(0);
-      table.integer('count_layanan_not_verified').defaultTo(0);
+      table
+        .string('username_puskesmas')
+        .references('user_puskesmas.username')
+        .onDelete('CASCADE');
+      table
+        .string('username_kestrad')
+        .references('user_kestrad.username')
+        .onDelete('CASCADE');
       table.integer('count_hattra_verified').defaultTo(0);
       table.integer('count_hattra_not_verified').defaultTo(0);
     })
@@ -24,5 +29,6 @@ exports.up = (knex, Promise) => {
 };
 
 exports.down = (knex, Promise) => {
-  return Promise.all([knex.schema.dropTable('user_puskesmas_additional')]);
+  return Promise.all([knex.schema.dropTable('layanan_additional')]);
 };
+  

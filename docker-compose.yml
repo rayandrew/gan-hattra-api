@@ -27,6 +27,8 @@ services:
     restart: 'no' # TODO: change this to 'always' on production
   mysql:
     image: "mysql"
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "[ mysql_root_password ]" # TODO: change this to a strong password on production, for administration purposes
       MYSQL_DATABASE: egov-jabar
