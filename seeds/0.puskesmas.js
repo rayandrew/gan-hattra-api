@@ -23,19 +23,19 @@ exports.seed = (knex, Promise) => {
         return knex('kategori').del();
       })
       .then(() => {
-        return knex('kestrad').del();
+        return knex('user_kestrad').del();
       })
       .then(() => {
-        return knex('puskesmas').del();
+        return knex('user_puskesmas').del();
       })
       .then(() => {
-        return knex('kota').del();
+        return knex('user_kota').del();
       })
       .then(() => {
-        return knex('provinsi').del();
+        return knex('user_provinsi').del();
       })
       .then(() => {
-        return knex('user').del();
+        return knex('users').del();
       });
   };
   
@@ -154,7 +154,7 @@ exports.seed = (knex, Promise) => {
             username: 'puskesmas_tasik',
             username_kota: 'kota_tasik',
             nama: 'datafreaksPuskesmas',
-            nama_dians: 'dinas_puskesmas_tasik',
+            nama_dinas: 'dinas_puskesmas_tasik',
             kepala_dinas: 'Adrian',
             alamat: 'Jalan Ranggagempol no.10'
           }
@@ -259,7 +259,7 @@ exports.seed = (knex, Promise) => {
           {
             id_layanan: 0,
             nama_hattra: 'Ray',
-            ijin_hattra: '123456'
+            ijin_hattra: '123456',
             verified: 'menunggu'
           }
         ];

@@ -94,7 +94,7 @@ exports.seed = (knex, Promise) => {
             username: 'puskesmas_medan',
             username_kota: 'kota_medan',
             nama: 'datafreaksPuskesmas',
-            nama_dians: 'dinas_puskesmas_medan',
+            nama_dinas: 'dinas_puskesmas_medan',
             kepala_dinas: 'Ray',
             alamat: 'Jalan medan no.10'
           }
@@ -199,7 +199,7 @@ exports.seed = (knex, Promise) => {
           {
             id_layanan: 0,
             nama_hattra: 'Aggi',
-            ijin_hattra: '151515'
+            ijin_hattra: '151515',
             verified: 'menunggu'
           }
         ];
