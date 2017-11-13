@@ -2,9 +2,10 @@ exports.up = (knex, Promise) => {
   return Promise.all([
     knex.schema.createTable('hattra_additional', table => {
       table
-        .string('username')
+        .integer('id_hattra')
+        .unsigned()
         .primary()
-        .references('user_kestrad.username')
+        .references('hattra.id_hattra')
         .onDelete('CASCADE');
       table
         .string('username_provinsi')
