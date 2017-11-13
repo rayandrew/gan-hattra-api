@@ -1,6 +1,18 @@
 exports.seed = (knex, Promise) => {
   let deleteQuery = () => {
-    return knex('hattra').del()
+    return knex('user_kestrad_additional').del()
+      .then(() => {
+        return knex('user_puskesmas_additional').del();
+      })
+      .then(() => {
+        return knex('user_kota_additional').del();
+      })
+      .then(() => {
+        return knex('user_provinsi_additional').del();
+      })
+      .then(() => {
+        return knex('hattra').del();
+      })
       .then(() => {
         return knex('layanan').del();
       })
@@ -52,7 +64,7 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let users = [
           {
-            username: 'jawa_barat_provinsi',
+            username: 'jawa_barat',
             email: 'jawa_barat_provinsi@e-gov.id',
             password:
               '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
@@ -68,7 +80,7 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let provinsi = [
           {
-            username: 'jawa_barat_provinsi',
+            username: 'jawa_barat',
             nama: 'jawa_barat',
             nama_dinas: 'dinas_jabar',
             kepala_dinas: 'Adrian',
@@ -87,8 +99,8 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let users = [
           {
-            username: 'tasik_kota',
-            email: 'tasik_kota@e-gov.id',
+            username: 'kota_tasik',
+            email: 'kota_tasik@e-gov.id',
             password:
               '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
             role: 'kota',
@@ -140,7 +152,7 @@ exports.seed = (knex, Promise) => {
         let puskesmas = [
           {
             username: 'puskesmas_tasik',
-            username_kota: 'tasik',
+            username_kota: 'kota_tasik',
             nama: 'datafreaksPuskesmas',
             nama_dians: 'dinas_puskesmas_tasik',
             kepala_dinas: 'Adrian',
@@ -258,6 +270,66 @@ exports.seed = (knex, Promise) => {
       })
   };
 
+  let provinsiCountQuery = () => {
+    return knex('user_provinsi_additional')
+      .then(() => {
+        let additional = [
+          {
+            username: 'jawa_barat'
+          }
+        ];
+        return Promise.all([
+          // Inserts seed entries
+          knex('user_provinsi_additional').insert(additional)
+        ]);
+      })
+  };
+
+  let kotaCountQuery = () => {
+    return knex('user_kota_additional')
+      .then(() => {
+        let additional = [
+          {
+            username: 'kota_tasik'
+          }
+        ];
+        return Promise.all([
+          // Inserts seed entries
+          knex('user_kota_additional').insert(additional)
+        ]);
+      })
+  };
+
+  let puskesmasCountQuery = () => {
+    return knex('user_provinsi_additional')
+      .then(() => {
+        let additional = [
+          {
+            username: 'puskesmas_tasik'
+          }
+        ];
+        return Promise.all([
+          // Inserts seed entries
+          knex('user_puskesmas_additional').insert(additional)
+        ]);
+      })
+  };
+
+  let kestradCountQuery = () => {
+    return knex('user_kestrad_additional')
+      .then(() => {
+        let additional = [
+          {
+            username: 'kestrad_tasik'
+          }
+        ];
+        return Promise.all([
+          // Inserts seed entries
+          knex('user_kestrad_additional').insert(additional)
+        ]);
+      })
+  };
+
   return knex('users')
     .then(deleteQuery)
     .then(adminQuery)
@@ -268,5 +340,9 @@ exports.seed = (knex, Promise) => {
     .then(kategoriQuery)
     .then(subkategoriQuery)
     .then(layananQuery)
-    .then(hattraQuery);
+    .then(hattraQuery)
+    .then(provinsiCountQuery)
+    .then(kotaCountQuery)
+    .then(puskesmasCountQuery)
+    .then(kestradCountQuery);
 };
