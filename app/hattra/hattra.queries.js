@@ -336,6 +336,13 @@ module.exports = {
       .limit(20);
   },
 
+  getSpecificHattra: id => {
+    return knex.select(
+      hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
+    )
+    .where('id_hattra', id)
+  },
+
   updateHattra: (id, hattraUpdates) => {
     let promises = Promise.resolve();
 

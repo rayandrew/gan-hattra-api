@@ -206,7 +206,7 @@ router.get(
  * @route {PATCH} /kestrad/:username/layanana/verification
  */
 router.patch(
-  '/kestrad/:username/layanana/verification',
+  '/kestrad/:username/layanan/verification',
   isOwnerOrPuskesmasAndHigher,
   validators.updateKestrad,
   (req, res, next) => {
