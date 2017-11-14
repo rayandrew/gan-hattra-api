@@ -5,9 +5,21 @@ exports.up = (knex, Promise) => {
             AFTER INSERT ON user_kota
             FOR EACH ROW 
         BEGIN
+            INSERT INTO user_kota_additional
+            VALUES (
+                NEW.username,
+                NEW.username_provinsi,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            );
+
             UPDATE user_provinsi_additional 
-            SET count_kota = count_kota + 1 
-            WHERE username = NEW.username_provinsi;
+            SET    count_kota = count_kota + 1 
+            WHERE  username = NEW.username_provinsi;
         END
     `),
     knex.raw(`
