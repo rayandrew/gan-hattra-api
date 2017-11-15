@@ -23,7 +23,7 @@ exports.up = (knex, Promise) => {
             AFTER DELETE ON user_provinsi
             FOR EACH ROW 
         BEGIN
-            DELETE FROM user_provinsi_additional
+            DELETE FROM users
             WHERE username = OLD.username;
         END
     `)
@@ -36,4 +36,3 @@ exports.down = (knex, Promise) => {
     knex.raw('DROP TRIGGER IF EXISTS after_user_provinsi_delete;')
   ]);
 };
-  

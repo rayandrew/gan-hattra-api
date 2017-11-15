@@ -31,4 +31,3 @@ exports.up = (knex, Promise) => {
 exports.down = (knex, Promise) => {
   return Promise.all([knex.schema.dropTable('layanan_additional')]);
 };
-  

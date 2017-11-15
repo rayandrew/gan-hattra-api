@@ -72,6 +72,9 @@ exports.up = (knex, Promise) => {
             UPDATE user_puskesmas_additional 
             SET    count_kestrad = count_kestrad - 1 
             WHERE  username = OLD.username_puskesmas;
+
+            DELETE FROM users
+            WHERE username = OLD.username;
         END
     `)
   ]);
@@ -83,4 +86,3 @@ exports.down = (knex, Promise) => {
     knex.raw('DROP TRIGGER IF EXISTS after_user_kestrad_delete;')
   ]);
 };
-  

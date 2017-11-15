@@ -58,7 +58,7 @@ exports.seed = (knex, Promise) => {
           {
             username: 'puskesmas_parapat',
             username_kota: 'kota_parapat',
-            nama: 'datafreaksPuskesmas',
+            nama: 'datafreaksPuskesmas2',
             nama_dinas: 'dinas_puskesmas_parapat',
             kepala_dinas: 'Verin',
             alamat: 'Jalan parapat no.10'
@@ -96,7 +96,6 @@ exports.seed = (knex, Promise) => {
             username_puskesmas: 'puskesmas_parapat',
             nama: 'datafreaksKestrad',
             penanggung_jawab: 'Verin',
-            jumlah_pegawai: 12,
             alamat: 'Jalan parapat no.10',
             kecamatan: 'parapat_kota'
           }
@@ -109,126 +108,74 @@ exports.seed = (knex, Promise) => {
   };
 
   let kategoriQuery = () => {
-    return knex('kategori')
-      .then(() => {
-        let kategori = [
-          {
-            nama_kategori: 'fisiologi'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('kategori').insert(kategori)
-        ]);
-      })
+    return knex('kategori').then(() => {
+      let kategori = [
+        {
+          nama_kategori: 'fisiologi'
+        }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('kategori').insert(kategori)
+      ]);
+    });
   };
 
   let subkategoriQuery = () => {
-    return knex('kategori')
-      .then(() => {
-        let subkategori = [
-          {
-            id_kategori: 0,
-            nama_subkategori: 'gerakan_sehat'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('subkategori').insert(subkategori)
-        ]);
-      })
+    return knex('kategori').then(() => {
+      let subkategori = [
+        {
+          id_kategori: 1,
+          nama_subkategori: 'gerakan_sehat'
+        }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('subkategori').insert(subkategori)
+      ]);
+    });
   };
 
   let layananQuery = () => {
-    return knex('layanan')
-      .then(() => {
-        let layanan = [
-          {
-            id_subkategori: 0,
-            username_kestrad: 'kestrad_parapat',
-            nama_layanan: 'tusuk',
-            verified: 'menunggu'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('layanan').insert(layanan)
-        ]);
-      })
+    return knex('layanan').then(() => {
+      let layanan = [
+        {
+          id_subkategori: 1,
+          username_kestrad: 'kestrad_parapat',
+          nama_layanan: 'tusuk',
+          verified: 'menunggu'
+        }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('layanan').insert(layanan)
+      ]);
+    });
   };
 
   let hattraQuery = () => {
-    return knex('hattra')
-      .then(() => {
-        let hattra = [
-          {
-            id_layanan: 0,
-            nama_hattra: 'Aldrich',
-            ijin_hattra: '121512',
-            verified: 'menunggu'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('hattra').insert(hattra)
-        ]);
-      })
-  };
-
-  let kotaCountQuery = () => {
-    return knex('user_kota_additional')
-      .then(() => {
-        let additional = [
-          {
-            username: 'kota_parapat'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('user_kota_additional').insert(additional)
-        ]);
-      })
-  };
-
-  let puskesmasCountQuery = () => {
-    return knex('user_provinsi_additional')
-      .then(() => {
-        let additional = [
-          {
-            username: 'puskesmas_parapat'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('user_puskesmas_additional').insert(additional)
-        ]);
-      })
-  };
-
-  let kestradCountQuery = () => {
-    return knex('user_kestrad_additional')
-      .then(() => {
-        let additional = [
-          {
-            username: 'kestrad_parapat'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('user_kestrad_additional').insert(additional)
-        ]);
-      })
+    return knex('hattra').then(() => {
+      let hattra = [
+        {
+          id_layanan: 1,
+          nama: 'Aldrich',
+          ijin_hattra: '121512',
+          verified: 'menunggu'
+        }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('hattra').insert(hattra)
+      ]);
+    });
   };
 
   return knex('users')
-  .then(kotaQuery)
-  .then(puskesmasQuery)
-  .then(kestradQuery)
-  .then(kategoriQuery)
-  .then(subkategoriQuery)
-  .then(layananQuery)
-  .then(hattraQuery)
-  .then(kotaCountQuery)
-  .then(puskesmasCountQuery)
-  .then(kestradCountQuery);
+    .then(kotaQuery)
+    .then(puskesmasQuery)
+    .then(kestradQuery)
+    .then(kategoriQuery)
+    .then(subkategoriQuery)
+    .then(layananQuery)
+    .then(hattraQuery);
 };
