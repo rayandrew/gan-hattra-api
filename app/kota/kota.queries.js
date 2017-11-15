@@ -30,6 +30,16 @@ const kotaColumns = [
   'created_at',
   'updated_at'
 ];
+
+const displayColumns = [
+  'count_puskesmas',
+  'count_kestrad',
+  'count_layanan_verified',
+  'count_layanan_not_verified',
+  'count_hattra_verified',
+  'count_hattra_not_verified'
+];
+
 const kotaUpdateableColumns = ['nama', 'kepala_dinas', 'alamat'];
 const kotaSearchableColumns = [
   'username',
@@ -44,9 +54,38 @@ module.exports = {
   listKota: (search, page, perPage, sort) => {
     return knex
       .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column)
+        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
       )
       .from('user_kota')
+      .innerJoin(
+        'user_kota_additional',
+        'user_kota.username',
+        'user_kota_additional.username'
+      )
+      .search(
+        search,
+        kotaSearchableColumns.map(column => 'user_kota.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        kotaSortableColumns.map(column => 'user_kota.' + column)
+      );
+  },
+
+  getKotaForProvinsi: (search, page, perPage, sort, username) => {
+    return knex
+      .select(
+        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
+      )
+      .from('user_kota')
+      .innerJoin(
+        'user_kota_additional',
+        'user_kota.username',
+        'user_kota_additional.username'
+      )
+      .where('user_kota.username_provinsi', username)
       .search(
         search,
         kotaSearchableColumns.map(column => 'user_kota.' + column)
@@ -73,25 +112,6 @@ module.exports = {
       .from('user_kota')
       .where('username', username)
       .first();
-  },
-
-  getKotaForProvinsi: (search, page, perPage, sort, username) => {
-    return knex
-      .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column)
-      )
-      .from('user_kota')
-      .where('user_kota.username_provinsi', username)
-      .search(
-        search,
-        kotaSearchableColumns.map(column => 'user_kota.' + column)
-      )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kotaSortableColumns.map(column => 'user_kota.' + column)
-      );
   },
 
   updateKota: (username, kotaUpdates) => {
