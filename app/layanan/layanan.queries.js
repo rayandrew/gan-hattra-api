@@ -14,15 +14,9 @@ const layananColumns = [
   'tanggal_verified'
 ];
 const displayColumns = [
-  'layanan.id_layanan',
-  'id_subkategori',
-  'nama_layanan',
-  'verified',
-  'tanggal_verified',
   'username_provinsi',
   'username_kota',
   'username_puskesmas',
-  'layanan.username_kestrad',
   'count_hattra_verified',
   'count_hattra_not_verified'
 ];
@@ -43,9 +37,14 @@ module.exports = {
       .select(
         layananColumns.map(
           column => 'layanan.' + column + ' as ' + column
-        )
+        ).concat(displayColumns)
       )
       .from('layanan')
+      .innerJoin(
+        'layanan_additional',
+        'layanan.id_layanan',
+        'layanan_additional.id_layanan'
+      )
       .search(
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
@@ -58,52 +57,108 @@ module.exports = {
       );
   },
 
-  getLayananForProvinsi: username => {
+  getLayananForProvinsi: (search, page, perPage, sort, username) => {
     return knex
-      .select(displayColumns)
+      .select(
+        layananColumns.map(
+          column => 'layanan.' + column + ' as ' + column
+        ).concat(displayColumns)
+      )
       .from('layanan')
       .innerJoin(
         'layanan_additional',
         'layanan.id_layanan',
         'layanan_additional.id_layanan'
       )
-      .where('username_provinsi', username);
+      .where('username_provinsi', username)
+      .search(
+        search,
+        layananSearchableColumns.map(column => 'layanan.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        layananColumns.map(column => 'layanan.' + column)
+      )
   },
 
-  getLayananForKota: username => {
+  getLayananForKota: (search, page, perPage, sort, username) => {
     return knex
-    .select(displayColumns)
-    .from('layanan')
-    .innerJoin(
-      'layanan_additional',
-      'layanan.id_layanan',
-      'layanan_additional.id_layanan'
-    )
-    .where('username_kota', username);
+      .select(
+        layananColumns.map(
+          column => 'layanan.' + column + ' as ' + column
+        ).concat(displayColumns)
+      )
+      .from('layanan')
+      .innerJoin(
+        'layanan_additional',
+        'layanan.id_layanan',
+        'layanan_additional.id_layanan'
+      )
+      .where('username_kota', username)
+      .search(
+        search,
+        layananSearchableColumns.map(column => 'layanan.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        layananColumns.map(column => 'layanan.' + column)
+      )
   },
 
-  getLayananForPuskesmas: username => {
+  getLayananForPuskesmas: (search, page, perPage, sort, username) => {
     return knex
-    .select(displayColumns)
-    .from('layanan')
-    .innerJoin(
-      'layanan_additional',
-      'layanan.id_layanan',
-      'layanan_additional.id_layanan'
-    )
-    .where('username_puskesmas', username);
+      .select(
+        layananColumns.map(
+          column => 'layanan.' + column + ' as ' + column
+        ).concat(displayColumns)
+      )
+      .from('layanan')
+      .innerJoin(
+        'layanan_additional',
+        'layanan.id_layanan',
+        'layanan_additional.id_layanan'
+      )
+      .where('username_puskesmas', username)
+      .search(
+        search,
+        layananSearchableColumns.map(column => 'layanan.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        layananColumns.map(column => 'layanan.' + column)
+      )
   },
 
-  getLayananForKestrad: username => {
+  getLayananForKestrad: (search, page, perPage, sort, username) => {
     return knex
-    .select(displayColumns)
-    .from('layanan')
-    .innerJoin(
-      'layanan_additional',
-      'layanan.id_layanan',
-      'layanan_additional.id_layanan'
-    )
-    .where('username_kestrad', username);
+      .select(
+        layananColumns.map(
+          column => 'layanan.' + column + ' as ' + column
+        ).concat(displayColumns)
+      )
+      .from('layanan')
+      .innerJoin(
+        'layanan_additional',
+        'layanan.id_layanan',
+        'layanan_additional.id_layanan'
+      )
+      .where('username_kestrad', username)
+      .search(
+        search,
+        layananSearchableColumns.map(column => 'layanan.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        layananColumns.map(column => 'layanan.' + column)
+      )
   },
 
   searchLayanan: search => {
@@ -142,7 +197,7 @@ module.exports = {
     
   updateVerifikasiLayanan: (id_layanan, layananUpdates) => {
     layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
-    if(layananUpdates.verified == "verified") {
+    if(layananUpdates.verified == "") {
       layananUpdates.tanggal_verified = new Date();
     }
     return knex('layanan')

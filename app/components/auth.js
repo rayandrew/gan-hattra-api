@@ -19,7 +19,9 @@ const predicates = {
     user && user.status && user.status === 'awaiting-validation',
   isDisabled: user => user && user.status && user.status === 'disabled',
   isProvinsiOrHigher: user =>
-    user && user.role && (user.role === 'admin' || user.role === 'provinsi')
+    user && user.role && (user.role === 'admin' || user.role === 'provinsi'),
+  isKestradOrHigher: user =>
+  user && user.role && (user.role === 'admin' || user.role === 'provinsi' || user.role === 'kota' || user.role === 'puskesmas' || user.role === 'kestrad')
 };
 
 /**
@@ -69,6 +71,14 @@ const middleware = {
      * Middleware that checks whether the user is an user.
      */
   isUser: createMiddlewareFromPredicate(predicates.isUser),
+  /**
+     * Middleware that checks whether the user is a puskesmas.
+     */
+  isPuskesmas: createMiddlewareFromPredicate(predicates.isPuskesmas),
+  /**
+     * Middleware that checks whether the user is a kota.
+     */
+  isKota: createMiddlewareFromPredicate(predicates.isKota),
 
   /**
      * Middleware that checks whether the user is Provinsi or higher (admin).

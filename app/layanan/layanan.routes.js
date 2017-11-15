@@ -49,7 +49,13 @@ router.get(
         .catch(next);
     } else if (auth.predicates.isProvinsi(req.user)) {
       return queries
-        .getLayananForProvinsi(req.user.username)
+        .getLayananForProvinsi(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort,
+          req.user.username
+        )
         .then(layanan => {
           if (!layanan) {
             return next(new errors.NotFound('layanan not found'));
@@ -59,7 +65,13 @@ router.get(
         .catch(next);
     } else if (auth.predicates.isKota(req.user)) {
       return queries
-        .getLayananForKota(req.user.username)
+        .getLayananForKota(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort,
+          req.user.username
+        )
         .then(layanan => {
           if (!layanan) {
             return next(new errors.NotFound('layanan not found'));
@@ -69,7 +81,13 @@ router.get(
         .catch(next);
     } else if (auth.predicates.isPuskesmas(req.user)) {
       return queries
-        .getLayananForPuskesmas(req.user.username)
+        .getLayananForPuskesmas(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort,
+          req.user.username
+        )
         .then(layanan => {
           if (!layanan) {
             return next(new errors.NotFound('layanan not found'));
@@ -79,7 +97,13 @@ router.get(
         .catch(next);
     } else { //isKestrad
       return queries
-        .getLayananForKestrad(req.user.username)
+        .getLayananForKestrad(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort,
+          req.user.username
+        )
         .then(layanan => {
           if (!layanan) {
             return next(new errors.NotFound('layanan not found'));
