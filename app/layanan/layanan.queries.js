@@ -148,7 +148,7 @@ module.exports = {
         'layanan.id_layanan',
         'layanan_additional.id_layanan'
       )
-      .where('username_kestrad', username)
+      .where('layanan.username_kestrad', username)
       .search(
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
@@ -187,21 +187,64 @@ module.exports = {
       .first();
   },
 
-  updateNamaLayanan: (id_layanan, layananUpdates) => {
+  updateNamaLayanan: (id_layanan, layananUpdates, username) => {
     let promises = Promise.resolve();
-    layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
-    return knex('layanan')
-      .update(layananUpdates)
-      .where('id_layanan', id_layanan);
+    promises = promises.then(() => {
+      return knex()
+        .select()
+        .from('layanan')
+        .innerJoin(
+          'layanan_additional',
+          'layanan.id_layanan',
+          'layanan_additional.id_layanan'
+        )
+        .where('username_puskesmas', username)
+        .andWhere('layanan.id_layanan', id_layanan)
+        .first();
+    });
+
+    return promises
+      .then((layanan) => {
+        if(layanan) {
+          layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
+          return knex('layanan')
+            .update(layananUpdates)
+            .where('id_layanan', id_layanan);
+        } else {
+          return 0;
+        }
+      });
   },
     
-  updateVerifikasiLayanan: (id_layanan, layananUpdates) => {
-    layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
-    if(layananUpdates.verified == "") {
-      layananUpdates.tanggal_verified = new Date();
-    }
-    return knex('layanan')
-    .update(layananUpdates)
-    .where('id_layanan', id_layanan);
+  updateVerifikasiLayanan: (id_layanan, layananUpdates, username) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return knex()
+        .select()
+        .from('layanan')
+        .innerJoin(
+          'layanan_additional',
+          'layanan.id_layanan',
+          'layanan_additional.id_layanan'
+        )
+        .where('username_kota', username)
+        .andWhere('layanan.id_layanan', id_layanan)
+        .first();
+    });
+
+    return promises
+    .then((layanan) => {
+      if(layanan) {
+        layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
+        if(layananUpdates.verified == "active") {
+          layananUpdates.tanggal_verified = new Date();
+        }
+        return knex('layanan')
+        .update(layananUpdates)
+        .where('id_layanan', id_layanan);
+      } else {
+        return 0;
+      }
+    });
   }
 };

@@ -163,7 +163,7 @@ router.patch(
     };
 
     return queries
-      .updateNamaLayanan(req.params.id_layanan, layananUpdates)
+      .updateNamaLayanan(req.params.id_layanan, layananUpdates, req.user.username)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
@@ -187,7 +187,7 @@ router.patch(
     };
 
     return queries
-      .updateVerifikasiLayanan(req.params.id_layanan, layananUpdates)
+      .updateVerifikasiLayanan(req.params.id_layanan, layananUpdates, req.user.username)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
