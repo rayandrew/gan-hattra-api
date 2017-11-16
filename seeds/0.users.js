@@ -67,7 +67,7 @@ exports.seed = (knex, Promise) => {
             username: 'jawa_barat',
             email: 'jawa_barat_provinsi@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'provinsi',
             status: 'disabled'
           } // Password: admin
@@ -102,7 +102,7 @@ exports.seed = (knex, Promise) => {
             username: 'kota_tasik',
             email: 'kota_tasik@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'kota',
             status: 'disabled'
           } // Password: admin
@@ -138,7 +138,7 @@ exports.seed = (knex, Promise) => {
             username: 'puskesmas_tasik',
             email: 'puskesmas_tasik@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'puskesmas',
             status: 'disabled'
           } // Password: admin
@@ -174,7 +174,7 @@ exports.seed = (knex, Promise) => {
             username: 'kestrad_tasik',
             email: 'kestrad_tasik@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'kestrad',
             status: 'disabled'
           } // Password: admin
