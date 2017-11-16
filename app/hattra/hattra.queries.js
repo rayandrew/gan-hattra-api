@@ -13,10 +13,26 @@ const hattraColumns = [
   'created_at',
   'updated_at'
 ];
+
 const hattraSearchableColumns = [
   'id_hattra',
   'id_layanan',
   'nama',
+  'ijin_hattra',
+  'verified'
+];
+
+const hattraAssignableColumns = [
+  'nama_layanan',
+  'ijin_hattra', 
+  'verified'
+];
+
+const displayColumns = [
+  'username_provinsi',
+  'username_kota',
+  'username_puskesmas',
+  'username_kestrad'
 ];
 
 module.exports = {
@@ -24,8 +40,13 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      )
+      ).concat(displayColumns)
       .from('hattra')
+      .innerJoin(
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
+      )
       .search(
         search,
         hattraSearchableColumns.map(column => 'hattra.' + column)
@@ -42,8 +63,13 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      )
+      ).concat(displayColumns)
       .from('hattra')
+      .innerJoin(
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
+      )
       .where('username_puskesmas', user)
       .search(
         search,
@@ -61,17 +87,12 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    )
+    ).concat(displayColumns)
     .from('hattra')
     .innerJoin(
-      'layanan',
-      'hattra.id_layanan',
-      'layanan.id_layanan'
-    )
-    .innerJoin(
-      'user_kestrad',
-      'layanan.username_kestrad',
-      'user_kestrad.username_kestrad'
+      'hattra_additional',
+      'hattra.id_hattra',
+      'hattra_additional.id_hattra'
     )
     .where('username_kestrad', user)
     .search(
@@ -90,22 +111,12 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    )
+    ).concat(displayColumns)
     .from('hattra')
     .innerJoin(
-      'layanan',
-      'hattra.id_layanan',
-      'layanan.id_layanan'
-    )
-    .innerJoin(
-      'user_kestrad',
-      'layanan.username_kestrad',
-      'user_kestrad.username_kestrad'
-    )
-    .innerJoin(
-      'user_puskesmas',
-      'user_kestrad.username_puskesmas',
-      'user_puskesmas.username_puskesmas'
+      'hattra_additional',
+      'hattra.id_hattra',
+      'hattra_additional.id_hattra'
     )
     .where('username_puskesmas', user)
     .search(
@@ -124,27 +135,12 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    )
+    ).concat(displayColumns)
     .from('hattra')
     .innerJoin(
-      'layanan',
-      'hattra.id_layanan',
-      'layanan.id_layanan'
-    )
-    .innerJoin(
-      'user_kestrad',
-      'layanan.username_kestrad',
-      'user_kestrad.username_kestrad'
-    )
-    .innerJoin(
-      'user_puskesmas',
-      'user_kestrad.username_puskesmas',
-      'user_puskesmas.username_puskesmas'
-    )
-    .innerJoin(
-      'user_kota',
-      'user_puskesmas.username_kota',
-      'user_kota.username_kota'
+      'hattra_additional',
+      'hattra.id_hattra',
+      'hattra_additional.id_hattra'
     )
     .where('username_kota', user)
     .search(
@@ -163,32 +159,12 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    )
+    ).concat(displayColumns)
     .from('hattra')
     .innerJoin(
-      'layanan',
-      'hattra.id_layanan',
-      'layanan.id_layanan'
-    )
-    .innerJoin(
-      'user_kestrad',
-      'layanan.username_kestrad',
-      'user_kestrad.username_kestrad'
-    )
-    .innerJoin(
-      'user_puskesmas',
-      'user_kestrad.username_puskesmas',
-      'user_puskesmas.username_puskesmas'
-    )
-    .innerJoin(
-      'user_kota',
-      'user_puskesmas.username_kota',
-      'user_kota.username_kota'
-    )
-    .innerJoin(
-      'user_provinsi',
-      'user_kota.username_provinsi',
-      'user_provinsi.username_provinsi'
+      'hattra_additional',
+      'hattra.id_hattra',
+      'hattra_additional.id_hattra'
     )
     .where('username_provinsi', user)
     .search(
@@ -207,8 +183,13 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      )
+      ).concat(displayColumns)
       .from('hattra')
+      .innerJoin(
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
+      )
       .search(
         search,
         hattraSearchableColumns.map(column => 'hattra.' + column)
@@ -220,17 +201,12 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      )
+      ).concat(displayColumns)
       .from('hattra')
       .innerJoin(
-        'layanan',
-        'hattra.id_layanan',
-        'layanan.id_layanan'
-      )
-      .innerJoin(
-        'user_kestrad',
-        'layanan.username_kestrad',
-        'user_kestrad.username_kestrad'
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
       )
       .search(
         search,
@@ -243,22 +219,12 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      )
+      ).concat(displayColumns)
       .from('hattra')
       .innerJoin(
-        'layanan',
-        'hattra.id_layanan',
-        'layanan.id_layanan'
-      )
-      .innerJoin(
-        'user_kestrad',
-        'layanan.username_kestrad',
-        'user_kestrad.username_kestrad'
-      )
-      .innerJoin(
-        'user_puskesmas',
-        'user_kestrad.username_puskesmas',
-        'user_puskesmas.username_puskesmas'
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
       )
       .where('username_puskesmas', username)
       .search(
@@ -272,27 +238,12 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      )
+      ).concat(displayColumns)
       .from('hattra')
       .innerJoin(
-        'user_puskesmas',
-        'hattra.username_puskesmas',
-        'user_puskesmas.username'
-      )
-      .innerJoin(
-        'layanan',
-        'hattra.id_layanan',
-        'layanan.id_layanan'
-      )
-      .innerJoin(
-        'user_kestrad',
-        'layanan.username_kestrad',
-        'user_kestrad.username_kestrad'
-      )
-      .innerJoin(
-        'user_puskesmas',
-        'user_kestrad.username_puskesmas',
-        'user_puskesmas.username_puskesmas'
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
       )
       .where('user_puskesmas.username_kota', username)
       .search(
@@ -306,27 +257,12 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      )
+      ).concat(displayColumns)
       .from('hattra')
       .innerJoin(
-        'layanan',
-        'hattra.id_layanan',
-        'layanan.id_layanan'
-      )
-      .innerJoin(
-        'user_kestrad',
-        'layanan.username_kestrad',
-        'user_kestrad.username_kestrad'
-      )
-      .innerJoin(
-        'user_puskesmas',
-        'user_kestrad.username_puskesmas',
-        'user_puskesmas.username_puskesmas'
-      )
-      .innerJoin(
-        'user_kota',
-        'user_puskesmas.username_kota',
-        'user_kota.username_kota'
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
       )
       .where('user_kota.username_provinsi', username)
       .search(
@@ -339,17 +275,68 @@ module.exports = {
   getSpecificHattra: id => {
     return knex.select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
+    ).concat(displayColumns)
+    .innerJoin(
+      'hattra_additional',
+      'hattra.id_hattra',
+      'hattra_additional.id_hattra'
     )
     .where('id_hattra', id)
   },
 
-  updateHattra: (id, hattraUpdates) => {
+  updateNamaHattra: (id_hattra, hattraUpdates, username) => {
     let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return knex()
+        .select()
+        .from('hattra')
+        .innerJoin(
+          'hattra_additional',
+          'hattra.id_hattra',
+          'hattra_additional.id_hattra'
+        )
+        .where('username_puskesmas', username)
+        .first();
+    });
 
-    return promises.then(hattraUpdates => {
-      return knex('hattra')
+    return promises
+      .then((hattra) => {
+        if(hattra) {
+          hattraUpdates = _.pick(hattraUpdates, hattraAssignableColumns);
+          return knex('hattra')
+            .update(layananUpdates)
+            .where('id_hattra', id_layanan);
+        } else {
+          return 0;
+        }
+      });
+  },
+    
+  updateVerifikasiHattra: (id_hattra, hattraUpdates, username) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return knex()
+        .select()
+        .from('hattra')
+        .innerJoin(
+          'hattra_additional',
+          'hattra.id_hattra',
+          'hattra_additional.id_hattra'
+        )
+        .where('username_kota', username)
+        .first();
+    });
+
+    return promises
+    .then((hattra) => {
+      if(hatra) {
+        hattraUpdates = _.pick(hattraUpdates, hattraAssignableColumns);
+        return knex('hattra')
         .update(hattraUpdates)
-        .where('id_hattra', id);
+        .where('id_hattra', id_hattra);
+      } else {
+        return 0;
+      }
     });
   }
 };

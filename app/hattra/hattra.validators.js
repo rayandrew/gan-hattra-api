@@ -14,11 +14,17 @@ const schemas = {
     )
   },
 
-  updateHattra: {
+  updateNamaHattra: {
     type: 'object',
     properties: {
       nama: commonSchemas.varchar(25),
-      ijin_hattra: commonSchemas.varchar(25),
+      ijin_hattra: commonSchemas.varchar(25)
+    }
+  },
+
+  updateVerifikasiHattra: {
+    type: 'object',
+    properties: {
       verified: commonSchemas.varchar(25)
     }
   }

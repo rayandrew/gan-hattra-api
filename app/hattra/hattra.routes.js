@@ -146,18 +146,17 @@ router.get(
  * @route {PATCH} /hattra/:id
  */
 router.patch(
-  '/hattra/:id',
-  isOwnerOrKestradAndHigher,
-  validators.updateHattra,
+  '/hattra/:id_hattra',
+  auth.middleware.isPuskesmas,
+  validators.updateNamaHattra,
   (req, res, next) => {
     let hattraUpdates = {
-      nama: req.body.nama,
-      ijin_hattra: req.body.ijin_hattra,
-      verified: req.body.verified
+      nama: req.body.hattra.nama,
+      ijin_hattra: req.body.hattra.ijin_hattra
     };
 
     return queries
-      .updateHattra(req.params.id_hattra, hattraUpdates)
+      .updateNamaHattra(req.params.id_hatra, hattraUpdates, req.user.username)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
@@ -172,16 +171,16 @@ router.patch(
  */
 router.patch(
   '/hattra/:id/verification',
-  isOwnerOrPuskesmasAndHigher,
-  validators.updateHattra,
+  auth.middleware.isPuskesmas,
+  validators.updateNamaHattra,
   (req, res, next) => {
     let hattraUpdates = {
-      verified: req.body.layanan.verified,
+      verified: req.body.hattra.verified
     };
 
     if (req.body.verification) {
       return queries
-        .updateHattra(req.params.id_hattra, layananUpdates)
+        .updateHattra(req.params.id_hattra, hattraUpdates)
         .then(affectedRowCount => {
           return res.json({ affectedRowCount: affectedRowCount });
         })
@@ -189,6 +188,24 @@ router.patch(
     } else {
       return next(new errors('hattra verification unauthorized'));
     }
+  }
+);
+
+router.patch(
+  '/hattra/:id_hattra/verification',
+  auth.middleware.isKota,
+  validators.updateVerifikasiHattra,
+  (req, res, next) => {
+    let hattraUpdates = {
+      verified: req.body.hattra.verified,
+    };
+
+    return queries
+      .updateVerifikasiHattra(req.params.id_hattra, hattraUpdates, req.user.username)
+      .then(affectedRowCount => {
+        return res.json({ affectedRowCount: affectedRowCount });
+      })
+      .catch(next);
   }
 );
 
