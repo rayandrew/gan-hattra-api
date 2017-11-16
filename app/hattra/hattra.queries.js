@@ -10,8 +10,7 @@ const hattraColumns = [
   'nama',
   'ijin_hattra',
   'verified',
-  'created_at',
-  'updated_at'
+  'tanggal_verified'
 ];
 
 const hattraSearchableColumns = [
@@ -40,7 +39,8 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      ).concat(displayColumns)
+        .concat(displayColumns)
+      )
       .from('hattra')
       .innerJoin(
         'hattra_additional',
@@ -63,7 +63,7 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      ).concat(displayColumns)
+      .concat(displayColumns))
       .from('hattra')
       .innerJoin(
         'hattra_additional',
@@ -87,7 +87,7 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    ).concat(displayColumns)
+    .concat(displayColumns))
     .from('hattra')
     .innerJoin(
       'hattra_additional',
@@ -111,7 +111,7 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    ).concat(displayColumns)
+    .concat(displayColumns))
     .from('hattra')
     .innerJoin(
       'hattra_additional',
@@ -135,7 +135,7 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    ).concat(displayColumns)
+    .concat(displayColumns))
     .from('hattra')
     .innerJoin(
       'hattra_additional',
@@ -159,7 +159,7 @@ module.exports = {
     return knex
     .select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    ).concat(displayColumns)
+    .concat(displayColumns))
     .from('hattra')
     .innerJoin(
       'hattra_additional',
@@ -183,7 +183,7 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      ).concat(displayColumns)
+      .concat(displayColumns))
       .from('hattra')
       .innerJoin(
         'hattra_additional',
@@ -201,7 +201,7 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      ).concat(displayColumns)
+      .concat(displayColumns))
       .from('hattra')
       .innerJoin(
         'hattra_additional',
@@ -219,7 +219,7 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      ).concat(displayColumns)
+      .concat(displayColumns))
       .from('hattra')
       .innerJoin(
         'hattra_additional',
@@ -238,7 +238,7 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      ).concat(displayColumns)
+      .concat(displayColumns))
       .from('hattra')
       .innerJoin(
         'hattra_additional',
@@ -257,7 +257,7 @@ module.exports = {
     return knex
       .select(
         hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      ).concat(displayColumns)
+      .concat(displayColumns))
       .from('hattra')
       .innerJoin(
         'hattra_additional',
@@ -275,7 +275,7 @@ module.exports = {
   getSpecificHattra: id => {
     return knex.select(
       hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-    ).concat(displayColumns)
+    .concat(displayColumns))
     .innerJoin(
       'hattra_additional',
       'hattra.id_hattra',
