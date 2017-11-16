@@ -51,7 +51,6 @@ router.get(
           req.user.username
         )
         .then(kota => {
-          if (!kota) return next(new errors.NotFound('Kota not found'));
           return res.json(kota);
         })
         .catch(next);
@@ -69,7 +68,10 @@ router.get(
   auth.middleware.isProvinsiOrHigher,
   (req, res, next) => {
     return queries
-      .searchUsers(req.query.search)
+      .searchUsers(req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort)
       .then(result => {
         return res.json(result);
       })
