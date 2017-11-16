@@ -30,16 +30,6 @@ const kotaColumns = [
   'created_at',
   'updated_at'
 ];
-
-const displayColumns = [
-  'count_puskesmas',
-  'count_kestrad',
-  'count_layanan_verified',
-  'count_layanan_not_verified',
-  'count_hattra_verified',
-  'count_hattra_not_verified'
-];
-
 const kotaUpdateableColumns = ['nama', 'kepala_dinas', 'alamat'];
 const kotaSearchableColumns = [
   'username',
@@ -54,14 +44,9 @@ module.exports = {
   listKota: (search, page, perPage, sort) => {
     return knex
       .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
+        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column)
       )
       .from('user_kota')
-      .innerJoin(
-        'user_kota_additional',
-        'user_kota.username',
-        'user_kota_additional.username'
-      )
       .search(
         search,
         kotaSearchableColumns.map(column => 'user_kota.' + column)
@@ -74,17 +59,28 @@ module.exports = {
       );
   },
 
+  searchUsers: search => {
+    return knex
+      .select(kotaSearchableColumns)
+      .from('user_kota')
+      .search(search, ['username'])
+      .limit(20);
+  },
+
+  getSpecificKota: username => {
+    return knex
+      .select(kotaColumns)
+      .from('user_kota')
+      .where('username', username)
+      .first();
+  },
+
   getKotaForProvinsi: (search, page, perPage, sort, username) => {
     return knex
       .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
+        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column)
       )
       .from('user_kota')
-      .innerJoin(
-        'user_kota_additional',
-        'user_kota.username',
-        'user_kota_additional.username'
-      )
       .where('user_kota.username_provinsi', username)
       .search(
         search,
@@ -98,42 +94,35 @@ module.exports = {
       );
   },
 
-  searchUsers: (search, page, perPage, sort) => {
-    return knex
-      .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
-      )
-      .from('user_kota')
-      .innerJoin(
-        'user_kota_additional',
-        'user_kota.username',
-        'user_kota_additional.username'
-      )
-      .search(
-        search,
-        kotaSearchableColumns.map(column => 'user_kota.' + column)
-      )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kotaSortableColumns.map(column => 'user_kota.' + column)
-      );
-  },
-
-  getSpecificKota: username => {
-    return knex
-      .select(kotaColumns)
-      .from('user_kota')
-      .where('username', username)
-      .first();
-  },
-
   updateKota: (username, kotaUpdates) => {
     kotaUpdates = _.pick(kotaUpdates, kotaUpdateableColumns);
     kotaUpdates.updated_at = new Date();
     return knex('user_kota')
       .update(kotaUpdates)
       .where('username', username);
+  },
+
+  updateKotaForProvinsi: (username, kotaUpdates, username_provinsi) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return knex()
+        .select('username')
+        .from('user_kota')
+        .where('username', username)
+        .andWhere('username_provinsi', username_provinsi)
+        .first()
+    });
+
+    return promises.then((kota) => {
+      if(kota) {
+        kotaUpdates = _.pick(kotaUpdates, kotaUpdateableColumns);
+        kotaUpdates.updated_at = new Date();
+        return knex('user_kota')
+          .update(kotaUpdates)
+          .where('username', username);
+      } else {
+        return 0;
+      }
+    });
   }
 };
