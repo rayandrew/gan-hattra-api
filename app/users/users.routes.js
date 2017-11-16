@@ -173,3 +173,27 @@ router.delete('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
 });
 
 module.exports = router;
+
+/**
+ * Updates password for the given username.
+ * @name Update user
+ * @route {PATCH} /users/:username/resetpassword
+ */
+router.patch(
+  '/users/:username/resetpassword',
+  auth.middleware.isAdmin,
+  validators.updateUser,
+  (req, res, next) => {
+    let userUpdates = {
+      password: req.body.password
+    };
+    if (req.params.username) {
+      return queries
+        .updateUser(req.params.username, userUpdates)
+        .then(affectedRowCount => {
+          return res.status(200).json({ affectedRowCount: affectedRowCount });
+        })
+        .catch(next);
+    }
+  }
+);
