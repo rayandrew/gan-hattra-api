@@ -9,7 +9,7 @@ exports.up = (knex, Promise) => {
         .onDelete('CASCADE');
       table.string('nama');
       table.string('ijin_hattra');
-      table.string('verifed');
+      table.string('verified');
       table.timestamp('tanggal_verified').defaultTo(knex.fn.now());
     })
   ]);

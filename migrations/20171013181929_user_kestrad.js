@@ -12,7 +12,6 @@ exports.up = (knex, Promise) => {
         .onDelete('CASCADE');
       table.string('nama');
       table.string('penanggung_jawab');
-      table.integer('jumlah_pegawai');
       table.string('alamat');
       table.string('kecamatan');
       table.timestamps();

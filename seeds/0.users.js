@@ -1,6 +1,7 @@
 exports.seed = (knex, Promise) => {
   let deleteQuery = () => {
-    return knex('user_kestrad_additional').del()
+    return knex('user_kestrad_additional')
+      .del()
       .then(() => {
         return knex('user_puskesmas_additional').del();
       })
@@ -38,16 +39,15 @@ exports.seed = (knex, Promise) => {
         return knex('users').del();
       });
   };
-  
+
   let adminQuery = () => {
-     return knex('users')
-    .then(() => {
+    return knex('users').then(() => {
       let users = [
         {
           username: 'admin',
           email: 'admin@e-gov.id',
           password:
-            '$2y$10$3ApPdLQHjB.i69PVYPyV3eMXT/qjkKNKo4grgkkRk8AOGm7RA/Xvy',
+            '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
           role: 'admin',
           status: 'active'
         } // Password: admin
@@ -67,7 +67,7 @@ exports.seed = (knex, Promise) => {
             username: 'jawa_barat',
             email: 'jawa_barat_provinsi@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'provinsi',
             status: 'disabled'
           } // Password: admin
@@ -102,7 +102,7 @@ exports.seed = (knex, Promise) => {
             username: 'kota_tasik',
             email: 'kota_tasik@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'kota',
             status: 'disabled'
           } // Password: admin
@@ -138,7 +138,7 @@ exports.seed = (knex, Promise) => {
             username: 'puskesmas_tasik',
             email: 'puskesmas_tasik@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'puskesmas',
             status: 'disabled'
           } // Password: admin
@@ -153,7 +153,7 @@ exports.seed = (knex, Promise) => {
           {
             username: 'puskesmas_tasik',
             username_kota: 'kota_tasik',
-            nama: 'datafreaksPuskesmas',
+            nama: 'datafreaksPuskesmas0',
             nama_dinas: 'dinas_puskesmas_tasik',
             kepala_dinas: 'Adrian',
             alamat: 'Jalan Ranggagempol no.10'
@@ -174,7 +174,7 @@ exports.seed = (knex, Promise) => {
             username: 'kestrad_tasik',
             email: 'kestrad_tasik@e-gov.id',
             password:
-              '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
             role: 'kestrad',
             status: 'disabled'
           } // Password: admin
@@ -191,7 +191,6 @@ exports.seed = (knex, Promise) => {
             username_puskesmas: 'puskesmas_tasik',
             nama: 'datafreaksKestrad',
             penanggung_jawab: 'Adrian',
-            jumlah_pegawai: 50,
             alamat: 'Jalan Ranggagempol no.10',
             kecamatan: 'Tawang'
           }
@@ -204,130 +203,82 @@ exports.seed = (knex, Promise) => {
   };
 
   let kategoriQuery = () => {
-    return knex('kategori')
-      .then(() => {
-        let kategori = [
-          {
-            nama_kategori: 'pelajaran'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('kategori').insert(kategori)
-        ]);
-      })
+    return knex('kategori').then(() => {
+      let kategori = [
+        { nama_kategori: 'keterampilan' },
+        { nama_kategori: 'ramuan' },
+        { nama_kategori: 'campuran' }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('kategori').insert(kategori)
+      ]);
+    });
   };
 
   let subkategoriQuery = () => {
-    return knex('kategori')
-      .then(() => {
-        let subkategori = [
-          {
-            id_kategori: 0,
-            nama_subkategori: 'pelajaran_olahraga'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('subkategori').insert(subkategori)
-        ]);
-      })
+    return knex('kategori').then(() => {
+      let subkategori = [
+        {
+          id_kategori: 1,
+          nama_subkategori: 'bekam'
+        },
+        {
+          id_kategori: 1,
+          nama_subkategori: 'pijat'
+        },
+        {
+          id_kategori: 1,
+          nama_subkategori: 'akupuntur'
+        },
+        {
+          id_kategori: 2,
+          nama_subkategori: 'herbal'
+        },
+        {
+          id_kategori: 2,
+          nama_subkategori: 'jamu'
+        }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('subkategori').insert(subkategori)
+      ]);
+    });
   };
 
   let layananQuery = () => {
-    return knex('layanan')
-      .then(() => {
-        let layanan = [
-          {
-            id_subkategori: 0,
-            username_kestrad: 'kestrad_tasik',
-            nama_layanan: 'akupuntur',
-            verified: 'menunggu'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('layanan').insert(layanan)
-        ]);
-      })
+    return knex('layanan').then(() => {
+      let layanan = [
+        {
+          id_subkategori: 1,
+          username_kestrad: 'kestrad_tasik',
+          nama_layanan: 'akupuntur',
+          verified: 'awaiting_validation'
+        }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('layanan').insert(layanan)
+      ]);
+    });
   };
 
   let hattraQuery = () => {
-    return knex('hattra')
-      .then(() => {
-        let hattra = [
-          {
-            id_layanan: 0,
-            nama_hattra: 'Ray',
-            ijin_hattra: '123456',
-            verified: 'menunggu'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('hattra').insert(hattra)
-        ]);
-      })
-  };
-
-  let provinsiCountQuery = () => {
-    return knex('user_provinsi_additional')
-      .then(() => {
-        let additional = [
-          {
-            username: 'jawa_barat'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('user_provinsi_additional').insert(additional)
-        ]);
-      })
-  };
-
-  let kotaCountQuery = () => {
-    return knex('user_kota_additional')
-      .then(() => {
-        let additional = [
-          {
-            username: 'kota_tasik'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('user_kota_additional').insert(additional)
-        ]);
-      })
-  };
-
-  let puskesmasCountQuery = () => {
-    return knex('user_provinsi_additional')
-      .then(() => {
-        let additional = [
-          {
-            username: 'puskesmas_tasik'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('user_puskesmas_additional').insert(additional)
-        ]);
-      })
-  };
-
-  let kestradCountQuery = () => {
-    return knex('user_kestrad_additional')
-      .then(() => {
-        let additional = [
-          {
-            username: 'kestrad_tasik'
-          }
-        ];
-        return Promise.all([
-          // Inserts seed entries
-          knex('user_kestrad_additional').insert(additional)
-        ]);
-      })
+    return knex('hattra').then(() => {
+      let hattra = [
+        {
+          id_layanan: 1,
+          nama: 'Ray',
+          ijin_hattra: '123456',
+          verified: 'awaiting_validation'
+        }
+      ];
+      return Promise.all([
+        // Inserts seed entries
+        knex('hattra').insert(hattra)
+      ]);
+    });
   };
 
   return knex('users')
@@ -340,9 +291,5 @@ exports.seed = (knex, Promise) => {
     .then(kategoriQuery)
     .then(subkategoriQuery)
     .then(layananQuery)
-    .then(hattraQuery)
-    .then(provinsiCountQuery)
-    .then(kotaCountQuery)
-    .then(puskesmasCountQuery)
-    .then(kestradCountQuery);
+    .then(hattraQuery);
 };
