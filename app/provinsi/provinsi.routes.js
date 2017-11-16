@@ -32,7 +32,12 @@ router.get(
   isUserProvinsiOrHigher,
   (req, res, next) => {
     return queries
-      .searchProvinsi(req.query.search)
+      .searchProvinsi(
+        req.query.search, 
+        req.query.page, 
+        req.query.perPage, 
+        req.query.sort
+      )
       .then(result => {
         return res.json(result);
       })
