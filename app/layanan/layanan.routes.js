@@ -125,7 +125,10 @@ router.get(
   auth.middleware.isLoggedIn,
   (req, res, next) => {
     return queries
-      .searchLayanan(req.query.search)
+      .searchLayanan(req.query.search,
+      req.query.page,
+      req.query.perPage,
+      req.query.sort)
       .then(result => {
         return res.json(result);
       })

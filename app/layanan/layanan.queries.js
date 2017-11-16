@@ -161,17 +161,29 @@ module.exports = {
       )
   },
 
-  searchLayanan: search => {
+  searchLayanan:  (search, page, perPage, sort) => {
     return knex
-      .select(displayColumns)
-      .from('layanan')
-      .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
-      )
-      .search(search, ['nama_layanan'])
-      .limit(20);
+    .select(
+      layananColumns.map(
+        column => 'layanan.' + column + ' as ' + column
+      ).concat(displayColumns)
+    )
+    .from('layanan')
+    .innerJoin(
+      'layanan_additional',
+      'layanan.id_layanan',
+      'layanan_additional.id_layanan'
+    )
+    .search(
+      search,
+      layananSearchableColumns.map(column => 'layanan.' + column)
+    )
+    .pageAndSort(
+      page,
+      perPage,
+      sort,
+      layananColumns.map(column => 'layanan.' + column)
+    );
   },
 
   getSpecificLayanan: nama => {
