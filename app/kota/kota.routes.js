@@ -107,12 +107,22 @@ router.patch(
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };
-    return queries
-      .updateKota(req.params.username, kotaUpdates)
+    const isAdmin = auth.predicates.isAdmin(req.user);
+    if(isAdmin || (req.params.username == req.user.username)) {
+      return queries
+        .updateKota(req.params.username, kotaUpdates)
+        .then(affectedRowCount => {
+          return res.json({ affectedRowCount: affectedRowCount });
+        })
+        .catch(next);
+    } else {
+      return queries
+      .updateKotaForProvinsi(req.params.username, kotaUpdates, req.user.username)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
       .catch(next);
+    }
   }
 );
 
