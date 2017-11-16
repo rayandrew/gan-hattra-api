@@ -2,9 +2,9 @@
 
 const express = require('express');
 const auth = require('../components/auth.js');
-const validators = require('./kestrad.validators.js');
+const validators = require('./hattra.validators.js');
 const errors = require('http-errors');
-const queries = require('./kestrad.queries.js');
+const queries = require('./hattra.queries.js');
 const config = require('config');
 const router = express.Router();
 
@@ -36,7 +36,7 @@ const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
 router.get(
   '/hattra',
   auth.middleware.isPuskesmasOrHigher,
-  validators.listKestrad,
+  validators.listHattra,
   (req, res, next) => {
     const isAdmin = auth.predicates.isAdmin(req.user);
     if (isAdmin) {
@@ -151,15 +151,13 @@ router.patch(
   validators.updateHattra,
   (req, res, next) => {
     let hattraUpdates = {
-      id_hattra: req.body.id_hattra,
-      id_layanan: req.body.id_layanan,
       nama: req.body.nama,
       ijin_hattra: req.body.ijin_hattra,
       verified: req.body.verified
     };
 
     return queries
-      .updateHattra(req.params.id, hattraUpdates)
+      .updateHattra(req.params.id_hattra, hattraUpdates)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
@@ -183,7 +181,7 @@ router.patch(
 
     if (req.body.verification) {
       return queries
-        .updateHattra(req.params.username, layananUpdates)
+        .updateHattra(req.params.id_hattra, layananUpdates)
         .then(affectedRowCount => {
           return res.json({ affectedRowCount: affectedRowCount });
         })
