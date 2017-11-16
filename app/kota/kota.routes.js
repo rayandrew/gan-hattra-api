@@ -69,7 +69,13 @@ router.get(
   auth.middleware.isProvinsiOrHigher,
   (req, res, next) => {
     return queries
-      .searchUsers(req.query.search)
+      .searchUsers(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username
+      )
       .then(result => {
         return res.json(result);
       })

@@ -98,12 +98,27 @@ module.exports = {
       );
   },
 
-  searchUsers: search => {
+  searchUsers: (search, page, perPage, sort) => {
     return knex
-      .select(kotaSearchableColumns)
+      .select(
+        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
+      )
       .from('user_kota')
-      .search(search, ['username'])
-      .limit(20);
+      .innerJoin(
+        'user_kota_additional',
+        'user_kota.username',
+        'user_kota_additional.username'
+      )
+      .search(
+        search,
+        kotaSearchableColumns.map(column => 'user_kota.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        kotaSortableColumns.map(column => 'user_kota.' + column)
+      );
   },
 
   getSpecificKota: username => {
