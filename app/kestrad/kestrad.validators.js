@@ -65,6 +65,18 @@ const schemas = {
     anyOf: [{ required: ['id_laynan', 'id_subkategori'] }]
   },
 
+  createHattra: {
+    type: 'object',
+    properties: {
+      id_hattra: commonSchemas.auto_id,
+      id_layanan: commonSchemas.auto_id,
+      nama: commonSchemas.varchar(),
+      verified: commonSchemas.varchar(),
+      tanggal_verified: commonSchemas.datetime
+    },
+    anyOf: [{ required: ['id_laynan', 'id_subkategori'] }]
+  },
+
   updateKestrad: {
     type: 'object',
     properties: {

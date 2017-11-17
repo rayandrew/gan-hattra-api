@@ -174,5 +174,47 @@ router.patch(
   }
 );
 
+router.post(
+  '/kestrad/addLayanan',
+  auth.middleware.isKestrad,
+  validators.createLayanan,
+  (req, res, next) => {
+    let insertLayanan = {
+      kecamatan: req.body.kecamatan,
+      nama: req.body.nama,
+      kepala_dinas: req.body.kepala_dinas,
+      alamat: req.body.alamat
+    };
+
+    return queries
+      .updateKestrad(req.params.username, insertLayanan)
+      .then(affectedRowCount => {
+        return res.json({ affectedRowCount: affectedRowCount });
+      })
+      .catch(next);
+  }
+);
+
+router.post(
+  '/kestrad/addHattra',
+  auth.middleware.isKestrad,
+  validators.createHattra,
+  (req, res, next) => {
+    let insertHattra = {
+      kecamatan: req.body.kecamatan,
+      nama: req.body.nama,
+      kepala_dinas: req.body.kepala_dinas,
+      alamat: req.body.alamat
+    };
+
+    return queries
+      .updateKestrad(req.params.username, insertHattra)
+      .then(affectedRowCount => {
+        return res.json({ affectedRowCount: affectedRowCount });
+      })
+      .catch(next);
+  }
+);
+
 
 module.exports = router;
