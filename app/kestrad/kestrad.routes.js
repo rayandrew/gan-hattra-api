@@ -28,6 +28,22 @@ const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
   }
 );
 
+const isOwnerOrPuskesmas = auth.createMiddlewareFromPredicate(
+  (user, req) => {
+    return (
+      user.username === req.params.username ||
+      auth.predicates.isPuskesmas(user)
+    );
+  }
+);
+
+/** custom username generator */
+const usernameGenerator = (pred, name) => {
+  const nameArr = name.split(' ').map(val => val.toLowerCase());
+  return (pred + '_' + nameArr.join('')).substring(0, 255);
+};
+
+
 /**
  * Get a list of kestrad.
  * @name Get kestrad
@@ -101,7 +117,11 @@ router.get(
  */
 router.get('/kestrad/search', auth.middleware.isLoggedIn, (req, res, next) => {
   return queries
-    .searchKestrad(req.query.search)
+    .searchKestrad(
+      req.query.search,
+      req.query.page,
+      req.query.perPage,
+      req.query.sort)
     .then(result => {
       return res.json(result);
     })
@@ -127,6 +147,7 @@ router.get(
   }
 );
 
+
 /**
  * Updates kestrad information for the given username.
  * @name Update kestrad
@@ -134,18 +155,18 @@ router.get(
  */
 router.patch(
   '/kestrad/:username',
-  isOwnerOrPuskesmasAndHigher,
+  isOwnerOrPuskesmas,
   validators.updateKestrad,
   (req, res, next) => {
     let kestradUpdates = {
-      nama_kota: req.body.nama_kota,
+      kecamatan: req.body.kecamatan,
       nama: req.body.nama,
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };
 
     return queries
-      .updateKestrad(req.params.username, kestradUpdates)
+      .updateKestrad(req.params.username, kestradUpdates, req.user.username)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
@@ -153,79 +174,5 @@ router.patch(
   }
 );
 
-/**
- * Updates kestrad verification for the given username.
- * @name Update kestrad verification
- * @route {PATCH} /kestrad/:username/verification
- */
-router.patch(
-  '/kestrad/:username/verification',
-  isOwnerOrPuskesmasAndHigher,
-  validators.updateKestrad,
-  (req, res, next) => {
-    let kestradUpdates = {
-      verified: req.kestrad.verified,
-      tanggal_verifikasi: req.kestrad.tanggal_verifikasi
-    };
-
-    if (req.body.verification) {
-      return queries
-        .updateKestrad(req.params.username, kestradUpdates)
-        .then(affectedRowCount => {
-          return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-    } else {
-      return next(new errors('Kestrad verification unauthorized'));
-    }
-  }
-);
-
-/**
- * Get layanan kestrad information for the specified username.
- * @name Get layanan kestrad info.
- * @route {GET} /kestrad/:username/layanan
- */
-router.get(
-  '/kestrad/:username/layanan',
-  isOwnerOrPuskesmasAndHigher,
-  (req, res, next) => {
-    return queries
-      .getLayananKestrad(req.params.username)
-      .then(user => {
-        if (!user) return next(new errors.NotFound('User not found.'));
-        return res.json(user);
-      })
-      .catch(next);
-  }
-);
-
-/**
- * Updates layanan kestrad verification for the given username.
- * @name Update layanan kestrad verification
- * @route {PATCH} /kestrad/:username/layanana/verification
- */
-router.patch(
-  '/kestrad/:username/layanana/verification',
-  isOwnerOrPuskesmasAndHigher,
-  validators.updateKestrad,
-  (req, res, next) => {
-    let layananUpdates = {
-      verified: req.body.layanan.verified,
-      tanggal_verifikasi: req.body.layanan.tanggal_verified
-    };
-
-    if (req.body.verification) {
-      return queries
-        .updateLayanan(req.params.username, layananUpdates)
-        .then(affectedRowCount => {
-          return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-    } else {
-      return next(new errors('Layanan Kestrad verification unauthorized'));
-    }
-  }
-);
 
 module.exports = router;

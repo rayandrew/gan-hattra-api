@@ -53,26 +53,6 @@ const schemas = {
     anyOf: [{ required: ['username'] }]
   },
 
-  createKategori: {
-    type: 'object',
-    properties: {
-      username: commonSchemas.username,
-      id_kategori: commonSchemas.auto_id,
-      nama_kategori: commonSchemas.varchar()
-    },
-    anyOf: [{ required: ['username', 'id_kategori'] }]
-  },
-
-  createSubkategori: {
-    type: 'object',
-    properties: {
-      id_subkategori: commonSchemas.auto_id,
-      id_kategori: commonSchemas.auto_id,
-      nama_subkategori: commonSchemas.varchar()
-    },
-    anyOf: [{ required: ['id_subkategori', 'id_kategori'] }]
-  },
-
   createLayanan: {
     type: 'object',
     properties: {
@@ -88,40 +68,10 @@ const schemas = {
   updateKestrad: {
     type: 'object',
     properties: {
-      username: commonSchemas.username,
-      nama_puskesmas: commonSchemas.varchar(),
       nama: commonSchemas.varchar(),
-      kepala_dinas: commonSchemas.varchar(),
-      alamat: commonSchemas.text
-    }
-  },
-
-  updateKategori: {
-    type: 'object',
-    properties: {
-      username: commonSchemas.username,
-      id_kategori: commonSchemas.auto_id,
-      nama_kategori: commonSchemas.varchar()
-    }
-  },
-
-  updateSubkategori: {
-    type: 'object',
-    properties: {
-      id_subkategori: commonSchemas.auto_id,
-      id_kategori: commonSchemas.auto_id,
-      nama_subkategori: commonSchemas.varchar()
-    }
-  },
-
-  updateLayanan: {
-    type: 'object',
-    properties: {
-      id_layanan: commonSchemas.auto_id,
-      id_subkategori: commonSchemas.auto_id,
-      nama_layanan: commonSchemas.varchar(),
-      verified: commonSchemas.varchar(),
-      tanggal_verified: commonSchemas.datetime
+      penanggung_jawab: commonSchemas.varchar(),
+      alamat: commonSchemas.text,
+      kecamatan: commonSchemas.varchar()
     }
   }
 };
