@@ -23,13 +23,13 @@ function ensureOldPasswordIsCorrect (username, password) {
 }
 
 const userColumns = [
-  'username',
+  'users.username',
   'email',
   'password',
   'role',
   'status',
-  'created_at',
-  'updated_at'
+  'users.created_at',
+  'users.updated_at'
 ];
 const userAssignableColumns = [
   'username',
@@ -49,15 +49,62 @@ const userSortableColumns = [
 ];
 const specificUserColumns = [
   'username',
-  'nama_provinsi',
-  'nama_kota',
-  'nama_puskesmas',
   'nama',
   'kepala_dinas',
   'alamat',
   'created_at',
   'updated_at'
 ];
+
+const kotaAdditional = [
+  'user_kota.username_provinsi'
+];
+
+const puskesmasAdditional = [
+  'user_puskesmas_additional.username_provinsi',
+  'user_puskesmas.username_provinsi'
+];
+
+const kestradAdditional = [
+  'user_kestrad_additional.username_provinsi',
+  'user_kestrad_additional.username_kota',
+  'user_kestrad.username_puskesmas'
+];
+
+const countAdditional = [
+  'count_kota',
+  'count_puskesmas',
+  'count_kestrad',
+  'count_layanan_verified',
+  'count_layanan_not_verified',
+  'count_hattra_verified',
+  'count_hattra_not_verified'
+];
+
+const middleTable = [
+  'nama_dinas',
+  'kepala_dinas',
+  'nama',
+  'alamat',
+  'penanggung_jawab',
+  'kecamatan'
+];
+
+//const table = useradditional
+// .slice(i, useradditional.length)
+// .join(
+//     countadditional
+//     .slice(i, countadditional.length)
+// );
+
+const getProvinsiTable = userColumns.concat(middleTable.slice(0,4)).concat(countAdditional);
+
+const getKotaTable = userColumns.concat(kotaAdditional).concat(middleTable.slice(0,4)).concat(countAdditional.slice(1,7));
+
+const getPuskesmasTable = userColumns.concat(puskesmasAdditional).concat(middleTable.slice(0,4)).concat(countAdditional.slice(2,7));
+
+const getKestradTable = userColumns.concat(kestradAdditional).concat(middleTable.slice(2,6)).concat(countAdditional.slice(3,7));
+
 
 module.exports = {
   listUsers: (search, page, perPage, sort) => {
@@ -87,9 +134,9 @@ module.exports = {
       .from('users')
       .where('username', newUser.username);
 
+    var specificUser = _.pick(newUser, specificUserColumns);
     newUser = _.pick(newUser, userAssignableColumns);
     newUser.created_at = newUser.updated_at = new Date();
-    var specificUser = _.pick(newUser, specificUserColumns);
     specificUser.created_at = specificUser.updated_at = new Date();
 
     return query
@@ -108,7 +155,6 @@ module.exports = {
               .insert(newUser)
               .then(insertedIds => Object.assign(newUser, { password: '' }))
               .then(() => knex('user_provinsi').insert(specificUser))
-              .then(specificUser);
           } else if (newUser.role === 'kota') {
             specificUser.username_provinsi = parent;
             return knex('users')
@@ -140,11 +186,90 @@ module.exports = {
   },
 
   getUser: username => {
-    return knex
-      .select(userColumns)
-      .from('users')
-      .where('username', username)
-      .first();
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return knex()
+        .select('role')
+        .from('users')
+        .where('username', username)
+        .map(function(row) {
+          return row.role;
+        });
+    });
+    
+    return promises
+      .then((role) => {
+        if(role == 'provinsi') {
+          return knex
+            .select(getProvinsiTable)
+            .from('users')
+            .innerJoin(
+              'user_provinsi',
+              'users.username',
+              'user_provinsi.username'
+            )
+            .innerJoin(
+              'user_provinsi_additional',
+              'users.username',
+              'user_provinsi_additional.username'
+            )
+            .where('users.username', username)
+            .first();
+        } else if(role == 'kota') {
+          return knex
+            .select(getKotaTable)
+            .from('users')
+            .innerJoin(
+              'user_kota',
+              'users.username',
+              'user_kota.username'
+            )
+            .innerJoin(
+              'user_kota_additional',
+              'users.username',
+              'user_kota_additional.username'
+            )
+            .where('users.username', username)
+            .first();
+        } else if(role == 'puskesmas') {
+          return knex
+            .select(getPuskesmasTable)
+            .from('users')
+            .innerJoin(
+              'user_puskesmas',
+              'users.username',
+              'user_puskesmas.username'
+            )
+            .innerJoin(
+              'user_puskesmas_additional',
+              'users.username',
+              'user_puskesmas_additional.username'
+            )
+            .where('users.username', username)
+            .first();
+        } else if(role == 'kestrad') {
+          return knex
+            .select(getKestradTable)
+            .from('users')
+            .innerJoin(
+              'user_kestrad',
+              'users.username',
+              'user_kestrad.username'
+            )
+            .innerJoin(
+              'user_kestrad_additional',
+              'users.username',
+              'user_kestrad_additional.username'
+            )
+            .where('users.username', username)
+            .first();
+        } else {
+          return knex
+            .select(userColumns)
+            .from('users')
+            .where('username', username)
+        }
+      });
   },
 
   updateUser: (username, userUpdates) => {
