@@ -7,14 +7,32 @@ const _ = require('lodash');
 
 const puskesmasColumns = [
   'username',
-  'nama_kota',
+  'username_kota',
   'nama',
+  'nama_dinas',
   'kepala_dinas',
   'alamat',
   'created_at',
   'updated_at'
 ];
-const puskesmasSearchableColumns = ['username', 'nama_dinas', 'kepala_dinas'];
+
+const displayColumns = [
+  'count_kestrad',
+  'count_layanan_verified',
+  'count_layanan_not_verified',
+  'count_hattra_verified',
+  'count_hattra_not_verified'
+];
+
+const puskesmasUpdateableColumns = ['nama', 'kepala_dinas', 'alamat'];
+const puskesmasSearchableColumns = [
+  'username',
+  'username_kota',
+  'nama',
+  'kepala_dinas',
+  'alamat'
+];
+const puskesmasSortableColumns = ['username', 'kepala_dinas', 'alamat'];
 
 module.exports = {
   listPuskesmas: (search, page, perPage, sort) => {
@@ -22,9 +40,15 @@ module.exports = {
       .select(
         puskesmasColumns.map(
           column => 'user_puskesmas.' + column + ' as ' + column
+          .concat(displayColumns)
         )
       )
       .from('user_puskesmas')
+      .innerJoin(
+        'user_puskesmas_additional',
+        'user_puskesmas.username',
+        'user_puskesmas_additional.username'
+      )
       .search(
         search,
         puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
@@ -33,16 +57,34 @@ module.exports = {
         page,
         perPage,
         sort,
-        puskesmasColumns.map(column => 'user_puskesmas.' + column)
+        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
       );
   },
 
   searchPuskesmas: search => {
     return knex
-      .select(['user_puskesmas', 'nama'])
-      .from('user_puskesmas')
-      .search(search, ['nama', 'user_puskesmas'])
-      .limit(20);
+    .select(
+      puskesmasColumns.map(
+        column => 'user_puskesmas.' + column + ' as ' + column
+        .concat(displayColumns)
+      )
+    )
+    .from('user_puskesmas')
+    .innerJoin(
+      'user_puskesmas_additional',
+      'user_puskesmas.username',
+      'user_puskesmas_additional.username'
+    )
+    .search(
+      search,
+      puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
+    )
+    .pageAndSort(
+      page,
+      perPage,
+      sort,
+      puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+    );
   },
 
   getSpecificPuskesmas: username => {
@@ -55,29 +97,34 @@ module.exports = {
 
   getPuskesmasForKota: username => {
     return knex
-      .select(puskesmasColumns)
+      .select(
+        puskesmasColumns.map(
+          column => 'user_puskesmas.' + column + ' as ' + column
+          .concat(displayColumns)
+        )
+      )
       .from('user_puskesmas')
       .innerJoin(
-        'user_kota',
-        'user_puskesmas.username_kota',
-        'user_kota.username'
+        'user_puskesmas_additional',
+        'user_puskesmas.username',
+        'user_puskesmas_additional.username'
       )
       .where('username_kota', username);
   },
 
   getPuskesmasForProvinsi: username => {
     return knex
-      .select(puskesmasColumns)
+      .select(
+        puskesmasColumns.map(
+          column => 'user_puskesmas.' + column + ' as ' + column
+          .concat(displayColumns)
+        )
+      )
       .from('user_puskesmas')
       .innerJoin(
-        'user_kota',
-        'user_puskesmas.username_kota',
-        'user_kota.username'
-      )
-      .innerJoin(
-        'user_provinsi',
-        'user_kota.username_provinsi',
-        'user_provinsi.username'
+        'user_puskesmas_additional',
+        'user_puskesmas.username',
+        'user_puskesmas_additional.username'
       )
       .where('username_provinsi', username);
   },
@@ -94,9 +141,35 @@ module.exports = {
     let promises = Promise.resolve();
 
     return promises.then(puskesmasUpdates => {
+      puskesmasUpdates = _.pick(puskesmasUpdates, puskesmasUpdateableColumns);
+      puskesmasUpdates.updated_at = new Date();
       return knex('user_puskesmas')
         .update(puskesmasUpdates)
         .where('username', username);
+    });
+  },
+
+  updatePuskesmasForKota: (username, puskesmasUpdates, username_kota) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return knex()
+        .select('username')
+        .from('user_puskesmas')
+        .where('username', username)
+        .andWhere('username_kota', username_kota)
+        .first()
+    });
+
+    return promises.then((puskesmas) => {
+      if(kota) {
+        kotaUpdates = _.pick(puskesmasUpdates, puskesmasUpdateableColumns);
+        kotaUpdates.updated_at = new Date();
+        return knex('user_puskesmas')
+          .update(puskesmasUpdates)
+          .where('username', username);
+      } else {
+        return 0;
+      }
     });
   }
 };
