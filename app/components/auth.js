@@ -20,6 +20,8 @@ const predicates = {
   isDisabled: user => user && user.status && user.status === 'disabled',
   isProvinsiOrHigher: user =>
     user && user.role && (user.role === 'admin' || user.role === 'provinsi'),
+  isPuskesmasOrHigher: user =>
+    user && user.role && (user.role === 'admin' || user.role === 'provinsi' || user.role === 'kota' || user.role === 'puskesmas'),
   isKestradOrHigher: user =>
   user && user.role && (user.role === 'admin' || user.role === 'provinsi' || user.role === 'kota' || user.role === 'puskesmas' || user.role === 'kestrad')
 };

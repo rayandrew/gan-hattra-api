@@ -49,21 +49,27 @@ router.get(
         .catch(next);
     } else if (auth.predicates.isProvinsi(req.user)) {
       return queries
-        .getPuskesmasForProvinsi(req.user.username)
-        .then(puskesmas => {
-          if (!puskesmas) {
-            return next(new errors.NotFound('Puskesmas not found'));
-          }
+        .getPuskesmasForProvinsi(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort,
+          req.user.username
+        )
+        .then(kota => {
           return res.json(puskesmas);
         })
         .catch(next);
     } else {
       return queries
-        .getPuskesmasForKota(req.user.username)
-        .then(puskesmas => {
-          if (!puskesmas) {
-            return next(new errors.NotFound('Puskesmas not found'));
-          }
+        .getPuskesmasForKota(
+          req.query.search,
+          req.query.page,
+          req.query.perPage,
+          req.query.sort,
+          req.user.username
+        )
+        .then(kota => {
           return res.json(puskesmas);
         })
         .catch(next);
@@ -78,10 +84,13 @@ router.get(
  */
 router.get(
   '/puskesmas/search',
-  auth.middleware.isLoggedIn,
+  auth.middleware.isKotaOrHigher,
   (req, res, next) => {
     return queries
-      .searchPuskesmas(req.query.search)
+      .searchPuskesmas(req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort)
       .then(result => {
         return res.json(result);
       })
@@ -115,18 +124,27 @@ router.patch(
   validators.updatePuskesmas,
   (req, res, next) => {
     let puskesmasUpdates = {
-      username_kota: req.body.nama_kota,
       nama: req.body.nama,
+      nama_dinas: req.body.nama_dinas,
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };
-
-    return queries
-      .updatePuskesmas(req.params.username, userUpdates)
+    const isAdmin = auth.predicates.isAdmin(req.user);
+    if(isAdmin || (req.params.username == req.user.username)) {
+      return queries
+        .updatePuskesmas(req.params.username, puskesmasUpdates)
+        .then(affectedRowCount => {
+          return res.json({ affectedRowCount: affectedRowCount });
+        })
+        .catch(next);
+    } else {
+      return queries
+      .updatePuskesmasForKota(req.params.username, puskesmasUpdates, req.user.username)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
       .catch(next);
+    }
   }
 );
 
