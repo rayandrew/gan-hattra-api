@@ -180,16 +180,16 @@ router.post(
   validators.createLayanan,
   (req, res, next) => {
     let insertLayanan = {
-      kecamatan: req.body.kecamatan,
-      nama: req.body.nama,
-      kepala_dinas: req.body.kepala_dinas,
-      alamat: req.body.alamat
+      username_kestrad: req.user.username_kestrad,
+      id_subkategori: req.body.id_subkategori,
+      nama_layanan: req.body.nama_layanan,
+      verified: req.body.verified
     };
 
     return queries
       .updateKestrad(req.params.username, insertLayanan)
-      .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+      .then(hattra => {
+        return res.json({ hattra: hattra });
       })
       .catch(next);
   }
@@ -201,16 +201,16 @@ router.post(
   validators.createHattra,
   (req, res, next) => {
     let insertHattra = {
-      kecamatan: req.body.kecamatan,
+      id_layanan: req.body.id_layanan,
       nama: req.body.nama,
-      kepala_dinas: req.body.kepala_dinas,
-      alamat: req.body.alamat
+      ijin_hattra: req.body.ijin_hattra,
+      verified: req.body.verified
     };
 
     return queries
       .updateKestrad(req.params.username, insertHattra)
-      .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+      .then(hattra => {
+        return res.json({ hattra: hattra });
       })
       .catch(next);
   }

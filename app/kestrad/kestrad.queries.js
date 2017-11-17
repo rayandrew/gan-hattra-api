@@ -243,11 +243,11 @@ module.exports = {
 
     return query
       .first()
-      .then(existinglayanan => {
-        if (existinglayanan) {
+      .then(existinghattra => {
+        if (existinghattra) {
           throw new errors.Conflict('Hattra already exists.');
         }
-        return id_layanan;
+        return id_hattra;
       })
       .then(kestradInsert => {
             return knex('hattra')
