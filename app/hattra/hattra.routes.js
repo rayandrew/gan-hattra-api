@@ -169,27 +169,6 @@ router.patch(
  * @name Update hattra verification
  * @route {PATCH} /hattra/:id/verification
  */
-router.patch(
-  '/hattra/:id/verification',
-  auth.middleware.isPuskesmas,
-  validators.updateNamaHattra,
-  (req, res, next) => {
-    let hattraUpdates = {
-      verified: req.body.hattra.verified
-    };
-
-    if (req.body.verification) {
-      return queries
-        .updateHattra(req.params.id_hattra, hattraUpdates)
-        .then(affectedRowCount => {
-          return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-    } else {
-      return next(new errors('hattra verification unauthorized'));
-    }
-  }
-);
 
 router.patch(
   '/hattra/:id_hattra/verification',
