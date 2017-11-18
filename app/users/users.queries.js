@@ -90,12 +90,6 @@ const middleTable = [
   'kecamatan'
 ];
 
-//const table = useradditional
-// .slice(i, useradditional.length)
-// .join(
-//     countadditional
-//     .slice(i, countadditional.length)
-// );
 
 const getProvinsiTable = userColumns.concat(middleTable.slice(0,4)).concat(countAdditional);
 
@@ -354,5 +348,71 @@ module.exports = {
           .where('username', username)
           .then(affectedRow => affectedRow + affectedRowCount);
       });
+  },
+
+  resetPassword: (userUpdates , username, username_changer, changer_role) => {
+    let promises = Promise.resolve();
+    if (userUpdates.password) {
+      promises = promises.then(() => {
+        return bcrypt.hash(userUpdates.password, BCRYPT_STRENGTH);
+      });
+    }
+    let promises2 = Promise.resolve();
+    promises2 = promises2.then(() => {
+      return knex()
+        .select('role')
+        .from('users')
+        .where('username', username)
+        .map(function(row) {
+          return row.role;
+        });
+    });
+    if(changer_role == 'admin') {
+      return promises.then(hash => {
+        userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
+        return knex('users')
+          .update(userUpdates)
+          .where('username', username);
+      });
+    } else if (changer_role == 'provinsi') {
+      return promises.then(hash => {
+        userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
+        return promises2.then(role => {
+          if(role != 'provinsi' && role != 'admin') {
+            return knex('users')
+            .update(userUpdates)
+            .where('username', username);
+          } else {
+            throw new errors.Forbidden();
+          }
+        });
+      });
+    } else if (changer_role == 'kota') {
+      return promises.then(hash => {
+        userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
+        return promises2.then(role => {
+          if(role != 'provinsi' && role != 'admin' && role != 'kota') {
+            return knex('users')
+            .update(userUpdates)
+            .where('username', username);
+          } else {
+            throw new errors.Forbidden();
+          }
+        });
+      });
+    } else {
+      return promises.then(hash => {
+        userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
+        return promises2.then(role => {
+          if(role == 'kestrad') {
+            return knex('users')
+            .update(userUpdates)
+            .where('username', username);
+          } else {
+            throw new errors.Forbidden();
+          }
+        });
+      });
+    }
   }
 };
