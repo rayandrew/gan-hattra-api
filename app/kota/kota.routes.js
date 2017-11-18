@@ -105,7 +105,6 @@ router.patch(
   (req, res, next) => {
     let kotaUpdates = {
       nama: req.body.nama,
-      nama_dinas: req.body.nama_dinas,
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };

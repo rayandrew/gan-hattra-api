@@ -9,7 +9,6 @@ const puskesmasColumns = [
   'username',
   'username_kota',
   'nama',
-  'nama_dinas',
   'kepala_dinas',
   'alamat',
   'created_at',
@@ -40,8 +39,7 @@ module.exports = {
       .select(
         puskesmasColumns.map(
           column => 'user_puskesmas.' + column + ' as ' + column
-          .concat(displayColumns)
-        )
+        ).concat(displayColumns)
       )
       .from('user_puskesmas')
       .innerJoin(
@@ -95,13 +93,12 @@ module.exports = {
       .first();
   },
 
-  getPuskesmasForKota: username => {
+  getPuskesmasForKota: (search, page, perPage, sort, username) => {
     return knex
       .select(
         puskesmasColumns.map(
           column => 'user_puskesmas.' + column + ' as ' + column
-          .concat(displayColumns)
-        )
+        ).concat(displayColumns)
       )
       .from('user_puskesmas')
       .innerJoin(
@@ -109,16 +106,25 @@ module.exports = {
         'user_puskesmas.username',
         'user_puskesmas_additional.username'
       )
-      .where('username_kota', username);
+      .where('user_puskesmas.username_kota', username)
+      .search(
+        search,
+        puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+      );
   },
 
-  getPuskesmasForProvinsi: username => {
+  getPuskesmasForProvinsi: (search, page, perPage, sort, username) => {
     return knex
       .select(
         puskesmasColumns.map(
           column => 'user_puskesmas.' + column + ' as ' + column
-          .concat(displayColumns)
-        )
+        ).concat(displayColumns)
       )
       .from('user_puskesmas')
       .innerJoin(
@@ -126,7 +132,17 @@ module.exports = {
         'user_puskesmas.username',
         'user_puskesmas_additional.username'
       )
-      .where('username_provinsi', username);
+      .where('username_provinsi', username)
+      .search(
+        search,
+        puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+      );
   },
 
   getPuskesmas: username => {

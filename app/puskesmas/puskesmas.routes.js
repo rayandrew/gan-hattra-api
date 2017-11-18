@@ -56,7 +56,7 @@ router.get(
           req.query.sort,
           req.user.username
         )
-        .then(kota => {
+        .then(puskesmas => {
           return res.json(puskesmas);
         })
         .catch(next);
@@ -69,7 +69,7 @@ router.get(
           req.query.sort,
           req.user.username
         )
-        .then(kota => {
+        .then(puskesmas => {
           return res.json(puskesmas);
         })
         .catch(next);
@@ -125,7 +125,6 @@ router.patch(
   (req, res, next) => {
     let puskesmasUpdates = {
       nama: req.body.nama,
-      nama_dinas: req.body.nama_dinas,
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };

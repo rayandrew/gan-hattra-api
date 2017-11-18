@@ -128,15 +128,15 @@ module.exports = {
       .limit(20);
   },
 
-  createUser: (newUser, parent) => {
+  createUser: (user, parent) => {
     let query = knex
       .select('username')
       .from('users')
-      .where('username', newUser.username);
+      .where('username', user.username);
 
-    var specificUser = _.pick(newUser, specificUserColumns);
-    newUser = _.pick(newUser, userAssignableColumns);
+    let newUser = _.pick(user, userAssignableColumns);
     newUser.created_at = newUser.updated_at = new Date();
+    let specificUser = _.pick(user, specificUserColumns);
     specificUser.created_at = specificUser.updated_at = new Date();
 
     return query
@@ -150,37 +150,49 @@ module.exports = {
       .then(hash => {
         newUser.password = hash;
         if (newUser.role !== 'admin' && newUser.role !== 'user') {
+          let queries = knex('users')
+          .insert(newUser)
+          .then(insertedIds => Object.assign(newUser, { password: '' }))
+          
           if (newUser.role === 'provinsi') {
-            return knex('users')
-              .insert(newUser)
-              .then(insertedIds => Object.assign(newUser, { password: '' }))
-              .then(() => knex('user_provinsi').insert(specificUser))
+              return queries
+              .then((userAdded) => {
+                return knex('user_provinsi').insert(specificUser)
+              })
+              .then(insertedMiddle => {
+                return specificUser;
+              });
           } else if (newUser.role === 'kota') {
             specificUser.username_provinsi = parent;
-            return knex('users')
-              .insert(newUser)
-              .then(insertedIds => Object.assign(newUser, { password: '' }))
-              .then(() => knex('user_kota').insert(specificUser))
-              .then(specificUser);
+            return queries
+            .then((userAdded) => {
+              return knex('user_kota').insert(specificUser)
+            })
+            .then(insertedMiddle => {
+              return specificUser;
+            });
           } else if (newUser.role === 'puskesmas') {
             specificUser.username_kota = parent;
-            return knex('users')
-              .insert(newUser)
-              .then(insertedIds => Object.assign(newUser, { password: '' }))
-              .then(() => knex('user_puskesmas').insert(specificUser))
-              .then(specificUser);
+            return queries
+            .then((userAdded) => {
+              return knex('user_puskesmas').insert(specificUser)
+            })
+            .then(insertedMiddle => {
+              return specificUser;
+            });
           } else {
             specificUser.username_puskesmas = parent;
-            return knex('users')
-              .insert(newUser)
-              .then(insertedIds => Object.assign(newUser, { password: '' }))
-              .then(() => knex('user_kestrad').insert(specificUser))
-              .then(specificUser);
+            return queries
+            .then((userAdded) => {
+              return knex('user_kestrad').insert(specificUser)
+            })
+            .then(insertedMiddle => {
+              return specificUser;
+            });
           }
+          //return queries;
         } else {
-          return knex('users')
-            .insert(newUser)
-            .then(insertedIds => Object.assign(newUser, { password: '' }));
+          return queries;
         }
       });
   },
