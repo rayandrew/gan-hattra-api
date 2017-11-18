@@ -32,7 +32,12 @@ router.get(
   isUserProvinsiOrHigher,
   (req, res, next) => {
     return queries
-      .searchProvinsi(req.query.search)
+      .searchProvinsi(
+        req.query.search, 
+        req.query.page, 
+        req.query.perPage, 
+        req.query.sort
+      )
       .then(result => {
         return res.json(result);
       })
@@ -107,7 +112,7 @@ router.patch(
   validators.updateProvinsi,
   (req, res, next) => {
     let userUpdates = {
-      nama: req.body.nama_dinas,
+      nama: req.body.nama,
       nama_dinas: req.body.nama_dinas,
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
