@@ -56,13 +56,10 @@ const schemas = {
   createLayanan: {
     type: 'object',
     properties: {
-      id_layanan: commonSchemas.auto_id,
       id_subkategori: commonSchemas.auto_id,
       nama_layanan: commonSchemas.varchar(),
-      verified: commonSchemas.varchar(),
-      tanggal_verified: commonSchemas.datetime
-    },
-    anyOf: [{ required: ['id_laynan', 'id_subkategori'] }]
+      verified: commonSchemas.varchar()
+    }
   },
 
   createHattra: {
@@ -71,10 +68,8 @@ const schemas = {
       id_hattra: commonSchemas.auto_id,
       id_layanan: commonSchemas.auto_id,
       nama: commonSchemas.varchar(),
-      verified: commonSchemas.varchar(),
-      tanggal_verified: commonSchemas.datetime
-    },
-    anyOf: [{ required: ['id_laynan', 'id_subkategori'] }]
+      verified: commonSchemas.varchar()
+    }
   },
 
   updateKestrad: {

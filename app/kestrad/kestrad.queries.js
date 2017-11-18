@@ -205,12 +205,12 @@ module.exports = {
       });
   },
 
-  addLayanan: (username, insertLayanan) => {
+  addLayanan: (insertLayanan) => {
     let query = knex
     .select('id_layanan')
     .from('layanan')
     .where({
-      username_kestrad: username,
+      username_kestrad: insertLayanan.username_kestrad,
       nama_layanan: insertLayanan.nama_layanan
     });
 
@@ -222,7 +222,6 @@ module.exports = {
         if (existinglayanan) {
           throw new errors.Conflict('Layanan already exists.');
         }
-        return id_layanan;
       })
       .then(kestradInsert => {
             return knex('layanan')
@@ -230,12 +229,12 @@ module.exports = {
       });
   },
 
-  addHattra: (username, insertHattra) => {
+  addHattra: (insertHattra) => {
     let query = knex
     .select('id_hattra')
     .from('hattra')
     .where({
-      id_hattra: insertHattra.id_hattra,
+      id_layanan: insertHattra.id_layanan,
       nama: insertHattra.nama
     });
 
@@ -247,7 +246,6 @@ module.exports = {
         if (existinghattra) {
           throw new errors.Conflict('Hattra already exists.');
         }
-        return id_hattra;
       })
       .then(kestradInsert => {
             return knex('hattra')
