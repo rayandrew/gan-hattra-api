@@ -85,6 +85,11 @@ const middleware = {
   isKota: createMiddlewareFromPredicate(predicates.isKota),
 
   /**
+   * Middleware that checks whether the user is a kestrad.
+   */
+  isKestrad: createMiddlewareFromPredicate(predicates.isKestrad),
+
+  /**
      * Middleware that checks whether the user is Provinsi or higher (admin).
      */
   isProvinsiOrHigher: createMiddlewareFromPredicate(

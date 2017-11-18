@@ -174,5 +174,47 @@ router.patch(
   }
 );
 
+router.post(
+  '/kestrad/addLayanan',
+  auth.middleware.isPuskesmas,
+  validators.createLayanan,
+  (req, res, next) => {
+    let insertLayanan = {
+      username_kestrad: req.body.username_kestrad,
+      id_subkategori: req.body.id_subkategori,
+      nama_layanan: req.body.nama_layanan,
+      verified : 'awaiting_validation'
+    };
+
+    return queries
+      .addLayanan(insertLayanan)
+      .then(layanan => {
+        return res.json({id_layanan : layanan[0]});
+      })
+      .catch(next);
+  }
+);
+
+router.post(
+  '/kestrad/addHattra',
+  auth.middleware.isPuskesmas,
+  validators.createHattra,
+  (req, res, next) => {
+    let insertHattra = {
+      id_layanan: req.body.id_layanan,
+      nama: req.body.nama,
+      ijin_hattra: req.body.ijin_hattra,
+      verified: 'awaiting_validation'
+    };
+
+    return queries
+      .addHattra(insertHattra)
+      .then(hattra => {
+        return res.json({ hattra: hattra[0]});
+      })
+      .catch(next);
+  }
+);
+
 
 module.exports = router;

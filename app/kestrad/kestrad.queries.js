@@ -32,6 +32,20 @@ const kestradAssignableColumns = [
   'alamat'
 ];
 
+const insertLayananColumns = [
+  'id_subkategori',
+  'username_kestrad',
+  'nama_layanan',
+  'verified'
+];
+
+const insertHattraColumns = [
+  'id_layanan',
+  'nama',
+  'ijin_hattra',
+  'verified'
+];
+
 module.exports = {
   listKestrad: (search, page, perPage, sort) => {
     return knex
@@ -188,6 +202,54 @@ module.exports = {
         } else {
           return 0;
         }
+      });
+  },
+
+  addLayanan: (insertLayanan) => {
+    let query = knex
+    .select('id_layanan')
+    .from('layanan')
+    .where({
+      username_kestrad: insertLayanan.username_kestrad,
+      nama_layanan: insertLayanan.nama_layanan
+    });
+
+    insertLayanan = _.pick(insertLayanan, insertLayananColumns);
+
+    return query
+      .first()
+      .then(existinglayanan => {
+        if (existinglayanan) {
+          throw new errors.Conflict('Layanan already exists.');
+        }
+      })
+      .then(kestradInsert => {
+            return knex('layanan')
+              .insert(insertLayanan);
+      });
+  },
+
+  addHattra: (insertHattra) => {
+    let query = knex
+    .select('id_hattra')
+    .from('hattra')
+    .where({
+      id_layanan: insertHattra.id_layanan,
+      nama: insertHattra.nama
+    });
+
+    insertHattra = _.pick(insertHattra, insertHattraColumns);
+
+    return query
+      .first()
+      .then(existinghattra => {
+        if (existinghattra) {
+          throw new errors.Conflict('Hattra already exists.');
+        }
+      })
+      .then(kestradInsert => {
+            return knex('hattra')
+              .insert(insertHattra);
       });
   },
 
