@@ -18,6 +18,15 @@ const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
   }
 );
 
+const isOwnerOrProvinsiAndHigher = auth.createMiddlewareFromPredicate(
+  (user, req) => {
+    return (
+      user.username === req.params.username ||
+      auth.predicates.isProvinsiOrHigher(user)
+    );
+  }
+);
+
 /**
  * Get all kota information
  * @name Get all kota

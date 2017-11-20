@@ -18,6 +18,15 @@ const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
   }
 );
 
+const isOwnerOrKotaAndHigher = auth.createMiddlewareFromPredicate(
+  (user, req) => {
+    return (
+      user.username === req.params.username ||
+      auth.predicates.isKotaOrHigher(user)
+    );
+  }
+);
+
 /** custom username generator */
 const usernameGenerator = (pred, name) => {
   const nameArr = name.split(' ').map(val => val.toLowerCase());
