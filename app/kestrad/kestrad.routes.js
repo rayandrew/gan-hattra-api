@@ -28,11 +28,11 @@ const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
   }
 );
 
-const isOwnerOrPuskesmas = auth.createMiddlewareFromPredicate(
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
   (user, req) => {
     return (
       user.username === req.params.username ||
-      auth.predicates.isPuskesmas(user)
+      auth.predicates.isAdmin(user)
     );
   }
 );
@@ -155,7 +155,7 @@ router.get(
  */
 router.patch(
   '/kestrad/:username',
-  isOwnerOrPuskesmas,
+  isOwnerOrAdmin,
   validators.updateKestrad,
   (req, res, next) => {
     let kestradUpdates = {
