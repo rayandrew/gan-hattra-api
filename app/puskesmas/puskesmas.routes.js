@@ -9,11 +9,11 @@ const config = require('config');
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing puskesmas is this puskesmas's owner or a supervisor. */
-const isOwnerOrKotaAndHigher = auth.createMiddlewareFromPredicate(
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
   (user, req) => {
     return (
       user.username === req.params.username ||
-      auth.predicates.isKotaOrHigher(user)
+      auth.predicates.isAdmin(user)
     );
   }
 );
@@ -120,7 +120,7 @@ router.get('/puskesmas/:username', isOwnerOrKotaAndHigher, (req, res, next) => {
  */
 router.patch(
   '/puskesmas/:username',
-  isOwnerOrKotaAndHigher,
+  isOwnerOrAdmin,
   validators.updatePuskesmas,
   (req, res, next) => {
     let puskesmasUpdates = {
@@ -128,22 +128,12 @@ router.patch(
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };
-    const isAdmin = auth.predicates.isAdmin(req.user);
-    if(isAdmin || (req.params.username == req.user.username)) {
-      return queries
-        .updatePuskesmas(req.params.username, puskesmasUpdates)
-        .then(affectedRowCount => {
-          return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-    } else {
-      return queries
-      .updatePuskesmasForKota(req.params.username, puskesmasUpdates, req.user.username)
+    return queries
+      .updatePuskesmas(req.params.username, puskesmasUpdates)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
       .catch(next);
-    }
   }
 );
 

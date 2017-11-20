@@ -135,28 +135,4 @@ module.exports = {
       .update(kotaUpdates)
       .where('username', username);
   },
-
-  updateKotaForProvinsi: (username, kotaUpdates, username_provinsi) => {
-    let promises = Promise.resolve();
-    promises = promises.then(() => {
-      return knex()
-        .select('username')
-        .from('user_kota')
-        .where('username', username)
-        .andWhere('username_provinsi', username_provinsi)
-        .first()
-    });
-
-    return promises.then((kota) => {
-      if(kota) {
-        kotaUpdates = _.pick(kotaUpdates, kotaUpdateableColumns);
-        kotaUpdates.updated_at = new Date();
-        return knex('user_kota')
-          .update(kotaUpdates)
-          .where('username', username);
-      } else {
-        return 0;
-      }
-    });
-  }
 };

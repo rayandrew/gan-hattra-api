@@ -130,7 +130,7 @@ router.post(
  * @route {PATCH} /users/:username
  */
 router.patch(
-  '/users/:username?',
+  '/users/:username',
   auth.middleware.isAdmin,
   validators.updateUser,
   (req, res, next) => {
@@ -162,8 +162,10 @@ router.patch(
  * @name Delete user
  * @route {DELETE} /users/:username
  */
-// DELETE DI ALL TABLE
-router.delete('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
+router.delete(
+  '/users/:username', 
+  auth.middleware.isAdmin, 
+  (req, res, next) => {
   return queries
     .deleteUser(req.params.username)
     .then(affectedRowCount => {
@@ -175,9 +177,9 @@ router.delete('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
 /**
  * Updates password for the given username.
  * @name Update user
- * @route {PATCH} /users/:username/resetpassword
+ * @route {GET} /users/:username/resetpassword
  */
-router.patch(
+router.get(
   '/users/:username/resetpassword',
   auth.middleware.isPuskesmasOrHigher,
   validators.updateUser,

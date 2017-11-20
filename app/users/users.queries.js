@@ -367,34 +367,60 @@ module.exports = {
           return row.role;
         });
     });
-    if(changer_role == 'admin') {
+    if(changer_role === 'admin') {
       return promises.then(hash => {
         userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
         return knex('users')
           .update(userUpdates)
           .where('username', username);
       });
-    } else if (changer_role == 'provinsi') {
+    } else if (changer_role === 'provinsi') {
       return promises.then(hash => {
         userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
         return promises2.then(role => {
-          if(role != 'provinsi' && role != 'admin') {
-            return knex('users')
-            .update(userUpdates)
-            .where('username', username);
+          if(role[0] === 'kota') {
+            let getProvinsi = knex('user_kota')
+              .select('username_provinsi')
+              .where('username_provinsi', username_changer)
+              .andWhere('username', username);
+
+            return getProvinsi
+              .first()
+              .then(provinsi => {
+                if(provinsi) {
+                  return knex('users')
+                  .update(userUpdates)
+                  .where('username', username);
+                } else {
+                  throw new errors.Forbidden();
+                }
+              });
           } else {
             throw new errors.Forbidden();
           }
         });
       });
-    } else if (changer_role == 'kota') {
+    } else if (changer_role === 'kota') {
       return promises.then(hash => {
         userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
         return promises2.then(role => {
-          if(role != 'provinsi' && role != 'admin' && role != 'kota') {
-            return knex('users')
-            .update(userUpdates)
-            .where('username', username);
+          if(role[0] === 'puskesmas') {
+            let getKota = knex('user_puskesmas')
+            .select('username_kota')
+            .where('username_kota', username_changer)
+            .andWhere('username', username);
+
+            return getKota
+              .first()
+              .then(kota => {
+                if(kota) {
+                  return knex('users')
+                  .update(userUpdates)
+                  .where('username', username);
+                } else {
+                  throw new errors.Forbidden();
+                }
+            });
           } else {
             throw new errors.Forbidden();
           }
@@ -404,10 +430,23 @@ module.exports = {
       return promises.then(hash => {
         userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
         return promises2.then(role => {
-          if(role == 'kestrad') {
-            return knex('users')
-            .update(userUpdates)
-            .where('username', username);
+          if(role[0] === 'kestrad') {
+            let getPuskesmas = knex('user_kestrad')
+            .select('username_puskesmas')
+            .where('username_puskesmas', username_changer)
+            .andWhere('username', username);
+
+            return getPuskesmas
+              .first()
+              .then(puskesmas => {
+                if(puskesmas) {
+                  return knex('users')
+                  .update(userUpdates)
+                  .where('username', username);
+                } else {
+                  throw new errors.Forbidden();
+                }
+              });
           } else {
             throw new errors.Forbidden();
           }

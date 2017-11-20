@@ -164,28 +164,5 @@ module.exports = {
         .where('username', username);
     });
   },
-
-  updatePuskesmasForKota: (username, puskesmasUpdates, username_kota) => {
-    let promises = Promise.resolve();
-    promises = promises.then(() => {
-      return knex()
-        .select('username')
-        .from('user_puskesmas')
-        .where('username', username)
-        .andWhere('username_kota', username_kota)
-        .first()
-    });
-
-    return promises.then((puskesmas) => {
-      if(kota) {
-        kotaUpdates = _.pick(puskesmasUpdates, puskesmasUpdateableColumns);
-        kotaUpdates.updated_at = new Date();
-        return knex('user_puskesmas')
-          .update(puskesmasUpdates)
-          .where('username', username);
-      } else {
-        return 0;
-      }
-    });
-  }
+  
 };

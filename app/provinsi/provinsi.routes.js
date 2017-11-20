@@ -21,6 +21,15 @@ const isUserProvinsiOrHigher = auth.createMiddlewareFromPredicate(
   }
 );
 
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
+  (user, req) => {
+    return (
+      user.username === req.params.username ||
+      auth.predicates.isAdmin(user)
+    );
+  }
+);
+
 /**
  * Get a list of provinsi for searching.
  * @name Search provinsi
@@ -108,7 +117,7 @@ router.get('/provinsi/:username', isUserProvinsiOrHigher, (req, res, next) => {
  */
 router.patch(
   '/provinsi/:username',
-  isUserProvinsiOrHigher,
+  isOwnerOrAdmin,
   validators.updateProvinsi,
   (req, res, next) => {
     let userUpdates = {

@@ -9,11 +9,11 @@ const config = require('config');
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing user is this user or (provinsi and higher). */
-const isOwnerOrProvinsiAndHigher = auth.createMiddlewareFromPredicate(
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
   (user, req) => {
     return (
       user.username === req.params.username ||
-      auth.predicates.isProvinsiOrHigher(user)
+      auth.predicates.isAdmin(user)
     );
   }
 );
@@ -101,29 +101,19 @@ router.get('/kota/:username', isOwnerOrProvinsiAndHigher, (req, res, next) => {
  */
 router.patch(
   '/kota/:username',
-  isOwnerOrProvinsiAndHigher,
+  isOwnerOrAdmin,
   (req, res, next) => {
     let kotaUpdates = {
       nama: req.body.nama,
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };
-    const isAdmin = auth.predicates.isAdmin(req.user);
-    if(isAdmin || (req.params.username == req.user.username)) {
-      return queries
-        .updateKota(req.params.username, kotaUpdates)
-        .then(affectedRowCount => {
-          return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-    } else {
-      return queries
-      .updateKotaForProvinsi(req.params.username, kotaUpdates, req.user.username)
+    return queries
+      .updateKota(req.params.username, kotaUpdates)
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
       .catch(next);
-    }
   }
 );
 

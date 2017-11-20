@@ -174,6 +174,11 @@ router.patch(
   }
 );
 
+/**
+ * Add a new layanan.
+ * @name Create layanan
+ * @route {POST} /kestrad/addLayanan
+ */
 router.post(
   '/kestrad/addLayanan',
   auth.middleware.isPuskesmas,
@@ -195,6 +200,11 @@ router.post(
   }
 );
 
+/**
+ * Add a new hattra.
+ * @name Create layanan
+ * @route {POST} /kestrad/addHattra
+ */
 router.post(
   '/kestrad/addHattra',
   auth.middleware.isPuskesmas,
