@@ -1,6 +1,7 @@
 'use strict';
 
 var knex = require('../components/knex.js');
+var helper = require('../common/helper.js');
 const errors = require('http-errors');
 const _ = require('lodash');
 
@@ -81,7 +82,7 @@ module.exports = {
         'user_kestrad.username',
         'user_kestrad_additional.username'
       )
-      .where('username_puskesmas', user)
+      .where('user_kestrad.username_puskesmas', user)
       .search(
         search,
         kestradSearchableColumns.map(column => 'user_kestrad.' + column)
@@ -140,6 +141,91 @@ module.exports = {
         sort,
         kestradColumns.map(column => 'user_kestrad.' + column)
       );
+  },
+
+  listKestradByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return helper.getRole(usernameListed)
+        .map(function(row) {
+          return row.role;
+        });
+    });
+    return promises
+      .then((role) => {
+        if(role) {
+          if(usernameRole === 'admin') {
+            if(role[0] === 'provinsi') {
+              return listKestradByProvinsi(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'kota') {
+              return listKestradByKota(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'puskesmas') {
+              return listKestradByPuskesmas(search, page, perPage, sort, usernameListed);
+            }
+          } else if (usernameRole === 'provinsi') {
+            if(role[0] === 'admin' || role[0] === 'provinsi') {
+              return new errors.Forbidden();
+            } else {
+              if(role[0] === 'kota') {
+                let getUser = knex('user_kestrad_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_kota', usernameListed);
+
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    return module.exports.listKestradByKota(search, page, perPage, sort, usernameListed);                                 
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else if (role[0] === 'puskesmas') {
+                let getUser = knex('user_kestrad_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_puskesmas', usernameListed);
+
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    return module.exports.listKestradByPuskesmas(search, page, perPage, sort, usernameListed);                    
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              }
+            }
+          } else if (usernameRole === 'kota') {
+            if(role[0] === 'admin' || role[0] === 'provinsi' || role[0] === 'kota') {
+              return new errors.Forbidden();
+            } else {
+               if (role[0] === 'puskesmas') {
+                let getUser = knex('user_kestrad_additional')
+                .select('username')
+                .where('username_kota', usernameLister)
+                .andWhere('username_puskesmas', usernameListed);
+
+                return getUser
+                .first()
+                .then(kota => {
+                  if(kota) {
+                    return module.exports.listKestradByPuskesmas(search, page, perPage, sort, usernameListed);                    
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else {
+                return new errors.Forbidden();
+              }
+            }
+          } 
+        } else {
+          return new errors.Forbidden();
+        }
+      });
   },
 
   searchKestrad: (search, page, perPage, sort) => {

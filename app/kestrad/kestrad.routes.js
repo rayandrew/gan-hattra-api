@@ -111,6 +111,32 @@ router.get(
 );
 
 /**
+ * Get a list of kestrad predecessor username.
+ * @name Get hattra
+ * @route {GET} /hattra
+ */
+router.get(
+  '/kestrad/byUser/:username',
+  auth.middleware.isPuskesmasOrHigher,
+  (req, res, next) => {
+    return queries
+      .listKestradByUsername(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username,
+        req.user.role,
+        req.params.username
+      )
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+);
+
+/**
  * Get a list of kestrad for searching.
  * @name Search kestrad
  * @route {GET} /kestrad/search

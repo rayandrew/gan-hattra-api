@@ -168,13 +168,20 @@ module.exports = {
       .then((role) => {
         if(role) {
           if(usernameRole === 'admin') {
-            return listHattraByProvinsi(search, page, perPage, sort, usernameListed);
+            if(role[0] === 'provinsi') {
+              return listHattraByProvinsi(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'kota') {
+              return listHattraByKota(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'puskesmas') {
+              return listHattraByPuskesmas(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'kestrad') {
+              return listHattraByKestrad(search, page, perPage, sort, usernameListed);
+            }
           } else if (usernameRole === 'provinsi') {
             if(role[0] === 'admin' || role[0] === 'provinsi') {
               return new errors.Forbidden();
             } else {
               if(role[0] === 'kota') {
-                console.log('masuk sini');
                 let getUser = knex('hattra_additional')
                 .select('username_provinsi')
                 .where('username_provinsi', usernameLister)
@@ -184,7 +191,6 @@ module.exports = {
                 .first()
                 .then(provinsi => {
                   if(provinsi) {
-                    console.log("masuk kota");
                     return module.exports.listHattraByKota(search, page, perPage, sort, usernameListed);                                 
                   } else {
                     return new errors.Forbidden();
@@ -200,7 +206,6 @@ module.exports = {
                 .first()
                 .then(provinsi => {
                   if(provinsi) {
-                    console.log("masuk puskesmas");            
                     return module.exports.listHattraByPuskesmas(search, page, perPage, sort, usernameListed);                    
                   } else {
                     return new errors.Forbidden();
@@ -239,7 +244,6 @@ module.exports = {
                 .first()
                 .then(kota => {
                   if(kota) {
-                    console.log("masuk puskesmas");            
                     return module.exports.listHattraByPuskesmas(search, page, perPage, sort, usernameListed);                    
                   } else {
                     return new errors.Forbidden();
