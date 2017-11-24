@@ -68,6 +68,32 @@ router.get(
 );
 
 /**
+ * Get a list of kota predecessor username.
+ * @name Get hattra
+ * @route {GET} /hattra
+ */
+router.get(
+  '/kota/byUser/:username',
+  auth.middleware.isPuskesmasOrHigher,
+  (req, res, next) => {
+    return queries
+      .listKotaByUsername(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username,
+        req.user.role,
+        req.params.username
+      )
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+);
+
+/**
  * Get a list of kota for searching.
  * @name Search users
  * @route {GET} /users/search

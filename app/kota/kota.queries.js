@@ -128,6 +128,28 @@ module.exports = {
       );
   },
 
+  listKotaByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return helper.getRole(usernameListed)
+        .map(function(row) {
+          return row.role;
+        });
+    });
+    return promises
+      .then((role) => {
+        if(role) {
+          if(usernameRole === 'admin') {
+            if(role[0] === 'provinsi') {
+              return getKotaForProvinsi(search, page, perPage, sort, usernameLister);
+            }
+          }
+        } else {
+          return new errors.Forbidden();
+        }
+      });
+  },
+
   updateKota: (username, kotaUpdates) => {
     kotaUpdates = _.pick(kotaUpdates, kotaUpdateableColumns);
     kotaUpdates.updated_at = new Date();
