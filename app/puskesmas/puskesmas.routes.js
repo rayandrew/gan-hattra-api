@@ -87,6 +87,32 @@ router.get(
 );
 
 /**
+ * Get a list of puskesmas predecessor username.
+ * @name Get hattra
+ * @route {GET} /hattra
+ */
+router.get(
+  '/puskesmas/byUser/:username',
+  auth.middleware.isPuskesmasOrHigher,
+  (req, res, next) => {
+    return queries
+      .listPuskesmasByUsername(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username,
+        req.user.role,
+        req.params.username
+      )
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+);
+
+/**
  * Get a list of puskesmas for searching.
  * @name Search puskesmas
  * @route {GET} /puskesmas/search

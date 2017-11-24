@@ -1,6 +1,7 @@
 'use strict';
 
 var knex = require('../components/knex.js');
+var helper = require('../common/helper.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
@@ -151,6 +152,51 @@ module.exports = {
       .from('user_puskesmas')
       .where('username', username)
       .first();
+  },
+
+  listPuskesmasByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return helper.getRole(usernameListed)
+        .map(function(row) {
+          return row.role;
+        });
+    });
+    return promises
+      .then((role) => {
+        if(role) {
+          if(usernameRole === 'admin') {
+            if(role[0] === 'provinsi') {
+              return getPuskesmasForProvinsi(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'kota') {
+              return getPuskesmasForKota(search, page, perPage, sort, usernameListed);
+            } 
+          } else if (usernameRole === 'provinsi') {
+            if(role[0] === 'admin' || role[0] === 'provinsi') {
+              return new errors.Forbidden();
+            } else {
+              if(role[0] === 'kota') {
+                let getUser = knex('user_kestrad_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_kota', usernameListed);
+
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    return module.exports.getPuskesmasForKota(search, page, perPage, sort, usernameListed);                                 
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              }
+            }
+          }
+        } else {
+          return new errors.Forbidden();
+        }
+      });
   },
 
   updatePuskesmas: (username, puskesmasUpdates) => {
