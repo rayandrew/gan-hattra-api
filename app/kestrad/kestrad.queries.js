@@ -156,11 +156,13 @@ module.exports = {
         if(role) {
           if(usernameRole === 'admin') {
             if(role[0] === 'provinsi') {
-              return listKestradByProvinsi(search, page, perPage, sort, usernameListed);
+              return module.exports.listKestradByProvinsi(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'kota') {
-              return listKestradByKota(search, page, perPage, sort, usernameListed);
+              return module.exports.listKestradByKota(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'puskesmas') {
-              return listKestradByPuskesmas(search, page, perPage, sort, usernameListed);
+              return module.exports.listKestradByPuskesmas(search, page, perPage, sort, usernameListed);
+            } else {
+              return new errors.Forbidden();
             }
           } else if (usernameRole === 'provinsi') {
             if(role[0] === 'admin' || role[0] === 'provinsi') {

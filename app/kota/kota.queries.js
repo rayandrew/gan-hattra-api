@@ -1,6 +1,7 @@
 'use strict';
 
 var knex = require('../components/knex.js');
+var helper = require('../common/helper.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
@@ -141,7 +142,9 @@ module.exports = {
         if(role) {
           if(usernameRole === 'admin') {
             if(role[0] === 'provinsi') {
-              return getKotaForProvinsi(search, page, perPage, sort, usernameLister);
+              return module.exports.getKotaForProvinsi(search, page, perPage, sort, usernameListed);
+            } else {
+              return new errors.Forbidden();
             }
           }
         } else {

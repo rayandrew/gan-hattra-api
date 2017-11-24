@@ -169,13 +169,15 @@ module.exports = {
         if(role) {
           if(usernameRole === 'admin') {
             if(role[0] === 'provinsi') {
-              return listHattraByProvinsi(search, page, perPage, sort, usernameListed);
+              return module.exports.listHattraByProvinsi(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'kota') {
-              return listHattraByKota(search, page, perPage, sort, usernameListed);
+              return module.exports.listHattraByKota(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'puskesmas') {
-              return listHattraByPuskesmas(search, page, perPage, sort, usernameListed);
+              return module.exports.listHattraByPuskesmas(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'kestrad') {
-              return listHattraByKestrad(search, page, perPage, sort, usernameListed);
+              return module.exports.listHattraByKestrad(search, page, perPage, sort, usernameListed);
+            } else {
+              return new errors.Forbidden();
             }
           } else if (usernameRole === 'provinsi') {
             if(role[0] === 'admin' || role[0] === 'provinsi') {

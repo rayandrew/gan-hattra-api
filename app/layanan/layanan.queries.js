@@ -175,13 +175,15 @@ module.exports = {
         if(role) {
           if(usernameRole === 'admin') {
             if(role[0] === 'provinsi') {
-              return getLayananForProvinsi(search, page, perPage, sort, usernameListed);
+              return module.exports.getLayananForProvinsi(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'kota') {
-              return getLayananForKota(search, page, perPage, sort, usernameListed);
+              return module.exports.getLayananForKota(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'puskesmas') {
-              return getLayananForPuskesmas(search, page, perPage, sort, usernameListed);
+              return module.exports.getLayananForPuskesmas(search, page, perPage, sort, usernameListed);
             } else if(role[0] === 'kestrad') {
-              return getLayananForKestrad(search, page, perPage, sort, usernameListed);
+              return module.exports.getLayananForKestrad(search, page, perPage, sort, usernameListed);
+            } else {
+              return new errors.Forbidden();
             }
           } else if (usernameRole === 'provinsi') {
             if(role[0] === 'admin' || role[0] === 'provinsi') {
