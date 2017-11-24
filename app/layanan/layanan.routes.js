@@ -116,6 +116,32 @@ router.get(
 );
 
 /**
+ * Get a list of layanan predecessor username.
+ * @name Get hattra
+ * @route {GET} /hattra
+ */
+router.get(
+  '/layanan/byUser/:username',
+  auth.middleware.isKestradOrHigher,
+  (req, res, next) => {
+    return queries
+      .listLayananByUsername(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username,
+        req.user.role,
+        req.params.username
+      )
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+);
+
+/**
  * Get a list of layanan for searching.
  * @name Search layanan
  * @route {GET} /layanan/search

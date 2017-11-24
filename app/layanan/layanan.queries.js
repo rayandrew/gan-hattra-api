@@ -1,6 +1,7 @@
 'use strict';
 
 var knex = require('../components/knex.js');
+var helper = require('../common/helper.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
@@ -159,6 +160,148 @@ module.exports = {
         sort,
         layananColumns.map(column => 'layanan.' + column)
       )
+  },
+
+  listLayananByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return helper.getRole(usernameListed)
+        .map(function(row) {
+          return row.role;
+        });
+    });
+    return promises
+      .then((role) => {
+        if(role) {
+          if(usernameRole === 'admin') {
+            if(role[0] === 'provinsi') {
+              return getLayananForProvinsi(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'kota') {
+              return getLayananForKota(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'puskesmas') {
+              return getLayananForPuskesmas(search, page, perPage, sort, usernameListed);
+            } else if(role[0] === 'kestrad') {
+              return getLayananForKestrad(search, page, perPage, sort, usernameListed);
+            }
+          } else if (usernameRole === 'provinsi') {
+            if(role[0] === 'admin' || role[0] === 'provinsi') {
+              return new errors.Forbidden();
+            } else {
+              if(role[0] === 'kota') {
+                let getUser = knex('layanan_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_kota', usernameListed);
+
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    return module.exports.getLayananForKota(search, page, perPage, sort, usernameListed);                                 
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else if (role[0] === 'puskesmas') {
+                let getUser = knex('layanan_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_puskesmas', usernameListed);
+
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    return module.exports.getLayananForPuskesmas(search, page, perPage, sort, usernameListed);                    
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else if(role[0] === 'kestrad') {
+                let getUser = knex('layanan_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_kestrad', usernameListed);
+                
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    return module.exports.getLayananForKestrad(search, page, perPage, sort, usernameListed);                  
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else {
+                return new errors.Forbidden();
+              }
+            }
+          } else if (usernameRole === 'kota') {
+            if(role[0] === 'admin' || role[0] === 'provinsi' || role[0] === 'kota') {
+              return new errors.Forbidden();
+            } else {
+               if (role[0] === 'puskesmas') {
+                let getUser = knex('layanan_additional')
+                .select('username_kota')
+                .where('username_kota', usernameLister)
+                .andWhere('username_puskesmas', usernameListed);
+
+                return getUser
+                .first()
+                .then(kota => {
+                  if(kota) {
+                    return module.exports.getLayananForPuskesmas(search, page, perPage, sort, usernameListed);                    
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else if(role[0] === 'kestrad') {
+                let getUser = knex('layanan_additional')
+                .select('username_kota')
+                .where('username_kota', usernameLister)
+                .andWhere('username_kestrad', usernameListed);
+                
+                return getUser
+                .first()
+                .then(kota => {
+                  if(kota) {
+                    return module.exports.getLayananForKestrad(search, page, perPage, sort, usernameListed);                  
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else {
+                return new errors.Forbidden();
+              }
+            }
+          } else if (usernameRole === 'puskesmas') {
+            if(role[0] !== 'kestrad') {
+              return new errors.Forbidden();
+            } else {
+               if(role[0] === 'kestrad') {
+                let getUser = knex('layanan_additional')
+                .select('username_puskesmas')
+                .where('username_puskesmas', usernameLister)
+                .andWhere('username_kestrad', usernameListed);
+                
+                return getUser
+                .first()
+                .then(puskesmas => {
+                  if(puskesmas) {
+                    return module.exports.getLayananForKestrad(search, page, perPage, sort, usernameListed);                  
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else {
+                return new errors.Forbidden();
+              }
+            }
+          }
+        } else {
+          return new errors.Forbidden();
+        }
+      });
   },
 
   searchLayanan:  (search, page, perPage, sort) => {
