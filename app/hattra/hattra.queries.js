@@ -1,6 +1,7 @@
 'use strict';
 
 var knex = require('../components/knex.js');
+var helper = require('../common/helper.js');
 const errors = require('http-errors');
 const _ = require('lodash');
 
@@ -47,30 +48,6 @@ module.exports = {
         'hattra.id_hattra',
         'hattra_additional.id_hattra'
       )
-      .search(
-        search,
-        hattraSearchableColumns.map(column => 'hattra.' + column)
-      )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        hattraColumns.map(column => 'hattra.' + column)
-      );
-  },
-
-  listHattraByKestrad: (search, page, perPage, sort, user) => {
-    return knex
-      .select(
-        hattraColumns.map(column => 'hattra.' + column + ' as ' + column)
-      .concat(displayColumns))
-      .from('hattra')
-      .innerJoin(
-        'hattra_additional',
-        'hattra.id_hattra',
-        'hattra_additional.id_hattra'
-      )
-      .where('username_puskesmas', user)
       .search(
         search,
         hattraSearchableColumns.map(column => 'hattra.' + column)
@@ -177,6 +154,144 @@ module.exports = {
       sort,
       hattraColumns.map(column => 'hattra.' + column)
     );
+  },
+
+  listHattraByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+    let promises = Promise.resolve();
+    promises = promises.then(() => {
+      return helper.getRole(usernameListed)
+        .map(function(row) {
+          return row.role;
+        });
+    });
+    return promises
+      .then((role) => {
+        if(role) {
+          if(usernameRole === 'admin') {
+            return listHattraByProvinsi(search, page, perPage, sort, usernameListed);
+          } else if (usernameRole === 'provinsi') {
+            if(role[0] === 'admin' || role[0] === 'provinsi') {
+              return new errors.Forbidden();
+            } else {
+              if(role[0] === 'kota') {
+                console.log('masuk sini');
+                let getUser = knex('hattra_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_kota', usernameListed);
+
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    console.log("masuk kota");
+                    return module.exports.listHattraByKota(search, page, perPage, sort, usernameListed);                                 
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else if (role[0] === 'puskesmas') {
+                let getUser = knex('hattra_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_puskesmas', usernameListed);
+
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    console.log("masuk puskesmas");            
+                    return module.exports.listHattraByPuskesmas(search, page, perPage, sort, usernameListed);                    
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else if(role[0] === 'kestrad') {
+                let getUser = knex('hattra_additional')
+                .select('username_provinsi')
+                .where('username_provinsi', usernameLister)
+                .andWhere('username_kestrad', usernameListed);
+                
+                return getUser
+                .first()
+                .then(provinsi => {
+                  if(provinsi) {
+                    return module.exports.listHattraByKestrad(search, page, perPage, sort, usernameListed);                  
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else {
+                return new errors.Forbidden();
+              }
+            }
+          } else if (usernameRole === 'kota') {
+            if(role[0] === 'admin' || role[0] === 'provinsi' || role[0] === 'kota') {
+              return new errors.Forbidden();
+            } else {
+               if (role[0] === 'puskesmas') {
+                let getUser = knex('hattra_additional')
+                .select('username_kota')
+                .where('username_kota', usernameLister)
+                .andWhere('username_puskesmas', usernameListed);
+
+                return getUser
+                .first()
+                .then(kota => {
+                  if(kota) {
+                    console.log("masuk puskesmas");            
+                    return module.exports.listHattraByPuskesmas(search, page, perPage, sort, usernameListed);                    
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else if(role[0] === 'kestrad') {
+                let getUser = knex('hattra_additional')
+                .select('username_kota')
+                .where('username_kota', usernameLister)
+                .andWhere('username_kestrad', usernameListed);
+                
+                return getUser
+                .first()
+                .then(kota => {
+                  if(kota) {
+                    return module.exports.listHattraByKestrad(search, page, perPage, sort, usernameListed);                  
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else {
+                return new errors.Forbidden();
+              }
+            }
+          } else if (usernameRole === 'puskesmas') {
+            if(role[0] !== 'kestrad') {
+              return new errors.Forbidden();
+            } else {
+               if(role[0] === 'kestrad') {
+                let getUser = knex('hattra_additional')
+                .select('username_puskesmas')
+                .where('username_puskesmas', usernameLister)
+                .andWhere('username_kestrad', usernameListed);
+                
+                return getUser
+                .first()
+                .then(puskesmas => {
+                  if(puskesmas) {
+                    return module.exports.listHattraByKestrad(search, page, perPage, sort, usernameListed);                  
+                  } else {
+                    return new errors.Forbidden();
+                  }
+                });
+              } else {
+                return new errors.Forbidden();
+              }
+            }
+          }
+        } else {
+          return new errors.Forbidden();
+        }
+      });
   },
 
   searchHattra: search => {
