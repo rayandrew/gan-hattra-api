@@ -58,8 +58,10 @@ const schemas = {
     properties: {
       id_subkategori: commonSchemas.auto_id,
       nama_layanan: commonSchemas.varchar(),
+      username_kestrad: commonSchemas.username,
       verified: commonSchemas.varchar()
-    }
+    },
+    required: ['id_subkategori', 'nama_layanan', 'username_kestrad']
   },
 
   createHattra: {

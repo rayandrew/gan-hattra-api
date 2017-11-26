@@ -17,6 +17,7 @@ const puskesmasColumns = [
 ];
 
 const displayColumns = [
+  'username_provinsi',
   'count_kestrad',
   'count_layanan_verified',
   'count_layanan_not_verified',
@@ -27,6 +28,7 @@ const displayColumns = [
 const puskesmasUpdateableColumns = ['nama', 'kepala_dinas', 'alamat'];
 const puskesmasSearchableColumns = [
   'username',
+  'username_provinsi',
   'username_kota',
   'nama',
   'kepala_dinas',
@@ -38,9 +40,9 @@ module.exports = {
   listPuskesmas: (search, page, perPage, sort) => {
     return knex
       .select(
-        puskesmasColumns.map(
-          column => 'user_puskesmas.' + column + ' as ' + column
-        ).concat(displayColumns)
+        puskesmasColumns
+          .map(column => 'user_puskesmas.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_puskesmas')
       .innerJoin(
@@ -62,44 +64,11 @@ module.exports = {
 
   searchPuskesmas: search => {
     return knex
-    .select(
-      puskesmasColumns.map(
-        column => 'user_puskesmas.' + column + ' as ' + column
-        .concat(displayColumns)
-      )
-    )
-    .from('user_puskesmas')
-    .innerJoin(
-      'user_puskesmas_additional',
-      'user_puskesmas.username',
-      'user_puskesmas_additional.username'
-    )
-    .search(
-      search,
-      puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
-    )
-    .pageAndSort(
-      page,
-      perPage,
-      sort,
-      puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
-    );
-  },
-
-  getSpecificPuskesmas: username => {
-    return knex
-      .select(puskesmasColumns)
-      .from('user_puskesmas')
-      .where('username', username)
-      .first();
-  },
-
-  getPuskesmasForKota: (search, page, perPage, sort, username) => {
-    return knex
       .select(
         puskesmasColumns.map(
-          column => 'user_puskesmas.' + column + ' as ' + column
-        ).concat(displayColumns)
+          column =>
+            'user_puskesmas.' + column + ' as ' + column.concat(displayColumns)
+        )
       )
       .from('user_puskesmas')
       .innerJoin(
@@ -107,7 +76,49 @@ module.exports = {
         'user_puskesmas.username',
         'user_puskesmas_additional.username'
       )
+      .search(
+        search,
+        puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
+      )
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+      );
+  },
+
+  getSpecificPuskesmas: username => {
+    return knex
+      .select(
+        puskesmasColumns
+          .map(column => 'user_puskesmas.' + column + ' as ' + column)
+          .concat(displayColumns)
+      )
+      .from('user_puskesmas')
+      .where('user_puskesmas.username', username)
+      .innerJoin(
+        'user_puskesmas_additional',
+        'user_puskesmas.username',
+        'user_puskesmas_additional.username'
+      )
+      .first();
+  },
+
+  getPuskesmasForKota: (search, page, perPage, sort, username) => {
+    return knex
+      .select(
+        puskesmasColumns
+          .map(column => 'user_puskesmas.' + column + ' as ' + column)
+          .concat(displayColumns)
+      )
+      .from('user_puskesmas')
       .where('user_puskesmas.username_kota', username)
+      .innerJoin(
+        'user_puskesmas_additional',
+        'user_puskesmas.username',
+        'user_puskesmas_additional.username'
+      )
       .search(
         search,
         puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
@@ -123,17 +134,17 @@ module.exports = {
   getPuskesmasForProvinsi: (search, page, perPage, sort, username) => {
     return knex
       .select(
-        puskesmasColumns.map(
-          column => 'user_puskesmas.' + column + ' as ' + column
-        ).concat(displayColumns)
+        puskesmasColumns
+          .map(column => 'user_puskesmas.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_puskesmas')
+      .where('username_provinsi', username)
       .innerJoin(
         'user_puskesmas_additional',
         'user_puskesmas.username',
         'user_puskesmas_additional.username'
       )
-      .where('username_provinsi', username)
       .search(
         search,
         puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
@@ -154,51 +165,73 @@ module.exports = {
       .first();
   },
 
-  listPuskesmasByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+  listPuskesmasByUsername: (
+    search,
+    page,
+    perPage,
+    sort,
+    usernameLister,
+    usernameRole,
+    usernameListed
+  ) => {
     let promises = Promise.resolve();
     promises = promises.then(() => {
-      return helper.getRole(usernameListed)
-        .map(function(row) {
-          return row.role;
-        });
+      return helper.getRole(usernameListed).map(function (row) {
+        return row.role;
+      });
     });
-    return promises
-      .then((role) => {
-        if(role) {
-          if(usernameRole === 'admin') {
-            if(role[0] === 'provinsi') {
-              return module.exports.getPuskesmasForProvinsi(search, page, perPage, sort, usernameListed);
-            } else if(role[0] === 'kota') {
-              return module.exports.getPuskesmasForKota(search, page, perPage, sort, usernameListed);
-            } else {
-              return new errors.Forbidden();
-            }
-          } else if (usernameRole === 'provinsi') {
-            if(role[0] === 'admin' || role[0] === 'provinsi') {
-              return new errors.Forbidden();
-            } else {
-              if(role[0] === 'kota') {
-                let getUser = knex('user_kestrad_additional')
+    return promises.then(role => {
+      if (role) {
+        if (usernameRole === 'admin') {
+          if (role[0] === 'provinsi') {
+            return module.exports.getPuskesmasForProvinsi(
+              search,
+              page,
+              perPage,
+              sort,
+              usernameListed
+            );
+          } else if (role[0] === 'kota') {
+            return module.exports.getPuskesmasForKota(
+              search,
+              page,
+              perPage,
+              sort,
+              usernameListed
+            );
+          } else {
+            return new errors.Forbidden();
+          }
+        } else if (usernameRole === 'provinsi') {
+          if (role[0] === 'admin' || role[0] === 'provinsi') {
+            return new errors.Forbidden();
+          } else {
+            if (role[0] === 'kota') {
+              let getUser = knex('user_kestrad_additional')
                 .select('username_provinsi')
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_kota', usernameListed);
 
-                return getUser
-                .first()
-                .then(provinsi => {
-                  if(provinsi) {
-                    return module.exports.getPuskesmasForKota(search, page, perPage, sort, usernameListed);                                 
-                  } else {
-                    return new errors.Forbidden();
-                  }
-                });
-              }
+              return getUser.first().then(provinsi => {
+                if (provinsi) {
+                  return module.exports.getPuskesmasForKota(
+                    search,
+                    page,
+                    perPage,
+                    sort,
+                    usernameListed
+                  );
+                } else {
+                  return new errors.Forbidden();
+                }
+              });
             }
           }
-        } else {
-          return new errors.Forbidden();
         }
-      });
+      } else {
+        return new errors.Forbidden();
+      }
+    });
   },
 
   updatePuskesmas: (username, puskesmasUpdates) => {
@@ -211,6 +244,5 @@ module.exports = {
         .update(puskesmasUpdates)
         .where('username', username);
     });
-  },
-  
+  }
 };

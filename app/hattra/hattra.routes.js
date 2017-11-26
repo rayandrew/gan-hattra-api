@@ -35,7 +35,7 @@ const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
  */
 router.get(
   '/hattra',
-  auth.middleware.isPuskesmasOrHigher,
+  auth.middleware.isKestradOrHigher,
   validators.listHattra,
   (req, res, next) => {
     const isAdmin = auth.predicates.isAdmin(req.user);
@@ -133,7 +133,6 @@ router.get(
   }
 );
 
-
 /**
  * Get a list of hattra for searching.
  * @name Search hattra
@@ -153,19 +152,15 @@ router.get('/hattra/search', auth.middleware.isLoggedIn, (req, res, next) => {
  * @name Get hattra info.
  * @route {GET} /hattra/:id
  */
-router.get(
-  '/hattra/:id',
-  isOwnerOrKestradAndHigher,
-  (req, res, next) => {
-    return queries
-      .getSpecificHattra(req.params.id)
-      .then(user => {
-        if (!user) return next(new errors.NotFound('id not found.'));
-        return res.json(user);
-      })
-      .catch(next);
-  }
-);
+router.get('/hattra/:id', isOwnerOrKestradAndHigher, (req, res, next) => {
+  return queries
+    .getSpecificHattra(req.params.id)
+    .then(user => {
+      if (!user) return next(new errors.NotFound('id not found.'));
+      return res.json(user);
+    })
+    .catch(next);
+});
 
 /**
  * Updates hattra information for the given id.
@@ -192,6 +187,34 @@ router.patch(
 );
 
 /**
+ * Get a list of hattra
+ * @name Get hattra
+ * @route {GET} /hattra/byLayanan/:id
+ */
+router.get(
+  '/hattra/byLayanan/:id',
+  auth.middleware.isKestradOrHigher,
+  validators.listHattra,
+  (req, res, next) => {
+    return queries
+      .listHattraByLayanan(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.params.id
+      )
+      .then(kestrad => {
+        if (!kestrad) {
+          return next(new errors.NotFound('Kestrad not found'));
+        }
+        return res.json(kestrad);
+      })
+      .catch(next);
+  }
+);
+
+/**
  * Updates hattra verification for the given id.
  * @name Update hattra verification
  * @route {PATCH} /hattra/:id/verification
@@ -203,11 +226,15 @@ router.patch(
   validators.updateVerifikasiHattra,
   (req, res, next) => {
     let hattraUpdates = {
-      verified: req.body.hattra.verified,
+      verified: req.body.hattra.verified
     };
 
     return queries
-      .updateVerifikasiHattra(req.params.id_hattra, hattraUpdates, req.user.username)
+      .updateVerifikasiHattra(
+        req.params.id_hattra,
+        hattraUpdates,
+        req.user.username
+      )
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })

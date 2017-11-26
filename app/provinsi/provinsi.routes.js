@@ -21,14 +21,9 @@ const isUserProvinsiOrHigher = auth.createMiddlewareFromPredicate(
   }
 );
 
-const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
-  (user, req) => {
-    return (
-      user.username === req.params.username ||
-      auth.predicates.isAdmin(user)
-    );
-  }
-);
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
+  return user.username === req.params.username || auth.predicates.isAdmin(user);
+});
 
 /**
  * Get a list of provinsi for searching.
@@ -42,9 +37,9 @@ router.get(
   (req, res, next) => {
     return queries
       .searchProvinsi(
-        req.query.search, 
-        req.query.page, 
-        req.query.perPage, 
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
         req.query.sort
       )
       .then(result => {

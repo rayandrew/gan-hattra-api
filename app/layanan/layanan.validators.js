@@ -27,7 +27,6 @@ const schemas = {
       verified: commonSchemas.varchar(255)
     }
   }
-
 };
 
 module.exports = _.mapValues(schemas, validation.createValidator);

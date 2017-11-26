@@ -40,18 +40,15 @@ const insertLayananColumns = [
   'verified'
 ];
 
-const insertHattraColumns = [
-  'id_layanan',
-  'nama',
-  'ijin_hattra',
-  'verified'
-];
+const insertHattraColumns = ['id_layanan', 'nama', 'ijin_hattra', 'verified'];
 
 module.exports = {
   listKestrad: (search, page, perPage, sort) => {
     return knex
       .select(
-        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column).concat(displayColumns)
+        kestradColumns
+          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kestrad')
       .innerJoin(
@@ -74,7 +71,9 @@ module.exports = {
   listKestradByPuskesmas: (search, page, perPage, sort, user) => {
     return knex
       .select(
-        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column).concat(displayColumns)
+        kestradColumns
+          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kestrad')
       .innerJoin(
@@ -98,7 +97,9 @@ module.exports = {
   listKestradByKota: (search, page, perPage, sort, user) => {
     return knex
       .select(
-        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column).concat(displayColumns)
+        kestradColumns
+          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kestrad')
       .innerJoin(
@@ -122,7 +123,9 @@ module.exports = {
   listKestradByProvinsi: (search, page, perPage, sort, user) => {
     return knex
       .select(
-        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column).concat(displayColumns)
+        kestradColumns
+          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kestrad')
       .innerJoin(
@@ -143,97 +146,139 @@ module.exports = {
       );
   },
 
-  listKestradByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+  listKestradByUsername: (
+    search,
+    page,
+    perPage,
+    sort,
+    usernameLister,
+    usernameRole,
+    usernameListed
+  ) => {
     let promises = Promise.resolve();
     promises = promises.then(() => {
-      return helper.getRole(usernameListed)
-        .map(function(row) {
-          return row.role;
-        });
+      return helper.getRole(usernameListed).map(function (row) {
+        return row.role;
+      });
     });
-    return promises
-      .then((role) => {
-        if(role) {
-          if(usernameRole === 'admin') {
-            if(role[0] === 'provinsi') {
-              return module.exports.listKestradByProvinsi(search, page, perPage, sort, usernameListed);
-            } else if(role[0] === 'kota') {
-              return module.exports.listKestradByKota(search, page, perPage, sort, usernameListed);
-            } else if(role[0] === 'puskesmas') {
-              return module.exports.listKestradByPuskesmas(search, page, perPage, sort, usernameListed);
-            } else {
-              return new errors.Forbidden();
-            }
-          } else if (usernameRole === 'provinsi') {
-            if(role[0] === 'admin' || role[0] === 'provinsi') {
-              return new errors.Forbidden();
-            } else {
-              if(role[0] === 'kota') {
-                let getUser = knex('user_kestrad_additional')
+    return promises.then(role => {
+      if (role) {
+        if (usernameRole === 'admin') {
+          if (role[0] === 'provinsi') {
+            return module.exports.listKestradByProvinsi(
+              search,
+              page,
+              perPage,
+              sort,
+              usernameListed
+            );
+          } else if (role[0] === 'kota') {
+            return module.exports.listKestradByKota(
+              search,
+              page,
+              perPage,
+              sort,
+              usernameListed
+            );
+          } else if (role[0] === 'puskesmas') {
+            return module.exports.listKestradByPuskesmas(
+              search,
+              page,
+              perPage,
+              sort,
+              usernameListed
+            );
+          } else {
+            return new errors.Forbidden();
+          }
+        } else if (usernameRole === 'provinsi') {
+          if (role[0] === 'admin' || role[0] === 'provinsi') {
+            return new errors.Forbidden();
+          } else {
+            if (role[0] === 'kota') {
+              let getUser = knex('user_kestrad_additional')
                 .select('username_provinsi')
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_kota', usernameListed);
 
-                return getUser
-                .first()
-                .then(provinsi => {
-                  if(provinsi) {
-                    return module.exports.listKestradByKota(search, page, perPage, sort, usernameListed);                                 
-                  } else {
-                    return new errors.Forbidden();
-                  }
-                });
-              } else if (role[0] === 'puskesmas') {
-                let getUser = knex('user_kestrad_additional')
+              return getUser.first().then(provinsi => {
+                if (provinsi) {
+                  return module.exports.listKestradByKota(
+                    search,
+                    page,
+                    perPage,
+                    sort,
+                    usernameListed
+                  );
+                } else {
+                  return new errors.Forbidden();
+                }
+              });
+            } else if (role[0] === 'puskesmas') {
+              let getUser = knex('user_kestrad_additional')
                 .select('username_provinsi')
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_puskesmas', usernameListed);
 
-                return getUser
-                .first()
-                .then(provinsi => {
-                  if(provinsi) {
-                    return module.exports.listKestradByPuskesmas(search, page, perPage, sort, usernameListed);                    
-                  } else {
-                    return new errors.Forbidden();
-                  }
-                });
-              }
+              return getUser.first().then(provinsi => {
+                if (provinsi) {
+                  return module.exports.listKestradByPuskesmas(
+                    search,
+                    page,
+                    perPage,
+                    sort,
+                    usernameListed
+                  );
+                } else {
+                  return new errors.Forbidden();
+                }
+              });
             }
-          } else if (usernameRole === 'kota') {
-            if(role[0] === 'admin' || role[0] === 'provinsi' || role[0] === 'kota') {
-              return new errors.Forbidden();
-            } else {
-               if (role[0] === 'puskesmas') {
-                let getUser = knex('user_kestrad_additional')
+          }
+        } else if (usernameRole === 'kota') {
+          if (
+            role[0] === 'admin' ||
+            role[0] === 'provinsi' ||
+            role[0] === 'kota'
+          ) {
+            return new errors.Forbidden();
+          } else {
+            if (role[0] === 'puskesmas') {
+              let getUser = knex('user_kestrad_additional')
                 .select('username')
                 .where('username_kota', usernameLister)
                 .andWhere('username_puskesmas', usernameListed);
 
-                return getUser
-                .first()
-                .then(kota => {
-                  if(kota) {
-                    return module.exports.listKestradByPuskesmas(search, page, perPage, sort, usernameListed);                    
-                  } else {
-                    return new errors.Forbidden();
-                  }
-                });
-              } else {
-                return new errors.Forbidden();
-              }
+              return getUser.first().then(kota => {
+                if (kota) {
+                  return module.exports.listKestradByPuskesmas(
+                    search,
+                    page,
+                    perPage,
+                    sort,
+                    usernameListed
+                  );
+                } else {
+                  return new errors.Forbidden();
+                }
+              });
+            } else {
+              return new errors.Forbidden();
             }
-          } 
-        } else {
-          return new errors.Forbidden();
+          }
         }
-      });
+      } else {
+        return new errors.Forbidden();
+      }
+    });
   },
 
   searchKestrad: (search, page, perPage, sort) => {
     return knex
       .select(
-        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column).concat(displayColumns)
+        kestradColumns
+          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kestrad')
       .innerJoin(
@@ -256,7 +301,9 @@ module.exports = {
   getKestradByUsername: username => {
     return knex
       .select(
-        kestradColumns.map(column => 'user_kestrad.' + column + ' as ' + column).concat(displayColumns)
+        kestradColumns
+          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kestrad')
       .innerJoin(
@@ -264,7 +311,7 @@ module.exports = {
         'user_kestrad.username',
         'user_kestrad_additional.username'
       )
-      .where('username', username)
+      .where('user_kestrad.username', username)
       .first();
   },
 
@@ -272,35 +319,35 @@ module.exports = {
     let promises = Promise.resolve();
     promises = promises.then(() => {
       return knex
-      .select()
-      .from('user_kestrad')
-      .where('username', username)
-      .andWhere('username_puskesmas', username_puskesmas)
-      .first()
+        .select()
+        .from('user_kestrad')
+        .where('username', username)
+        .andWhere('username_puskesmas', username_puskesmas)
+        .first();
     });
-      
-    return promises
-      .then((kestrad) => {
-        if(kestrad) {
-          kestradUpdates = _.pick(kestradUpdates, kestradAssignableColumns);
-          kestradUpdates.updated_at = new Date();
-          return knex('user_kestrad')
+
+    return promises.then(kestrad => {
+      if (kestrad) {
+        kestradUpdates = _.pick(kestradUpdates, kestradAssignableColumns);
+        kestradUpdates.updated_at = new Date();
+        return knex('user_kestrad')
           .update(kestradUpdates)
           .where('username', username);
-        } else {
-          return 0;
-        }
-      });
+      } else {
+        return 0;
+      }
+    });
   },
 
-  addLayanan: (insertLayanan) => {
+  addLayanan: insertLayanan => {
     let query = knex
-    .select('id_layanan')
-    .from('layanan')
-    .where({
-      username_kestrad: insertLayanan.username_kestrad,
-      nama_layanan: insertLayanan.nama_layanan
-    });
+      .select('id_layanan')
+      .from('layanan')
+      .where({
+        username_kestrad: insertLayanan.username_kestrad,
+        nama_layanan: insertLayanan.nama_layanan,
+        id_subkategori: insertLayanan.id_subkategori
+      });
 
     insertLayanan = _.pick(insertLayanan, insertLayananColumns);
 
@@ -312,19 +359,18 @@ module.exports = {
         }
       })
       .then(kestradInsert => {
-            return knex('layanan')
-              .insert(insertLayanan);
+        return knex('layanan').insert(insertLayanan);
       });
   },
 
-  addHattra: (insertHattra) => {
+  addHattra: insertHattra => {
     let query = knex
-    .select('id_hattra')
-    .from('hattra')
-    .where({
-      id_layanan: insertHattra.id_layanan,
-      nama: insertHattra.nama
-    });
+      .select('id_hattra')
+      .from('hattra')
+      .where({
+        id_layanan: insertHattra.id_layanan,
+        nama: insertHattra.nama
+      });
 
     insertHattra = _.pick(insertHattra, insertHattraColumns);
 
@@ -336,9 +382,7 @@ module.exports = {
         }
       })
       .then(kestradInsert => {
-            return knex('hattra')
-              .insert(insertHattra);
+        return knex('hattra').insert(insertHattra);
       });
-  },
-
+  }
 };

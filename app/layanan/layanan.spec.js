@@ -91,17 +91,17 @@ describe('Kota handling', function () {
 
     // patch /layanan/verifikasi/:username
     it('should not edit layanan if Kota is not logged in', done => {
-        chai
-          .request(routes)
-          .patch('/api/layanan/verifikasi' + layanan.id)
-          .send({ verified: 'active' })
-          .end((err, resfromget) => {
-            expect(err).to.be.null;
-            expect(resfromdel).to.have.status(401);
-            expect(resfromdel.body.message).to.equal('Unauthorized').null;
-            expect(resfromdel.body.name).to.equal('UnauthorizedError');
-            done();
-          });
-      });
+      chai
+        .request(routes)
+        .patch('/api/layanan/verifikasi' + layanan.id)
+        .send({ verified: 'active' })
+        .end((err, resfromget) => {
+          expect(err).to.be.null;
+          expect(resfromdel).to.have.status(401);
+          expect(resfromdel.body.message).to.equal('Unauthorized').null;
+          expect(resfromdel.body.name).to.equal('UnauthorizedError');
+          done();
+        });
+    });
   });
 });

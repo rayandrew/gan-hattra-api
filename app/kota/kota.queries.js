@@ -40,6 +40,7 @@ const displayColumns = [
   'count_hattra_verified',
   'count_hattra_not_verified'
 ];
+
 const kotaUpdateableColumns = ['nama', 'kepala_dinas', 'alamat'];
 const kotaSearchableColumns = [
   'username',
@@ -54,7 +55,9 @@ module.exports = {
   listKota: (search, page, perPage, sort) => {
     return knex
       .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
+        kotaColumns
+          .map(column => 'user_kota.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kota')
       .innerJoin(
@@ -77,7 +80,9 @@ module.exports = {
   searchUsers: (search, page, perPage, sort) => {
     return knex
       .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
+        kotaColumns
+          .map(column => 'user_kota.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kota')
       .innerJoin(
@@ -99,16 +104,27 @@ module.exports = {
 
   getSpecificKota: username => {
     return knex
-      .select(kotaColumns)
+      .select(
+        kotaColumns
+          .map(column => 'user_kota.' + column + ' as ' + column)
+          .concat(displayColumns)
+      )
       .from('user_kota')
-      .where('username', username)
+      .where('user_kota.username', username)
+      .innerJoin(
+        'user_kota_additional',
+        'user_kota.username',
+        'user_kota_additional.username'
+      )
       .first();
   },
 
   getKotaForProvinsi: (search, page, perPage, sort, username) => {
     return knex
       .select(
-        kotaColumns.map(column => 'user_kota.' + column + ' as ' + column).concat(displayColumns)
+        kotaColumns
+          .map(column => 'user_kota.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kota')
       .innerJoin(
@@ -129,28 +145,40 @@ module.exports = {
       );
   },
 
-  listKotaByUsername : (search, page, perPage, sort, usernameLister, usernameRole, usernameListed) => {
+  listKotaByUsername: (
+    search,
+    page,
+    perPage,
+    sort,
+    usernameLister,
+    usernameRole,
+    usernameListed
+  ) => {
     let promises = Promise.resolve();
     promises = promises.then(() => {
-      return helper.getRole(usernameListed)
-        .map(function(row) {
-          return row.role;
-        });
-    });
-    return promises
-      .then((role) => {
-        if(role) {
-          if(usernameRole === 'admin') {
-            if(role[0] === 'provinsi') {
-              return module.exports.getKotaForProvinsi(search, page, perPage, sort, usernameListed);
-            } else {
-              return new errors.Forbidden();
-            }
-          }
-        } else {
-          return new errors.Forbidden();
-        }
+      return helper.getRole(usernameListed).map(function (row) {
+        return row.role;
       });
+    });
+    return promises.then(role => {
+      if (role) {
+        if (usernameRole === 'admin') {
+          if (role[0] === 'provinsi') {
+            return module.exports.getKotaForProvinsi(
+              search,
+              page,
+              perPage,
+              sort,
+              usernameListed
+            );
+          } else {
+            return new errors.Forbidden();
+          }
+        }
+      } else {
+        return new errors.Forbidden();
+      }
+    });
   },
 
   updateKota: (username, kotaUpdates) => {
@@ -159,5 +187,5 @@ module.exports = {
     return knex('user_kota')
       .update(kotaUpdates)
       .where('username', username);
-  },
+  }
 };

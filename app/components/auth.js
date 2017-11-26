@@ -21,11 +21,24 @@ const predicates = {
   isProvinsiOrHigher: user =>
     user && user.role && (user.role === 'admin' || user.role === 'provinsi'),
   isKotaOrHigher: user =>
-    user && user.role && (user.role === 'admin' || user.role === 'provinsi' || user.role === 'kota'),
+    user &&
+    user.role &&
+    (user.role === 'admin' || user.role === 'provinsi' || user.role === 'kota'),
   isPuskesmasOrHigher: user =>
-    user && user.role && (user.role === 'admin' || user.role === 'provinsi' || user.role === 'kota' || user.role === 'puskesmas'),
+    user &&
+    user.role &&
+    (user.role === 'admin' ||
+      user.role === 'provinsi' ||
+      user.role === 'kota' ||
+      user.role === 'puskesmas'),
   isKestradOrHigher: user =>
-  user && user.role && (user.role === 'admin' || user.role === 'provinsi' || user.role === 'kota' || user.role === 'puskesmas' || user.role === 'kestrad')
+    user &&
+    user.role &&
+    (user.role === 'admin' ||
+      user.role === 'provinsi' ||
+      user.role === 'kota' ||
+      user.role === 'puskesmas' ||
+      user.role === 'kestrad')
 };
 
 /**
@@ -54,34 +67,34 @@ const createMiddlewareFromPredicate = predicate => {
 /* Common middleware for authorization check */
 const middleware = {
   /**
-     * Middleware that checks whether the user is logged in. Throws a HTTP Unauthorized (401) error otherwise.
-     */
+   * Middleware that checks whether the user is logged in. Throws a HTTP Unauthorized (401) error otherwise.
+   */
   isLoggedIn: (req, res, next) => {
     if (!req.user) return next(new errors.Unauthorized('Not logged in.'));
     return next();
   },
 
   /**
-     * Middleware that checks whether the user is a supervisor.
-     */
+   * Middleware that checks whether the user is a supervisor.
+   */
   isSupervisor: createMiddlewareFromPredicate(predicates.isSupervisor),
 
   /**
-     * Middleware that checks whether the user is an admin.
-     */
+   * Middleware that checks whether the user is an admin.
+   */
   isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
 
   /**
-     * Middleware that checks whether the user is an user.
-     */
+   * Middleware that checks whether the user is an user.
+   */
   isUser: createMiddlewareFromPredicate(predicates.isUser),
   /**
-     * Middleware that checks whether the user is a puskesmas.
-     */
+   * Middleware that checks whether the user is a puskesmas.
+   */
   isPuskesmas: createMiddlewareFromPredicate(predicates.isPuskesmas),
   /**
-     * Middleware that checks whether the user is a kota.
-     */
+   * Middleware that checks whether the user is a kota.
+   */
   isKota: createMiddlewareFromPredicate(predicates.isKota),
 
   /**
@@ -90,27 +103,27 @@ const middleware = {
   isKestrad: createMiddlewareFromPredicate(predicates.isKestrad),
 
   /**
-     * Middleware that checks whether the user is Provinsi or higher (admin).
-     */
+   * Middleware that checks whether the user is Provinsi or higher (admin).
+   */
   isProvinsiOrHigher: createMiddlewareFromPredicate(
     predicates.isProvinsiOrHigher
   ),
 
   /**
-     * Middleware that checks whether the user is Kota or higher (admin).
-     */
+   * Middleware that checks whether the user is Kota or higher (admin).
+   */
   isKotaOrHigher: createMiddlewareFromPredicate(predicates.isKotaOrHigher),
 
   /**
-     * Middleware that checks whether the user is Puskesmas or higher (admin).
-     */
+   * Middleware that checks whether the user is Puskesmas or higher (admin).
+   */
   isPuskesmasOrHigher: createMiddlewareFromPredicate(
     predicates.isPuskesmasOrHigher
   ),
 
   /**
-     * Middleware that checks whether the user is Puskesmas or higher (admin).
-     */
+   * Middleware that checks whether the user is Puskesmas or higher (admin).
+   */
   isKestradOrHigher: createMiddlewareFromPredicate(predicates.isKestradOrHigher)
 };
 

@@ -28,21 +28,15 @@ const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
   }
 );
 
-const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
-  (user, req) => {
-    return (
-      user.username === req.params.username ||
-      auth.predicates.isAdmin(user)
-    );
-  }
-);
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
+  return user.username === req.params.username || auth.predicates.isAdmin(user);
+});
 
 /** custom username generator */
 const usernameGenerator = (pred, name) => {
   const nameArr = name.split(' ').map(val => val.toLowerCase());
   return (pred + '_' + nameArr.join('')).substring(0, 255);
 };
-
 
 /**
  * Get a list of kestrad.
@@ -147,7 +141,8 @@ router.get('/kestrad/search', auth.middleware.isLoggedIn, (req, res, next) => {
       req.query.search,
       req.query.page,
       req.query.perPage,
-      req.query.sort)
+      req.query.sort
+    )
     .then(result => {
       return res.json(result);
     })
@@ -164,7 +159,7 @@ router.get(
   isOwnerOrPuskesmasAndHigher,
   (req, res, next) => {
     return queries
-      .getSpecificKestrad(req.params.username)
+      .getKestradByUsername(req.params.username)
       .then(user => {
         if (!user) return next(new errors.NotFound('User not found.'));
         return res.json(user);
@@ -172,7 +167,6 @@ router.get(
       .catch(next);
   }
 );
-
 
 /**
  * Updates kestrad information for the given username.
@@ -210,17 +204,18 @@ router.post(
   auth.middleware.isPuskesmas,
   validators.createLayanan,
   (req, res, next) => {
+    console.log(req.body);
     let insertLayanan = {
       username_kestrad: req.body.username_kestrad,
       id_subkategori: req.body.id_subkategori,
       nama_layanan: req.body.nama_layanan,
-      verified : 'awaiting_validation'
+      verified: 'awaiting_validation'
     };
 
     return queries
       .addLayanan(insertLayanan)
       .then(layanan => {
-        return res.json({id_layanan : layanan[0]});
+        return res.json({ id_layanan: layanan[0] });
       })
       .catch(next);
   }
@@ -246,11 +241,10 @@ router.post(
     return queries
       .addHattra(insertHattra)
       .then(hattra => {
-        return res.json({ hattra: hattra[0]});
+        return res.json({ hattra: hattra[0] });
       })
       .catch(next);
   }
 );
-
 
 module.exports = router;

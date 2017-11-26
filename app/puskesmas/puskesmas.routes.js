@@ -9,14 +9,9 @@ const config = require('config');
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing puskesmas is this puskesmas's owner or a supervisor. */
-const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
-  (user, req) => {
-    return (
-      user.username === req.params.username ||
-      auth.predicates.isAdmin(user)
-    );
-  }
-);
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
+  return user.username === req.params.username || auth.predicates.isAdmin(user);
+});
 
 const isOwnerOrKotaAndHigher = auth.createMiddlewareFromPredicate(
   (user, req) => {
@@ -122,10 +117,12 @@ router.get(
   auth.middleware.isKotaOrHigher,
   (req, res, next) => {
     return queries
-      .searchPuskesmas(req.query.search,
+      .searchPuskesmas(
+        req.query.search,
         req.query.page,
         req.query.perPage,
-        req.query.sort)
+        req.query.sort
+      )
       .then(result => {
         return res.json(result);
       })

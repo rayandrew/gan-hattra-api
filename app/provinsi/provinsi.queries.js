@@ -5,19 +5,43 @@ const errors = require('http-errors');
 const _ = require('lodash');
 const user = require('../users/users.queries.js');
 
-const provinsiColumns = ['username', 'nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const provinsiUpdatableColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const provinsiSearchableColumns = ['nama', 'nama_dinas', 'kepala_dinas', 'alamat'];
-const displayColumns = ['count_kota', 'count_puskesmas', 'count_kestrad', 'count_layanan_verified', 'count_layanan_not_verified', 'count_hattra_verified', 'count_hattra_not_verified'];
-//const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
+const provinsiColumns = [
+  'username',
+  'nama',
+  'nama_dinas',
+  'kepala_dinas',
+  'alamat'
+];
+const provinsiUpdatableColumns = [
+  'nama',
+  'nama_dinas',
+  'kepala_dinas',
+  'alamat'
+];
+const provinsiSearchableColumns = [
+  'nama',
+  'nama_dinas',
+  'kepala_dinas',
+  'alamat'
+];
+const displayColumns = [
+  'count_kota',
+  'count_puskesmas',
+  'count_kestrad',
+  'count_layanan_verified',
+  'count_layanan_not_verified',
+  'count_hattra_verified',
+  'count_hattra_not_verified'
+];
+// const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
 
 module.exports = {
   listProvinsi: (search, page, perPage, sort) => {
     return knex
       .select(
-        provinsiColumns.map(
-          column => 'user_provinsi.' + column + ' as ' + column
-        ).concat(displayColumns)
+        provinsiColumns
+          .map(column => 'user_provinsi.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_provinsi')
       .innerJoin(
@@ -39,9 +63,10 @@ module.exports = {
 
   searchProvinsi: (search, page, perPage, sort) => {
     return knex
-      .select(provinsiColumns.map(
-          column => 'user_provinsi.' + column + ' as ' + column
-        ).concat(displayColumns)
+      .select(
+        provinsiColumns
+          .map(column => 'user_provinsi.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_provinsi')
       .innerJoin(
@@ -49,7 +74,10 @@ module.exports = {
         'user_provinsi.username',
         'user_provinsi_additional.username'
       )
-      .search(search, provinsiSearchableColumns.map(column => 'user_provinsi.' + column))
+      .search(
+        search,
+        provinsiSearchableColumns.map(column => 'user_provinsi.' + column)
+      )
       .limit(20)
       .pageAndSort(
         page,

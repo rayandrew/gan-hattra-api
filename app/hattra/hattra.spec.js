@@ -91,17 +91,17 @@ describe('Hattra handling', function () {
 
     // patch /hattra/:id_hattra/verification
     it('should not edit hattra if Kota is not logged in', done => {
-        chai
-          .request(routes)
-          .patch('/api/hattra/' + hattra.id_hattra + '/verification')
-          .send({ verified: 'active' })
-          .end((err, resfromget) => {
-            expect(err).to.be.null;
-            expect(resfromdel).to.have.status(401);
-            expect(resfromdel.body.message).to.equal('Unauthorized').null;
-            expect(resfromdel.body.name).to.equal('UnauthorizedError');
-            done();
-          });
-      });
+      chai
+        .request(routes)
+        .patch('/api/hattra/' + hattra.id_hattra + '/verification')
+        .send({ verified: 'active' })
+        .end((err, resfromget) => {
+          expect(err).to.be.null;
+          expect(resfromdel).to.have.status(401);
+          expect(resfromdel.body.message).to.equal('Unauthorized').null;
+          expect(resfromdel.body.name).to.equal('UnauthorizedError');
+          done();
+        });
+    });
   });
 });

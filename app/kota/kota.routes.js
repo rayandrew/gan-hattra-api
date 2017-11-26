@@ -9,14 +9,9 @@ const config = require('config');
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing user is this user or (provinsi and higher). */
-const isOwnerOrAdmin = auth.createMiddlewareFromPredicate(
-  (user, req) => {
-    return (
-      user.username === req.params.username ||
-      auth.predicates.isAdmin(user)
-    );
-  }
-);
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
+  return user.username === req.params.username || auth.predicates.isAdmin(user);
+});
 
 const isOwnerOrProvinsiAndHigher = auth.createMiddlewareFromPredicate(
   (user, req) => {
@@ -103,10 +98,12 @@ router.get(
   auth.middleware.isProvinsiOrHigher,
   (req, res, next) => {
     return queries
-      .searchUsers(req.query.search,
+      .searchUsers(
+        req.query.search,
         req.query.page,
         req.query.perPage,
-        req.query.sort)
+        req.query.sort
+      )
       .then(result => {
         return res.json(result);
       })
@@ -134,22 +131,18 @@ router.get('/kota/:username', isOwnerOrProvinsiAndHigher, (req, res, next) => {
  * @name Update kota
  * @route {PATCH} /kota/:username
  */
-router.patch(
-  '/kota/:username',
-  isOwnerOrAdmin,
-  (req, res, next) => {
-    let kotaUpdates = {
-      nama: req.body.nama,
-      kepala_dinas: req.body.kepala_dinas,
-      alamat: req.body.alamat
-    };
-    return queries
-      .updateKota(req.params.username, kotaUpdates)
-      .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
-      })
-      .catch(next);
-  }
-);
+router.patch('/kota/:username', isOwnerOrAdmin, (req, res, next) => {
+  let kotaUpdates = {
+    nama: req.body.nama,
+    kepala_dinas: req.body.kepala_dinas,
+    alamat: req.body.alamat
+  };
+  return queries
+    .updateKota(req.params.username, kotaUpdates)
+    .then(affectedRowCount => {
+      return res.json({ affectedRowCount: affectedRowCount });
+    })
+    .catch(next);
+});
 
 module.exports = router;

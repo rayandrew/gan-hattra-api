@@ -95,7 +95,8 @@ router.get(
           return res.json(layanan);
         })
         .catch(next);
-    } else { //isKestrad
+    } else {
+      // isKestrad
       return queries
         .getLayananForKestrad(
           req.query.search,
@@ -146,17 +147,63 @@ router.get(
  * @name Search layanan
  * @route {GET} /layanan/search
  */
-router.get(
-  '/layanan/search',
-  auth.middleware.isLoggedIn,
-  (req, res, next) => {
-    return queries
-      .searchLayanan(req.query.search,
+router.get('/layanan/search', auth.middleware.isLoggedIn, (req, res, next) => {
+  return queries
+    .searchLayanan(
+      req.query.search,
       req.query.page,
       req.query.perPage,
-      req.query.sort)
-      .then(result => {
-        return res.json(result);
+      req.query.sort
+    )
+    .then(result => {
+      return res.json(result);
+    })
+    .catch(next);
+});
+
+/**
+ * Get a list of kategori
+ * @name Get kategori
+ * @route {GET} /layanan/listKategori
+ */
+router.get(
+  '/layanan/listKategori',
+  auth.middleware.isKestradOrHigher,
+  validators.listLayanan,
+  (req, res, next) => {
+    return queries
+      .listKategori(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort
+      )
+      .then(kategori => {
+        return res.json(kategori);
+      })
+      .catch(next);
+  }
+);
+
+/**
+ * Get a list of subkategori
+ * @name Get subkategori
+ * @route {GET} /layanan/listSubkategori
+ */
+router.get(
+  '/layanan/listSubkategori',
+  auth.middleware.isKestradOrHigher,
+  validators.listLayanan,
+  (req, res, next) => {
+    return queries
+      .listSubKategori(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort
+      )
+      .then(subkategori => {
+        return res.json(subkategori);
       })
       .catch(next);
   }
@@ -167,11 +214,11 @@ router.get(
  * @name Get layanan info.
  * @route {GET} /layanan/:nama
  */
-router.get('/layanan/:nama', isOwnerOrKestradAndHigher, (req, res, next) => {
+router.get('/layanan/:id', isOwnerOrKestradAndHigher, (req, res, next) => {
   return queries
-    .getSpecificLayanan(req.params.nama)
+    .getSpecificLayanan(req.params.id)
     .then(user => {
-      if (!user) return next(new errors.NotFound('User not found.'));
+      if (!user) return next(new errors.NotFound('Layanan not found.'));
       return res.json(user);
     })
     .catch(next);
@@ -192,7 +239,11 @@ router.patch(
     };
 
     return queries
-      .updateNamaLayanan(req.params.id_layanan, layananUpdates, req.user.username)
+      .updateNamaLayanan(
+        req.params.id_layanan,
+        layananUpdates,
+        req.user.username
+      )
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
@@ -200,11 +251,10 @@ router.patch(
   }
 );
 
-
 /**
  * Updates verification information for the given id_layanan.
  * @name Update layanan
- * @route {PATCH} /layanan/:nama
+ * @route {PATCH} /layanan/:id_layanan
  */
 router.patch(
   '/layanan/verifikasi/:id_layanan',
@@ -216,13 +266,16 @@ router.patch(
     };
 
     return queries
-      .updateVerifikasiLayanan(req.params.id_layanan, layananUpdates, req.user.username)
+      .updateVerifikasiLayanan(
+        req.params.id_layanan,
+        layananUpdates,
+        req.user.username
+      )
       .then(affectedRowCount => {
         return res.json({ affectedRowCount: affectedRowCount });
       })
       .catch(next);
   }
 );
-
 
 module.exports = router;
