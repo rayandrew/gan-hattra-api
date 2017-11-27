@@ -11,7 +11,9 @@ const hattraColumns = [
   'nama',
   'ijin_hattra',
   'verified',
-  'tanggal_verified'
+  'tanggal_verified',
+  'created_at',
+  'updated_at'
 ];
 
 const hattraSearchableColumns = [
@@ -50,7 +52,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        hattraColumns.map(column => 'hattra.' + column)
+        hattraColumns.concat(displayColumns)
       );
   },
 
@@ -73,7 +75,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        hattraColumns.map(column => 'hattra.' + column)
+        hattraColumns.concat(displayColumns)
       );
   },
 
@@ -96,7 +98,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        hattraColumns.map(column => 'hattra.' + column)
+        hattraColumns.concat(displayColumns)
       );
   },
 
@@ -119,7 +121,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        hattraColumns.map(column => 'hattra.' + column)
+        hattraColumns.concat(displayColumns)
       );
   },
 
@@ -142,7 +144,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        hattraColumns.map(column => 'hattra.' + column)
+        hattraColumns.concat(displayColumns)
       );
   },
 
@@ -209,7 +211,7 @@ module.exports = {
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_kota', usernameListed);
 
-              return getUser.first().then(provinsi => {
+              return getUser.then(provinsi => {
                 if (provinsi) {
                   return module.exports.listHattraByKota(
                     search,
@@ -228,7 +230,7 @@ module.exports = {
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_puskesmas', usernameListed);
 
-              return getUser.first().then(provinsi => {
+              return getUser.then(provinsi => {
                 if (provinsi) {
                   return module.exports.listHattraByPuskesmas(
                     search,
@@ -247,7 +249,7 @@ module.exports = {
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_kestrad', usernameListed);
 
-              return getUser.first().then(provinsi => {
+              return getUser.then(provinsi => {
                 if (provinsi) {
                   return module.exports.listHattraByKestrad(
                     search,
@@ -265,6 +267,7 @@ module.exports = {
             }
           }
         } else if (usernameRole === 'kota') {
+          
           if (
             role[0] === 'admin' ||
             role[0] === 'provinsi' ||
@@ -278,7 +281,7 @@ module.exports = {
                 .where('username_kota', usernameLister)
                 .andWhere('username_puskesmas', usernameListed);
 
-              return getUser.first().then(kota => {
+              return getUser.then(kota => {
                 if (kota) {
                   return module.exports.listHattraByPuskesmas(
                     search,
@@ -297,7 +300,7 @@ module.exports = {
                 .where('username_kota', usernameLister)
                 .andWhere('username_kestrad', usernameListed);
 
-              return getUser.first().then(kota => {
+              return getUser.then(kota => {
                 if (kota) {
                   return module.exports.listHattraByKestrad(
                     search,
@@ -324,7 +327,7 @@ module.exports = {
                 .where('username_puskesmas', usernameLister)
                 .andWhere('username_kestrad', usernameListed);
 
-              return getUser.first().then(puskesmas => {
+              return getUser.then(puskesmas => {
                 if (puskesmas) {
                   return module.exports.listHattraByKestrad(
                     search,
@@ -346,6 +349,29 @@ module.exports = {
         return new errors.Forbidden();
       }
     });
+  },
+
+  listHattraByLayanan: (search, page, perPage, sort, id) => {
+    return knex
+      .select(
+        hattraColumns
+          .map(column => 'hattra.' + column + ' as ' + column)
+          .concat(displayColumns)
+      )
+      .from('hattra')
+      .innerJoin(
+        'hattra_additional',
+        'hattra.id_hattra',
+        'hattra_additional.id_hattra'
+      )
+      .where('hattra.id_layanan', id)
+      .search(search, hattraSearchableColumns.map(column => 'hattra.' + column))
+      .pageAndSort(
+        page,
+        perPage,
+        sort,
+        hattraColumns.concat(displayColumns)
+      );
   },
 
   searchHattra: search => {
@@ -483,7 +509,7 @@ module.exports = {
   updateVerifikasiHattra: (id_hattra, hattraUpdates, username) => {
     let promises = Promise.resolve();
     promises = promises.then(() => {
-      return knex()
+      return knex
         .select()
         .from('hattra')
         .innerJoin(
@@ -498,6 +524,11 @@ module.exports = {
     return promises.then(hattra => {
       if (hatra) {
         hattraUpdates = _.pick(hattraUpdates, hattraAssignableColumns);
+        if (hattraUpdates.verified == 'active') {
+          hattraUpdates.tanggal_verified = new Date();
+        } else {
+          hattraUpdates.tanggal_verified = null;
+        }
         return knex('hattra')
           .update(hattraUpdates)
           .where('id_hattra', id_hattra);

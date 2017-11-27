@@ -24,7 +24,9 @@ const layananColumns = [
   'username_kestrad',
   'nama_layanan',
   'verified',
-  'tanggal_verified'
+  'tanggal_verified',
+  'created_at',
+  'updated_at'
 ];
 
 const displayColumns = [
@@ -61,7 +63,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        layananColumns.map(column => 'layanan.' + column)
+        layananColumns.concat(displayColumns)
       );
   },
 
@@ -87,7 +89,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        layananColumns.map(column => 'layanan.' + column)
+        layananColumns.concat(displayColumns)
       );
   },
 
@@ -113,7 +115,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        layananColumns.map(column => 'layanan.' + column)
+        layananColumns.concat(displayColumns)
       );
   },
 
@@ -139,7 +141,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        layananColumns.map(column => 'layanan.' + column)
+        layananColumns.concat(displayColumns)
       );
   },
 
@@ -165,7 +167,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        layananColumns.map(column => 'layanan.' + column)
+        layananColumns.concat(displayColumns)
       );
   },
 
@@ -392,7 +394,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        layananColumns.map(column => 'layanan.' + column)
+        layananColumns.concat(displayColumns)
       );
   },
 
@@ -427,7 +429,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kategoriColumns.map(column => 'kategori.' + column)
+        kategoriColumns
       );
   },
 
@@ -473,7 +475,7 @@ module.exports = {
   updateVerifikasiLayanan: (id_layanan, layananUpdates, username) => {
     let promises = Promise.resolve();
     promises = promises.then(() => {
-      return knex()
+      return knex
         .select()
         .from('layanan')
         .innerJoin(
@@ -489,8 +491,10 @@ module.exports = {
     return promises.then(layanan => {
       if (layanan) {
         layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
-        if (layananUpdates.verified == 'active') {
+        if (layananUpdates.verified === 'active') {
           layananUpdates.tanggal_verified = new Date();
+        } else {
+          layananUpdates.tanggal_verified = null;
         }
         return knex('layanan')
           .update(layananUpdates)

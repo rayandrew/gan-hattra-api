@@ -7,10 +7,10 @@ exports.seed = (knex, Promise) => {
             username: 'sumatera_utara',
             email: 'sumatera_utara_provinsi@e-gov.id',
             password:
-              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
+              '$2y$10$ENgz.2DX1PgPq9v2h/CKieiZuxPa.TOhhOe39F9ZuAug5.BwmRF.C',
             role: 'provinsi',
-            status: 'disabled'
-          } // Password: admin
+            status: 'active'
+          } // Password: sumatera_utara
         ];
         return Promise.all([
           // Inserts seed entries
@@ -22,7 +22,6 @@ exports.seed = (knex, Promise) => {
           {
             username: 'sumatera_utara',
             nama: 'sumatera_utara',
-            nama_dinas: 'dinas_uksu',
             kepala_dinas: 'Ray',
             alamat: 'Jalan medan no.10'
           }
@@ -42,10 +41,10 @@ exports.seed = (knex, Promise) => {
             username: 'kota_medan',
             email: 'kota_medan@e-gov.id',
             password:
-              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
+              '$2y$10$JHnn1BrSnl2wzSfWERwUseIWoNdUnhEqO6vSOyPJISXMsNIFfzc9K',
             role: 'kota',
-            status: 'disabled'
-          } // Password: admin
+            status: 'active'
+          } // Password: kota_medan
         ];
         return Promise.all([
           // Inserts seed entries
@@ -58,7 +57,6 @@ exports.seed = (knex, Promise) => {
             username: 'kota_medan',
             username_provinsi: 'sumatera_utara',
             nama: 'medan',
-            nama_dinas: 'dinas_medan',
             kepala_dinas: 'Ray',
             alamat: 'Jalan medan no.10'
           }
@@ -75,13 +73,13 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let users = [
           {
-            username: 'puskesmas_medan',
-            email: 'puskesmas_medan@e-gov.id',
+            username: 'pusk_medan',
+            email: 'pusk_medan@e-gov.id',
             password:
-              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
+              '$2y$10$mCMSEWw0/Z1LK.zIiMTdYuKpJEddP4Xn.mejupNYAo2ys.aZDorZC',
             role: 'puskesmas',
-            status: 'disabled'
-          } // Password: admin
+            status: 'active'
+          } // Password: pusk_medan
         ];
         return Promise.all([
           // Inserts seed entries
@@ -91,10 +89,9 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let puskesmas = [
           {
-            username: 'puskesmas_medan',
+            username: 'pusk_medan',
             username_kota: 'kota_medan',
             nama: 'datafreaksPuskesmas1',
-            nama_dinas: 'dinas_puskesmas_medan',
             kepala_dinas: 'Ray',
             alamat: 'Jalan medan no.10'
           }
@@ -114,10 +111,10 @@ exports.seed = (knex, Promise) => {
             username: 'kestrad_medan',
             email: 'kestrad_medan@e-gov.id',
             password:
-              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
+              '$2y$10$P4uqiKT7fQnYly4kpOHDp.OjQQUpXYQIMZf6bYYdzNcwYG3ZyNdVS',
             role: 'kestrad',
-            status: 'disabled'
-          } // Password: admin
+            status: 'active'
+          } // Password: kestrad_medan
         ];
         return Promise.all([
           // Inserts seed entries
@@ -128,7 +125,7 @@ exports.seed = (knex, Promise) => {
         let kestrad = [
           {
             username: 'kestrad_medan',
-            username_puskesmas: 'puskesmas_medan',
+            username_puskesmas: 'pusk_medan',
             nama: 'datafreaksKestrad',
             penanggung_jawab: 'Ray',
             alamat: 'Jalan medan no.10',

@@ -7,10 +7,10 @@ exports.seed = (knex, Promise) => {
             username: 'kota_parapat',
             email: 'kota_medan@e-gov.id',
             password:
-              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
+              '$2y$10$29ee5/vqi.knOGA99cYy2en8cBJOAivT/18N.UG04ecdYn9G6mv8a',
             role: 'kota',
-            status: 'disabled'
-          } // Password: admin
+            status: 'active'
+          } // Password: kota_parapat
         ];
         return Promise.all([
           // Inserts seed entries
@@ -23,7 +23,6 @@ exports.seed = (knex, Promise) => {
             username: 'kota_parapat',
             username_provinsi: 'sumatera_utara',
             nama: 'parapat',
-            nama_dinas: 'dinas_parapat',
             kepala_dinas: 'Verin',
             alamat: 'Jalan parapat no.10'
           }
@@ -40,13 +39,13 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let users = [
           {
-            username: 'puskesmas_parapat',
-            email: 'puskesmas_parapat@e-gov.id',
+            username: 'pusk_parapat',
+            email: 'pusk_parapat@e-gov.id',
             password:
-              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
+              '$2y$10$jPMPgZNIIzpmT/Ad8HGHs.CeeNN2Q.TMZsdeLkD9JJ3v97.pVmEYS',
             role: 'puskesmas',
-            status: 'disabled'
-          } // Password: admin
+            status: 'active'
+          } // Password: pusk_parapat
         ];
         return Promise.all([
           // Inserts seed entries
@@ -56,10 +55,9 @@ exports.seed = (knex, Promise) => {
       .then(() => {
         let puskesmas = [
           {
-            username: 'puskesmas_parapat',
+            username: 'pusk_parapat',
             username_kota: 'kota_parapat',
             nama: 'datafreaksPuskesmas2',
-            nama_dinas: 'dinas_puskesmas_parapat',
             kepala_dinas: 'Verin',
             alamat: 'Jalan parapat no.10'
           }
@@ -79,10 +77,10 @@ exports.seed = (knex, Promise) => {
             username: 'kestrad_parapat',
             email: 'kestrad_parapat@e-gov.id',
             password:
-              '$2y$10$Pe7WP9.qytIhowGEr8hF2uA4sk6F0mrd5FjRX77PKBxNweM9H85X6',
+              '$2y$10$zPUOTzeyNVsRGqGagopdZ.qrTjxwygO7CJGftuL3MRHgXnMZZyvlW',
             role: 'kestrad',
-            status: 'disabled'
-          } // Password: admin
+            status: 'active'
+          } // Password: kestrad_parapat
         ];
         return Promise.all([
           // Inserts seed entries
@@ -93,7 +91,7 @@ exports.seed = (knex, Promise) => {
         let kestrad = [
           {
             username: 'kestrad_parapat',
-            username_puskesmas: 'puskesmas_parapat',
+            username_puskesmas: 'pusk_parapat',
             nama: 'datafreaksKestrad',
             penanggung_jawab: 'Verin',
             alamat: 'Jalan parapat no.10',

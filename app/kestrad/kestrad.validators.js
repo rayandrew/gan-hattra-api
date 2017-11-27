@@ -67,11 +67,11 @@ const schemas = {
   createHattra: {
     type: 'object',
     properties: {
-      id_hattra: commonSchemas.auto_id,
       id_layanan: commonSchemas.auto_id,
       nama: commonSchemas.varchar(),
-      verified: commonSchemas.varchar()
-    }
+      ijin_hattra: commonSchemas.varchar()
+    },
+    required: ['id_layanan', 'nama']
   },
 
   updateKestrad: {

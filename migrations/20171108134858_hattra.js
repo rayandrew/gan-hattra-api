@@ -10,7 +10,8 @@ exports.up = (knex, Promise) => {
       table.string('nama');
       table.string('ijin_hattra');
       table.string('verified');
-      table.timestamp('tanggal_verified').defaultTo(knex.fn.now());
+      table.timestamp('tanggal_verified').nullable();
+      table.timestamps();
     })
   ]);
 };

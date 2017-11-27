@@ -185,7 +185,7 @@ router.delete('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
  * @name Update user
  * @route {GET} /users/:username/resetpassword
  */
-router.get(
+router.patch(
   '/users/:username/resetpassword',
   auth.middleware.isPuskesmasOrHigher,
   (req, res, next) => {

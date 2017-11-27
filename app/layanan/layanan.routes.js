@@ -257,13 +257,22 @@ router.patch(
  * @route {PATCH} /layanan/:id_layanan
  */
 router.patch(
-  '/layanan/verifikasi/:id_layanan',
+  '/layanan/:id_layanan/verification/:unverify?',
   auth.middleware.isKota,
   validators.updateVerifikasiLayanan,
   (req, res, next) => {
-    let layananUpdates = {
-      verified: req.body.verified
-    };
+    let layananUpdates;
+    if(!req.params.unverify) {
+      layananUpdates = {
+        verified: 'active'
+      };
+    }
+
+    if(req.params.unverify && req.params.unverify === 'unverify') {
+      layananUpdates = {
+        verified: 'disabled'
+      };
+    }
 
     return queries
       .updateVerifikasiLayanan(

@@ -27,9 +27,9 @@ const displayColumns = [
 
 const puskesmasUpdateableColumns = ['nama', 'kepala_dinas', 'alamat'];
 const puskesmasSearchableColumns = [
-  'username',
+  'user_puskesmas.username',
+  'user_puskesmas.username_kota',
   'username_provinsi',
-  'username_kota',
   'nama',
   'kepala_dinas',
   'alamat'
@@ -58,7 +58,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+        puskesmasColumns.concat(displayColumns)
       );
   },
 
@@ -84,7 +84,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+        puskesmasColumns.concat(displayColumns)
       );
   },
 
@@ -127,7 +127,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+        puskesmasColumns.concat(displayColumns)
       );
   },
 
@@ -147,13 +147,13 @@ module.exports = {
       )
       .search(
         search,
-        puskesmasSearchableColumns.map(column => 'user_puskesmas.' + column)
+        puskesmasSearchableColumns
       )
       .pageAndSort(
         page,
         perPage,
         sort,
-        puskesmasSortableColumns.map(column => 'user_puskesmas.' + column)
+        puskesmasColumns.concat(displayColumns)
       );
   },
 

@@ -64,7 +64,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kestradColumns.map(column => 'user_kestrad.' + column)
+        kestradColumns.concat(displayColumns)
       );
   },
 
@@ -90,7 +90,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kestradColumns.map(column => 'user_kestrad.' + column)
+        kestradColumns.concat(displayColumns)
       );
   },
 
@@ -116,7 +116,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kestradColumns.map(column => 'user_kestrad.' + column)
+        kestradColumns.concat(displayColumns)
       );
   },
 
@@ -142,7 +142,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kestradColumns.map(column => 'user_kestrad.' + column)
+        kestradColumns.concat(displayColumns)
       );
   },
 
@@ -294,7 +294,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kestradColumns.map(column => 'user_kestrad.' + column)
+        kestradColumns.concat(displayColumns)
       );
   },
 
@@ -349,8 +349,9 @@ module.exports = {
         id_subkategori: insertLayanan.id_subkategori
       });
 
-    insertLayanan = _.pick(insertLayanan, insertLayananColumns);
-
+    let newLayanan = _.pick(insertLayanan, insertLayananColumns);
+    newLayanan.created_at = newLayanan.updated_at = new Date();
+    
     return query
       .first()
       .then(existinglayanan => {
@@ -359,7 +360,7 @@ module.exports = {
         }
       })
       .then(kestradInsert => {
-        return knex('layanan').insert(insertLayanan);
+        return knex('layanan').insert(newLayanan);
       });
   },
 
@@ -372,7 +373,8 @@ module.exports = {
         nama: insertHattra.nama
       });
 
-    insertHattra = _.pick(insertHattra, insertHattraColumns);
+    let newHattra = _.pick(insertHattra, insertHattraColumns);
+    newHattra.created_at = newHattra.updated_at = new Date();
 
     return query
       .first()
@@ -382,7 +384,7 @@ module.exports = {
         }
       })
       .then(kestradInsert => {
-        return knex('hattra').insert(insertHattra);
+        return knex('hattra').insert(newHattra);
       });
   }
 };

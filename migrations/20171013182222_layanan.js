@@ -13,7 +13,8 @@ exports.up = (knex, Promise) => {
         .onDelete('CASCADE');
       table.string('nama_layanan');
       table.string('verified');
-      table.timestamp('tanggal_verified').defaultTo(knex.fn.now());
+      table.timestamp('tanggal_verified').nullable();
+      table.timestamps();
     })
   ]);
 };

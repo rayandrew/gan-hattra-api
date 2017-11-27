@@ -204,7 +204,6 @@ router.post(
   auth.middleware.isPuskesmas,
   validators.createLayanan,
   (req, res, next) => {
-    console.log(req.body);
     let insertLayanan = {
       username_kestrad: req.body.username_kestrad,
       id_subkategori: req.body.id_subkategori,

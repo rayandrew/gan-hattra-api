@@ -206,7 +206,7 @@ router.get(
       )
       .then(kestrad => {
         if (!kestrad) {
-          return next(new errors.NotFound('Kestrad not found'));
+          return next(new errors.NotFound('Hattra not found'));
         }
         return res.json(kestrad);
       })
@@ -221,13 +221,23 @@ router.get(
  */
 
 router.patch(
-  '/hattra/:id_hattra/verification',
+  '/hattra/:id_hattra/verification/:unverify?',
   auth.middleware.isKota,
   validators.updateVerifikasiHattra,
   (req, res, next) => {
-    let hattraUpdates = {
-      verified: req.body.hattra.verified
-    };
+    let hattraUpdates;
+
+    if(!req.params.unverify) {
+      hattraUpdates = {
+        verified: 'active'
+      };
+    }
+
+    if(req.params.unverify && req.params.unverify === 'unverify') {
+      hattraUpdates = {
+        verified: 'disabled'
+      };
+    }
 
     return queries
       .updateVerifikasiHattra(

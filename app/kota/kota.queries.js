@@ -49,7 +49,16 @@ const kotaSearchableColumns = [
   'kepala_dinas',
   'alamat'
 ];
-const kotaSortableColumns = ['username', 'kepala_dinas', 'alamat'];
+
+const kotaSortableColumns = [
+  'username',
+  'username_provinsi',
+  'nama',
+  'kepala_dinas',
+  'alamat',
+  'created_at',
+  'updated_at'
+];
 
 module.exports = {
   listKota: (search, page, perPage, sort) => {
@@ -73,7 +82,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kotaSortableColumns.map(column => 'user_kota.' + column)
+        kotaSortableColumns.concat(displayColumns)
       );
   },
 
@@ -98,7 +107,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kotaSortableColumns.map(column => 'user_kota.' + column)
+        kotaSortableColumns.concat(displayColumns)
       );
   },
 
@@ -123,8 +132,8 @@ module.exports = {
     return knex
       .select(
         kotaColumns
-          .map(column => 'user_kota.' + column + ' as ' + column)
-          .concat(displayColumns)
+        .map(column => 'user_kota.' + column + ' as ' + column)
+        .concat(displayColumns)
       )
       .from('user_kota')
       .innerJoin(
@@ -141,7 +150,7 @@ module.exports = {
         page,
         perPage,
         sort,
-        kotaSortableColumns.map(column => 'user_kota.' + column)
+        kotaSortableColumns.concat(displayColumns)
       );
   },
 
