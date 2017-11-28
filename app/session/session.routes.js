@@ -32,7 +32,6 @@ router.post(
   validators.createSession,
   passport.authenticate('local'),
   (req, res) => {
-    console.log(req.user);
     return res.json(req.user);
   }
 );

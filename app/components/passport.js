@@ -195,7 +195,10 @@ passport.use(
               .first();
           }
         })
-        .then(user => done(null, user))
+        .then(user => {
+           delete user.password; 
+	   done(null, user);
+        })
         .catch(done);
     }
   )
@@ -272,6 +275,7 @@ passport.deserializeUser((username, done) => {
       }
     })
     .then(function (user) {
+      delete user.password;
       done(null, user);
     })
     .catch(done);
