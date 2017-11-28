@@ -59,12 +59,7 @@ module.exports = {
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        layananColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
   },
 
   getLayananForProvinsi: (search, page, perPage, sort, username) => {
@@ -85,12 +80,7 @@ module.exports = {
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        layananColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
   },
 
   getLayananForKota: (search, page, perPage, sort, username) => {
@@ -111,12 +101,7 @@ module.exports = {
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        layananColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
   },
 
   getLayananForPuskesmas: (search, page, perPage, sort, username) => {
@@ -137,12 +122,7 @@ module.exports = {
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        layananColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
   },
 
   getLayananForKestrad: (search, page, perPage, sort, username) => {
@@ -163,12 +143,7 @@ module.exports = {
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        layananColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
   },
 
   listLayananByUsername: (
@@ -234,7 +209,7 @@ module.exports = {
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_kota', usernameListed);
 
-              return getUser.first().then(provinsi => {
+              return getUser.then(provinsi => {
                 if (provinsi) {
                   return module.exports.getLayananForKota(
                     search,
@@ -253,7 +228,7 @@ module.exports = {
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_puskesmas', usernameListed);
 
-              return getUser.first().then(provinsi => {
+              return getUser.then(provinsi => {
                 if (provinsi) {
                   return module.exports.getLayananForPuskesmas(
                     search,
@@ -272,7 +247,7 @@ module.exports = {
                 .where('username_provinsi', usernameLister)
                 .andWhere('username_kestrad', usernameListed);
 
-              return getUser.first().then(provinsi => {
+              return getUser.then(provinsi => {
                 if (provinsi) {
                   return module.exports.getLayananForKestrad(
                     search,
@@ -303,7 +278,7 @@ module.exports = {
                 .where('username_kota', usernameLister)
                 .andWhere('username_puskesmas', usernameListed);
 
-              return getUser.first().then(kota => {
+              return getUser.then(kota => {
                 if (kota) {
                   return module.exports.getLayananForPuskesmas(
                     search,
@@ -322,7 +297,7 @@ module.exports = {
                 .where('username_kota', usernameLister)
                 .andWhere('username_kestrad', usernameListed);
 
-              return getUser.first().then(kota => {
+              return getUser.then(kota => {
                 if (kota) {
                   return module.exports.getLayananForKestrad(
                     search,
@@ -349,7 +324,7 @@ module.exports = {
                 .where('username_puskesmas', usernameLister)
                 .andWhere('username_kestrad', usernameListed);
 
-              return getUser.first().then(puskesmas => {
+              return getUser.then(puskesmas => {
                 if (puskesmas) {
                   return module.exports.getLayananForKestrad(
                     search,
@@ -390,12 +365,7 @@ module.exports = {
         search,
         layananSearchableColumns.map(column => 'layanan.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        layananColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
   },
 
   getSpecificLayanan: id => {
@@ -425,12 +395,7 @@ module.exports = {
         search,
         kategoriSearchableColumns.map(column => 'kategori.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kategoriColumns
-      );
+      .pageAndSort(page, perPage, sort, kategoriColumns);
   },
 
   listSubKategori: (search, page, perPage, sort) => {

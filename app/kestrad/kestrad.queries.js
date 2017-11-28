@@ -60,12 +60,7 @@ module.exports = {
         search,
         kestradSearchableColumns.map(column => 'user_kestrad.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kestradColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
   },
 
   listKestradByPuskesmas: (search, page, perPage, sort, user) => {
@@ -86,12 +81,7 @@ module.exports = {
         search,
         kestradSearchableColumns.map(column => 'user_kestrad.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kestradColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
   },
 
   listKestradByKota: (search, page, perPage, sort, user) => {
@@ -112,12 +102,7 @@ module.exports = {
         search,
         kestradSearchableColumns.map(column => 'user_kestrad.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kestradColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
   },
 
   listKestradByProvinsi: (search, page, perPage, sort, user) => {
@@ -138,12 +123,7 @@ module.exports = {
         search,
         kestradSearchableColumns.map(column => 'user_kestrad.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kestradColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
   },
 
   listKestradByUsername: (
@@ -290,12 +270,7 @@ module.exports = {
         search,
         kestradSearchableColumns.map(column => 'user_kestrad.' + column)
       )
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        kestradColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
   },
 
   getKestradByUsername: username => {
@@ -351,7 +326,7 @@ module.exports = {
 
     let newLayanan = _.pick(insertLayanan, insertLayananColumns);
     newLayanan.created_at = newLayanan.updated_at = new Date();
-    
+
     return query
       .first()
       .then(existinglayanan => {

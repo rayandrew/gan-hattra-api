@@ -227,13 +227,13 @@ router.patch(
   (req, res, next) => {
     let hattraUpdates;
 
-    if(!req.params.unverify) {
+    if (!req.params.unverify) {
       hattraUpdates = {
         verified: 'active'
       };
     }
 
-    if(req.params.unverify && req.params.unverify === 'unverify') {
+    if (req.params.unverify && req.params.unverify === 'unverify') {
       hattraUpdates = {
         verified: 'disabled'
       };

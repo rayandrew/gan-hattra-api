@@ -132,8 +132,8 @@ module.exports = {
     return knex
       .select(
         kotaColumns
-        .map(column => 'user_kota.' + column + ' as ' + column)
-        .concat(displayColumns)
+          .map(column => 'user_kota.' + column + ' as ' + column)
+          .concat(displayColumns)
       )
       .from('user_kota')
       .innerJoin(

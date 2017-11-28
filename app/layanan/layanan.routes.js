@@ -262,13 +262,13 @@ router.patch(
   validators.updateVerifikasiLayanan,
   (req, res, next) => {
     let layananUpdates;
-    if(!req.params.unverify) {
+    if (!req.params.unverify) {
       layananUpdates = {
         verified: 'active'
       };
     }
 
-    if(req.params.unverify && req.params.unverify === 'unverify') {
+    if (req.params.unverify && req.params.unverify === 'unverify') {
       layananUpdates = {
         verified: 'disabled'
       };

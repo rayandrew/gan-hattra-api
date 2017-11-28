@@ -31,6 +31,7 @@ const userColumns = [
   'users.created_at',
   'users.updated_at'
 ];
+
 const userAssignableColumns = [
   'username',
   'email',
@@ -82,7 +83,6 @@ const countAdditional = [
 ];
 
 const middleTable = [
-  'nama_dinas',
   'kepala_dinas',
   'nama',
   'alamat',
@@ -91,17 +91,17 @@ const middleTable = [
 ];
 
 const getProvinsiTable = userColumns
-  .concat(middleTable.slice(0, 4))
+  .concat(middleTable.slice(0, 3))
   .concat(countAdditional);
 
 const getKotaTable = userColumns
   .concat(kotaAdditional)
-  .concat(middleTable.slice(0, 4))
+  .concat(middleTable.slice(0, 3))
   .concat(countAdditional.slice(1, 7));
 
 const getPuskesmasTable = userColumns
   .concat(puskesmasAdditional)
-  .concat(middleTable.slice(0, 4))
+  .concat(middleTable.slice(0, 3))
   .concat(countAdditional.slice(2, 7));
 
 const getKestradTable = userColumns
@@ -132,9 +132,8 @@ module.exports = {
   },
 
   createUser: (user, parent) => {
-    let query = knex
+    let query = knex('users')
       .select('username')
-      .from('users')
       .where('username', user.username);
 
     let newUser = _.pick(user, userAssignableColumns);
@@ -203,20 +202,17 @@ module.exports = {
   getUser: username => {
     let promises = Promise.resolve();
     promises = promises.then(() => {
-      return knex()
+      return knex('users')
         .select('role')
-        .from('users')
         .where('username', username)
-        .map(function (row) {
-          return row.role;
-        });
+        .first()
+        .then(result => result.role);
     });
 
     return promises.then(role => {
       if (role === 'provinsi') {
-        return knex
+        return knex('users')
           .select(getProvinsiTable)
-          .from('users')
           .innerJoin(
             'user_provinsi',
             'users.username',
@@ -230,9 +226,8 @@ module.exports = {
           .where('users.username', username)
           .first();
       } else if (role === 'kota') {
-        return knex
+        return knex('users')
           .select(getKotaTable)
-          .from('users')
           .innerJoin('user_kota', 'users.username', 'user_kota.username')
           .innerJoin(
             'user_kota_additional',
@@ -242,9 +237,8 @@ module.exports = {
           .where('users.username', username)
           .first();
       } else if (role === 'puskesmas') {
-        return knex
+        return knex('users')
           .select(getPuskesmasTable)
-          .from('users')
           .innerJoin(
             'user_puskesmas',
             'users.username',
@@ -258,9 +252,8 @@ module.exports = {
           .where('users.username', username)
           .first();
       } else if (role === 'kestrad') {
-        return knex
+        return knex('users')
           .select(getKestradTable)
-          .from('users')
           .innerJoin('user_kestrad', 'users.username', 'user_kestrad.username')
           .innerJoin(
             'user_kestrad_additional',
@@ -273,47 +266,40 @@ module.exports = {
         return knex
           .select(userColumns)
           .from('users')
-          .where('username', username);
+          .where('username', username)
+          .first();
       }
     });
   },
 
-  updateUser: (username, userUpdates) => {
+  updateUser: (
+    username,
+    userUpdates,
+    requireOldPasswordCheck = true,
+    oldPassword = ''
+  ) => {
     let promises = Promise.resolve();
+
     if (userUpdates.password) {
+      if (requireOldPasswordCheck) {
+        promises = promises.then(() => {
+          return ensureOldPasswordIsCorrect(username, oldPassword);
+        });
+      }
+
       promises = promises.then(() => {
         return bcrypt.hash(userUpdates.password, BCRYPT_STRENGTH);
       });
     }
+
     userUpdates = _.pick(userUpdates, userAssignableColumns);
     userUpdates.updated_at = new Date();
-    return knex
-      .select('role')
-      .from('users')
-      .where('username', username)
-      .then(result => {
-        const { role } = result;
-        if (role === 'admin') {
-          return promises.then(hash => {
-            userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
-            return knex('users')
-              .update(userUpdates)
-              .where('username', username);
-          });
-        } else {
-          return promises.then(hash => {
-            userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
-            return knex('users')
-              .update(userUpdates)
-              .where('username', username)
-              .then(() => {
-                knex(role)
-                  .update(userUpdates)
-                  .where('username', username);
-              });
-          });
-        }
-      });
+    return promises.then(hash => {
+      userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
+      return knex('users')
+        .update(userUpdates)
+        .where('username', username);
+    });
   },
 
   deleteUser: username => {

@@ -145,10 +145,7 @@ module.exports = {
         'user_puskesmas.username',
         'user_puskesmas_additional.username'
       )
-      .search(
-        search,
-        puskesmasSearchableColumns
-      )
+      .search(search, puskesmasSearchableColumns)
       .pageAndSort(
         page,
         perPage,

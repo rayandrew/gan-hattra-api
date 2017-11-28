@@ -15,14 +15,9 @@ const usernameGenerator = (pred, name) => {
   return (pred + '_' + nameArr.join('')).substring(0, 255);
 };
 
-const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
-  (user, req) => {
-    return (
-      user.username === req.params.username ||
-      auth.predicates.isKestradOrHigher(user)
-    );
-  }
-);
+const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
+  return user.username === req.params.username || auth.predicates.isAdmin(user);
+});
 
 /**
  * Get a list of users.
@@ -67,7 +62,7 @@ router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
  * @name Get user info.
  * @route {GET} /users/:username
  */
-router.get('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
+router.get('/users/:username', isOwnerOrAdmin, (req, res, next) => {
   return queries
     .getUser(req.params.username)
     .then(user => {
@@ -140,29 +135,34 @@ router.post(
  */
 router.patch(
   '/users/:username',
-  auth.middleware.isAdmin,
+  isOwnerOrAdmin,
   validators.updateUser,
   (req, res, next) => {
     let userUpdates = {
       email: req.body.email,
-      password: req.body.password,
-      status: req.body.status
+      password: req.body.newPassword
     };
-    if (req.params.username) {
-      return queries
-        .updateUser(req.params.username, userUpdates)
-        .then(affectedRowCount => {
-          return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
-    } else {
-      return queries
-        .updateUser(req.user.username, userUpdates)
-        .then(affectedRowCount => {
-          return res.json({ affectedRowCount: affectedRowCount });
-        })
-        .catch(next);
+
+    // Admin can update all and don't need old password check for password changes, owner can't update status, role, NIM
+    let requireOldPasswordCheck = true;
+    if (auth.predicates.isAdmin(req.user)) {
+      userUpdates.status = req.body.status;
+      requireOldPasswordCheck = false;
     }
+
+    console.log(userUpdates);
+
+    return queries
+      .updateUser(
+        req.params.username,
+        userUpdates,
+        requireOldPasswordCheck,
+        req.body.oldPassword
+      )
+      .then(affectedRowCount => {
+        return res.json({ affectedRowCount: affectedRowCount });
+      })
+      .catch(next);
   }
 );
 

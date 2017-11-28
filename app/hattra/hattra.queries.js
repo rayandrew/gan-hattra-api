@@ -48,12 +48,7 @@ module.exports = {
         'hattra_additional.id_hattra'
       )
       .search(search, hattraSearchableColumns.map(column => 'hattra.' + column))
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        hattraColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, hattraColumns.concat(displayColumns));
   },
 
   listHattraByKestrad: (search, page, perPage, sort, user) => {
@@ -71,12 +66,7 @@ module.exports = {
       )
       .where('username_kestrad', user)
       .search(search, hattraSearchableColumns.map(column => 'hattra.' + column))
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        hattraColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, hattraColumns.concat(displayColumns));
   },
 
   listHattraByPuskesmas: (search, page, perPage, sort, user) => {
@@ -94,12 +84,7 @@ module.exports = {
       )
       .where('username_puskesmas', user)
       .search(search, hattraSearchableColumns.map(column => 'hattra.' + column))
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        hattraColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, hattraColumns.concat(displayColumns));
   },
 
   listHattraByKota: (search, page, perPage, sort, user) => {
@@ -117,12 +102,7 @@ module.exports = {
       )
       .where('username_kota', user)
       .search(search, hattraSearchableColumns.map(column => 'hattra.' + column))
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        hattraColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, hattraColumns.concat(displayColumns));
   },
 
   listHattraByProvinsi: (search, page, perPage, sort, user) => {
@@ -140,12 +120,7 @@ module.exports = {
       )
       .where('username_provinsi', user)
       .search(search, hattraSearchableColumns.map(column => 'hattra.' + column))
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        hattraColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, hattraColumns.concat(displayColumns));
   },
 
   listHattraByUsername: (
@@ -267,7 +242,6 @@ module.exports = {
             }
           }
         } else if (usernameRole === 'kota') {
-          
           if (
             role[0] === 'admin' ||
             role[0] === 'provinsi' ||
@@ -366,12 +340,7 @@ module.exports = {
       )
       .where('hattra.id_layanan', id)
       .search(search, hattraSearchableColumns.map(column => 'hattra.' + column))
-      .pageAndSort(
-        page,
-        perPage,
-        sort,
-        hattraColumns.concat(displayColumns)
-      );
+      .pageAndSort(page, perPage, sort, hattraColumns.concat(displayColumns));
   },
 
   searchHattra: search => {
@@ -522,7 +491,7 @@ module.exports = {
     });
 
     return promises.then(hattra => {
-      if (hatra) {
+      if (hattra) {
         hattraUpdates = _.pick(hattraUpdates, hattraAssignableColumns);
         if (hattraUpdates.verified == 'active') {
           hattraUpdates.tanggal_verified = new Date();
