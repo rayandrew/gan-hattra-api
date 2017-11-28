@@ -196,8 +196,8 @@ passport.use(
           }
         })
         .then(user => {
-           delete user.password; 
-	   done(null, user);
+          delete user.password;
+          done(null, user);
         })
         .catch(done);
     }
