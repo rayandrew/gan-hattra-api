@@ -88,3 +88,6 @@ typings/
 
 # vs code
 .vscode
+
+# frontend
+frontend/
