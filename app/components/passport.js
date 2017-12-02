@@ -115,16 +115,15 @@ passport.use(
         .where('username', username)
         .then(function (user) {
           if (!user) {
-            return done(new errors.Unauthorized('Wrong username or password.'));
+            throw new errors.Unauthorized('Wrong username or password.');
           }
+
           return bcrypt.compare(password, user.password).then(res => {
             if (!res) {
-              return done(
-                new errors.Unauthorized('Wrong username or password.')
-              );
+              throw new errors.Unauthorized('Wrong username or password.');
             }
             if (!auth.predicates.isActive(user)) {
-              return done(new errors.Forbidden('Account inactive.'));
+              throw new errors.Forbidden('Account inactive.');
             }
             delete user.password;
             return user;

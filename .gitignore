@@ -1,9 +1,3 @@
-# Environment-specific Docker Compose files
-docker-compose.local.yml
-docker-compose.staging.yml
-docker-compose.prod.yml
-docker-compose.production.yml
-
 # Sublime Text files
 *.sublime-*
 
