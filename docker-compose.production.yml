@@ -13,7 +13,7 @@ services:
     restart: always
   app:
     build: .
-    command: 'node_modules/.bin/nodemon'
+    command: 'node server.js'
     depends_on:
       - mysql
       - redis
