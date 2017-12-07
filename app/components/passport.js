@@ -52,7 +52,7 @@ const kotaAdditional = ['user_kota.username_provinsi'];
 
 const puskesmasAdditional = [
   'user_puskesmas_additional.username_provinsi',
-  'user_puskesmas.username_provinsi'
+  'user_puskesmas.username_kota'
 ];
 
 const kestradAdditional = [
