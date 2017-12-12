@@ -6,7 +6,6 @@ exports.up = (knex, Promise) => {
         .integer('id_layanan')
         .unsigned()
         .references('layanan.id_layanan')
-        .onDelete('CASCADE');
       table.string('nama');
       table.string('ijin_hattra');
       table.string('verified');

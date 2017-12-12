@@ -6,11 +6,9 @@ exports.up = (knex, Promise) => {
         .integer('id_subkategori')
         .unsigned()
         .references('subkategori.id_subkategori')
-        .onDelete('CASCADE');
       table
         .string('username_kestrad')
         .references('user_kestrad.username')
-        .onDelete('CASCADE');
       table.string('nama_layanan');
       table.string('verified');
       table.timestamp('tanggal_verified').nullable();

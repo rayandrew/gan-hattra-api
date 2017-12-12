@@ -71,6 +71,16 @@ exports.up = (knex, Promise) => {
         END
     `),
     knex.raw(`
+        CREATE TRIGGER before_layanan_delete
+            BEFORE DELETE ON layanan
+            FOR EACH ROW
+        BEGIN
+            DELETE
+            FROM hattra
+            WHERE id_layanan = OLD.id_layanan;
+        END
+    `),
+    knex.raw(`
         CREATE TRIGGER after_layanan_delete 
             AFTER DELETE ON layanan
             FOR EACH ROW 
@@ -93,6 +103,10 @@ exports.up = (knex, Promise) => {
             INTO   user_provinsi
             FROM   user_kota
             WHERE  username = user_kota;
+
+            DELETE
+            FROM hattra
+            WHERE id_layanan = OLD.id_layanan;
 
             IF (OLD.verified = 'active') THEN
                 UPDATE user_provinsi_additional 
@@ -202,6 +216,7 @@ exports.up = (knex, Promise) => {
 exports.down = (knex, Promise) => {
   return Promise.all([
     knex.raw('DROP TRIGGER IF EXISTS after_layanan_insert;'),
+    knex.raw('DROP TRIGGER IF EXISTS before_layanan_delete;'),
     knex.raw('DROP TRIGGER IF EXISTS after_layanan_delete;'),
     knex.raw('DROP TRIGGER IF EXISTS after_layanan_update;')
   ]);

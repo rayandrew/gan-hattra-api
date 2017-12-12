@@ -9,7 +9,6 @@ exports.up = (knex, Promise) => {
       table
         .string('username_kota')
         .references('user_kota.username')
-        .onDelete('CASCADE');
       table.string('nama').unique();
       table.string('kepala_dinas');
       table.string('alamat');
