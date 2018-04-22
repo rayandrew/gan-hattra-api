@@ -27,8 +27,6 @@ services:
     restart: 'no' # TODO: change this to 'always' on production
   mysql:
     image: "mysql"
-    ports:
-      - "3306:3306"
     volumes:
       - ./dump:/docker-entrypoint-initdb.d
     environment:

@@ -9,7 +9,7 @@ services:
       - "./etc/ssl:/etc/ssl"
       - "./frontend:/var/www"
     ports:
-      - "3002:80"
+      - "3000:80"
     restart: always
   app:
     build: .
@@ -21,8 +21,6 @@ services:
     volumes:
       - .:/usr/src/e-gov-jabar
       - /usr/src/e-gov-jabar/node_modules
-    ports:
-      - "3000:3000"
     environment:
       NODE_ENV: production
       EGOV_API_PORT: 3000
