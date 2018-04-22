@@ -6,9 +6,9 @@
     "client": "mysql",
     "connection": {
         "host"     : "127.0.0.1",
-        "user"     : "pmkdata",
-        "password" : "pmkdata",
-        "database" : "pmkdata",
+        "user"     : "egov-jabar",
+        "password" : "[ mysql_password ]",
+        "database" : "egov-jabar",
         "charset"  : "utf8"
     },
     "debug": false
@@ -39,6 +39,6 @@
 
   "publicUserRegistration": true,
   "publicStudentRegistration": true,
-  
+
   "routePrefix": "/api"
 }

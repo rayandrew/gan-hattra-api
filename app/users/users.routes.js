@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const auth = require('../components/auth.js');
-const validators = require('./users.validators.js');
-const errors = require('http-errors');
-const queries = require('./users.queries.js');
-const config = require('config');
+const express = require("express");
+const auth = require("../components/auth.js");
+const validators = require("./users.validators.js");
+const errors = require("http-errors");
+const queries = require("./users.queries.js");
+const config = require("config");
 
 const router = express.Router();
 
 /** custom username generator */
 const usernameGenerator = (pred, name) => {
-  const nameArr = name.split(' ').map(val => val.toLowerCase());
-  return (pred + '_' + nameArr.join('')).substring(0, 255);
+  const nameArr = name.split(" ").map(val => val.toLowerCase());
+  return (pred + "_" + nameArr.join("")).substring(0, 255);
 };
 
 const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
@@ -25,7 +25,7 @@ const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
  * @route {GET} /users
  */
 router.get(
-  '/users',
+  "/users",
   auth.middleware.isAdmin,
   validators.listUsers,
   (req, res, next) => {
@@ -48,7 +48,7 @@ router.get(
  * @name Search users
  * @route {GET} /users/search
  */
-router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
+router.get("/users/search", auth.middleware.isLoggedIn, (req, res, next) => {
   return queries
     .searchUsers(req.query.search)
     .then(result => {
@@ -62,11 +62,11 @@ router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
  * @name Get user info.
  * @route {GET} /users/:username
  */
-router.get('/users/:username', isOwnerOrAdmin, (req, res, next) => {
+router.get("/users/:username", isOwnerOrAdmin, (req, res, next) => {
   return queries
     .getUser(req.params.username)
     .then(user => {
-      if (!user) return next(new errors.NotFound('User not found.'));
+      if (!user) return next(new errors.NotFound("User not found."));
       return res.json(user);
     })
     .catch(next);
@@ -78,52 +78,50 @@ router.get('/users/:username', isOwnerOrAdmin, (req, res, next) => {
  * @route {POST} /users
  */
 router.post(
-  '/users',
+  "/users",
   auth.middleware.isLoggedIn,
   validators.createUser,
   (req, res, next) => {
     // TODO: email/captcha validation
-    const publicUserRegistration = config.get('publicUserRegistration');
+    const publicUserRegistration = config.get("publicUserRegistration");
     const isAdmin = auth.predicates.isAdmin(req.user);
 
     if (!isAdmin && !publicUserRegistration) {
       return next(new errors.Forbidden());
     }
 
-    req.body.status = 'active';
+    req.body.status = "active";
 
     if (auth.predicates.isProvinsi(req.user)) {
       if (!req.body.username) {
-        req.body.username = usernameGenerator('kota', req.body.nama);
+        req.body.username = usernameGenerator("kota", req.body.nama);
       }
-      req.body.role = 'kota';
+      req.body.role = "kota";
     } else if (auth.predicates.isKota(req.user)) {
       if (!req.body.username) {
-        req.body.username = usernameGenerator('pusk', req.body.nama);
+        req.body.username = usernameGenerator("pusk", req.body.nama);
       }
-      req.body.role = 'puskesmas';
+      req.body.role = "puskesmas";
     } else if (auth.predicates.isPuskesmas(req.user)) {
       if (!req.body.username) {
-        req.body.username = usernameGenerator('kestrad', req.body.nama);
+        req.body.username = usernameGenerator("kestrad", req.body.nama);
       }
-      req.body.role = 'kestrad';
+      req.body.role = "kestrad";
     } else if (isAdmin) {
       if (!req.body.username) {
-        req.body.username = usernameGenerator('provinsi', req.body.nama);
+        req.body.username = usernameGenerator("provinsi", req.body.nama);
       }
-      req.body.role = 'provinsi';
+      req.body.role = "provinsi";
     } else {
-      req.body.role = 'user';
-      req.body.status = 'awaiting_validation';
+      req.body.role = "user";
+      req.body.status = "awaiting_validation";
     }
 
     if (!req.body.password) req.body.password = req.body.username;
 
     return queries
       .createUser(req.body, req.user.username)
-      .then(insertedUser => {
-        return res.status(201).json(insertedUser);
-      })
+      .then(insertedUser => res.status(201).json(insertedUser))
       .catch(next);
   }
 );
@@ -134,7 +132,7 @@ router.post(
  * @route {PATCH} /users/:username
  */
 router.patch(
-  '/users/:username',
+  "/users/:username",
   isOwnerOrAdmin,
   validators.updateUser,
   (req, res, next) => {
@@ -150,8 +148,6 @@ router.patch(
       requireOldPasswordCheck = false;
     }
 
-    console.log(userUpdates);
-
     return queries
       .updateUser(
         req.params.username,
@@ -159,9 +155,9 @@ router.patch(
         requireOldPasswordCheck,
         req.body.oldPassword
       )
-      .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
-      })
+      .then(affectedRowCount =>
+        res.json({ affectedRowCount: affectedRowCount })
+      )
       .catch(next);
   }
 );
@@ -171,12 +167,10 @@ router.patch(
  * @name Delete user
  * @route {DELETE} /users/:username
  */
-router.delete('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
+router.delete("/users/:username", auth.middleware.isAdmin, (req, res, next) => {
   return queries
     .deleteUser(req.params.username)
-    .then(affectedRowCount => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
+    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
     .catch(next);
 });
 
@@ -186,7 +180,7 @@ router.delete('/users/:username', auth.middleware.isAdmin, (req, res, next) => {
  * @route {GET} /users/:username/resetpassword
  */
 router.patch(
-  '/users/:username/resetpassword',
+  "/users/:username/resetpassword",
   auth.middleware.isPuskesmasOrHigher,
   (req, res, next) => {
     let userUpdates = {
@@ -201,9 +195,9 @@ router.patch(
           req.user.username,
           req.user.role
         )
-        .then(affectedRowCount => {
-          return res.status(200).json({ affectedRowCount: affectedRowCount });
-        })
+        .then(affectedRowCount =>
+          res.status(200).json({ affectedRowCount: affectedRowCount })
+        )
         .catch(next);
     }
   }

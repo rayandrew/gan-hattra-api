@@ -1,12 +1,15 @@
 {
     "name": "gan-hattra-api",
-    "version": "0.0.1",
-    "description": "e-Traditional",
+    "version": "1.1.0",
+    "description": "Gan-Hattra Backend API",
     "main": "server.js",
     "scripts": {
         "lint": "prettier-semistandard server.js knexfile.js app/**/*.js scripts/**/*.js seeds/**/*.js migrations/**/*.js",
-        "test": "NODE_ENV=test mocha \"app/**/*.spec.js\"",
+        "test": "cross-env NODE_ENV=test nyc mocha \"app/**/*.spec.js\" --reporter mochawesome --reporter-options reportDir=./reports/test,reportFilename=index --exit || exit 0",
+        "cov-report": "nyc report",
+        "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
         "docs": "rimraf docs && jsdoc -c jsdoc.conf",
+        "clean-report": "rimraf reports && rimraf .nyc_output",
         "migrate": "knex migrate:latest",
         "rethink": "node ./scripts/rethink.migrate.js",
         "rollback": "knex migrate:rollback",
@@ -23,7 +26,7 @@
     },
     "homepage": "https://github.com/rayandrews/gan-hattra-api#readme",
     "dependencies": {
-        "ajv": "^5.1.5",
+        "ajv": "^6.4.0",
         "api-error-handler": "^1.0.0",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.17.2",
@@ -34,11 +37,11 @@
         "express-session": "^1.15.3",
         "fs-readdir-recursive": "^1.0.0",
         "http-errors": "^1.6.1",
-        "knex": "^0.13.0",
+        "knex": "^0.14.6",
         "lodash": "^4.17.4",
         "method-override": "^2.3.9",
         "mysql": "^2.13.0",
-        "passport": "^0.3.2",
+        "passport": "^0.4.0",
         "passport-local": "^1.0.0",
         "redis": "^2.7.1",
         "rethinkdb": "^2.3.3",
@@ -49,16 +52,20 @@
     "devDependencies": {
         "chai": "^4.0.2",
         "chai-as-promised": "^7.0.0",
-        "chai-http": "^3.0.0",
+        "chai-http": "^4.0.0",
+        "codecov": "^3.0.0",
+        "cross-env": "^5.1.4",
         "jsdoc": "^3.4.3",
         "jsdoc-route-plugin": "^0.1.0",
-        "mocha": "^3.4.2",
+        "mocha": "^5.1.1",
+        "mochawesome": "^3.0.2",
         "nodemon": "^1.11.0",
+        "nyc": "^11.7.1",
         "prettier-semistandard": "^0.1.1",
         "rimraf": "^2.6.1",
-        "sinon": "^2.3.5",
-        "sinon-chai": "^2.11.0",
-        "sqlite3": "^3.1.9"
+        "sinon": "^4.5.0",
+        "sinon-chai": "^3.0.0",
+        "sqlite3": "^4.0.0"
     },
     "semistandard": {
         "env": {
@@ -68,5 +75,31 @@
         "ignore": [
             "node_modules"
         ]
+    },
+    "nyc": {
+        "include": [
+            "app/**/*.js"
+        ],
+        "exclude": [
+            "**/*.spec.js",
+            "**/migrations/**",
+            "**/seeder/**",
+            "**/seeds/**",
+            "**/config/**",
+            "**/coverage/**",
+            "**/test/**",
+            "test{,-*}.js",
+            "**/*.test.js",
+            "**/__tests__/**",
+            "**/node_modules/**"
+        ],
+        "reporter": [
+            "lcov",
+            "text-summary",
+            "html"
+        ],
+        "cache": true,
+        "all": true,
+        "report-dir": "./reports/coverage"
     }
 }

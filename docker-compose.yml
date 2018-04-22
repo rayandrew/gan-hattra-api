@@ -8,7 +8,7 @@ services:
     depends_on:
       - mysql
       - redis
-      - rethinkdb
+      # - rethinkdb
     volumes: # TODO: use in-container files instead in production (?)
       - .:/usr/src/e-gov-jabar
       - /usr/src/e-gov-jabar/node_modules
@@ -29,6 +29,8 @@ services:
     image: "mysql"
     ports:
       - "3306:3306"
+    volumes:
+      - ./dump:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: "[ mysql_root_password ]" # TODO: change this to a strong password on production, for administration purposes
       MYSQL_DATABASE: egov-jabar
@@ -48,9 +50,9 @@ services:
     restart: unless-stopped
     depends_on:
         - mysql
-  rethinkdb:
-    image: rethinkdb
-    restart: on-failure
-    ports:
-        - "28015:28015"
-        - "1001:8080"
+  #rethinkdb:
+  #  image: rethinkdb
+  #  restart: on-failure
+  #  ports:
+  #      - "28015:28015"
+  #      - "1001:8080"

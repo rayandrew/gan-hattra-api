@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
 /**
  * @module app/common/helper
  */
 
-var knex = require('../components/knex.js');
+var knex = require("../components/knex.js");
 
 module.exports = {
   getRole: username => {
-    return knex('users')
-      .select('role')
-      .where('username', username);
+    return knex("users")
+      .first("role")
+      .where("username", username);
   }
 };

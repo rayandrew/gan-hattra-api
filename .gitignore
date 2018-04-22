@@ -88,3 +88,11 @@ typings/
 
 # frontend
 frontend/
+
+# dump sql
+dump/
+
+# coverage
+coverage/
+.nyc_output/
+reports/

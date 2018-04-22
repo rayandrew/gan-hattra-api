@@ -1,130 +1,122 @@
-'use strict';
+"use strict";
 
-var knex = require('../components/knex.js');
-var helper = require('../common/helper.js');
-const errors = require('http-errors');
-const _ = require('lodash');
+var knex = require("../components/knex.js");
+var helper = require("../common/helper.js");
+const errors = require("http-errors");
+const _ = require("lodash");
 
 const kestradColumns = [
-  'username',
-  'username_puskesmas',
-  'nama',
-  'penanggung_jawab',
-  'alamat',
-  'kecamatan',
-  'created_at',
-  'updated_at'
+  "username",
+  "username_puskesmas",
+  "nama",
+  "penanggung_jawab",
+  "alamat",
+  "kecamatan",
+  "created_at",
+  "updated_at"
 ];
 
 const displayColumns = [
-  'username_provinsi',
-  'username_kota',
-  'count_layanan_verified',
-  'count_layanan_not_verified',
-  'count_hattra_verified',
-  'count_hattra_not_verified'
+  "username_provinsi",
+  "username_kota",
+  "count_layanan_verified",
+  "count_layanan_not_verified",
+  "count_hattra_verified",
+  "count_hattra_not_verified"
 ];
-const kestradSearchableColumns = ['username', 'username_puskesmas', 'nama'];
+const kestradSearchableColumns = ["username", "username_puskesmas", "nama"];
 
 const kestradAssignableColumns = [
-  'kecamatan',
-  'nama',
-  'kepala_dinas',
-  'alamat'
+  "kecamatan",
+  "nama",
+  "kepala_dinas",
+  "alamat"
 ];
 
 const insertLayananColumns = [
-  'id_subkategori',
-  'username_kestrad',
-  'nama_layanan',
-  'verified'
+  "id_subkategori",
+  "username_kestrad",
+  "nama_layanan",
+  "verified"
 ];
 
-const insertHattraColumns = ['id_layanan', 'nama', 'ijin_hattra', 'verified'];
+const insertHattraColumns = ["id_layanan", "nama", "ijin_hattra", "verified"];
 
 module.exports = {
-  listKestrad: (search, page, perPage, sort) => {
-    return knex
+  listKestrad: (search, page, perPage, sort) =>
+    knex("user_kestrad")
       .select(
         kestradColumns
-          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .map(column => "user_kestrad." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('user_kestrad')
       .innerJoin(
-        'user_kestrad_additional',
-        'user_kestrad.username',
-        'user_kestrad_additional.username'
+        "user_kestrad_additional",
+        "user_kestrad.username",
+        "user_kestrad_additional.username"
       )
       .search(
         search,
-        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+        kestradSearchableColumns.map(column => "user_kestrad." + column)
       )
-      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns)),
 
-  listKestradByPuskesmas: (search, page, perPage, sort, user) => {
-    return knex
+  listKestradByPuskesmas: (search, page, perPage, sort, user) =>
+    knex("user_kestrad")
       .select(
         kestradColumns
-          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .map(column => "user_kestrad." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('user_kestrad')
       .innerJoin(
-        'user_kestrad_additional',
-        'user_kestrad.username',
-        'user_kestrad_additional.username'
+        "user_kestrad_additional",
+        "user_kestrad.username",
+        "user_kestrad_additional.username"
       )
-      .where('user_kestrad.username_puskesmas', user)
+      .where("user_kestrad.username_puskesmas", user)
       .search(
         search,
-        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+        kestradSearchableColumns.map(column => "user_kestrad." + column)
       )
-      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns)),
 
-  listKestradByKota: (search, page, perPage, sort, user) => {
-    return knex
+  listKestradByKota: (search, page, perPage, sort, user) =>
+    knex("user_kestrad")
       .select(
         kestradColumns
-          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .map(column => "user_kestrad." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('user_kestrad')
       .innerJoin(
-        'user_kestrad_additional',
-        'user_kestrad.username',
-        'user_kestrad_additional.username'
+        "user_kestrad_additional",
+        "user_kestrad.username",
+        "user_kestrad_additional.username"
       )
-      .where('username_kota', user)
+      .where("username_kota", user)
       .search(
         search,
-        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+        kestradSearchableColumns.map(column => "user_kestrad." + column)
       )
-      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns)),
 
-  listKestradByProvinsi: (search, page, perPage, sort, user) => {
-    return knex
+  listKestradByProvinsi: (search, page, perPage, sort, user) =>
+    knex("user_kestrad")
       .select(
         kestradColumns
-          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .map(column => "user_kestrad." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('user_kestrad')
       .innerJoin(
-        'user_kestrad_additional',
-        'user_kestrad.username',
-        'user_kestrad_additional.username'
+        "user_kestrad_additional",
+        "user_kestrad.username",
+        "user_kestrad_additional.username"
       )
-      .where('username_provinsi', user)
+      .where("username_provinsi", user)
       .search(
         search,
-        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+        kestradSearchableColumns.map(column => "user_kestrad." + column)
       )
-      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns)),
 
   listKestradByUsername: (
     search,
@@ -134,17 +126,17 @@ module.exports = {
     usernameLister,
     usernameRole,
     usernameListed
-  ) => {
-    let promises = Promise.resolve();
-    promises = promises.then(() => {
-      return helper.getRole(usernameListed).map(function (row) {
-        return row.role;
-      });
-    });
-    return promises.then(role => {
-      if (role) {
-        if (usernameRole === 'admin') {
-          if (role[0] === 'provinsi') {
+  ) =>
+    helper
+      .getRole(usernameListed)
+      .then(row => row.role)
+      .then(role => {
+        if (!role) {
+          throw new errors.Forbidden();
+        }
+
+        if (usernameRole === "admin") {
+          if (role === "provinsi") {
             return module.exports.listKestradByProvinsi(
               search,
               page,
@@ -152,7 +144,7 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role[0] === 'kota') {
+          } else if (role === "kota") {
             return module.exports.listKestradByKota(
               search,
               page,
@@ -160,7 +152,7 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role[0] === 'puskesmas') {
+          } else if (role === "puskesmas") {
             return module.exports.listKestradByPuskesmas(
               search,
               page,
@@ -169,197 +161,168 @@ module.exports = {
               usernameListed
             );
           } else {
-            return new errors.Forbidden();
+            throw new errors.Forbidden();
           }
-        } else if (usernameRole === 'provinsi') {
-          if (role[0] === 'admin' || role[0] === 'provinsi') {
-            return new errors.Forbidden();
+        } else if (usernameRole === "provinsi") {
+          if (role === "kota") {
+            const getUser = knex("user_kestrad_additional")
+              .first("username_provinsi")
+              .where("username_provinsi", usernameLister)
+              .andWhere("username_kota", usernameListed);
+
+            return getUser.then(provinsi => {
+              if (!provinsi) {
+                throw new errors.Forbidden();
+              }
+
+              return module.exports.listKestradByKota(
+                search,
+                page,
+                perPage,
+                sort,
+                usernameListed
+              );
+            });
+          } else if (role === "puskesmas") {
+            const getUser = knex("user_kestrad_additional")
+              .first("username_provinsi")
+              .where("username_provinsi", usernameLister)
+              .andWhere("username_puskesmas", usernameListed);
+
+            return getUser.then(provinsi => {
+              if (!provinsi) {
+                throw new errors.Forbidden();
+              }
+
+              return module.exports.listKestradByPuskesmas(
+                search,
+                page,
+                perPage,
+                sort,
+                usernameListed
+              );
+            });
           } else {
-            if (role[0] === 'kota') {
-              let getUser = knex('user_kestrad_additional')
-                .select('username_provinsi')
-                .where('username_provinsi', usernameLister)
-                .andWhere('username_kota', usernameListed);
-
-              return getUser.first().then(provinsi => {
-                if (provinsi) {
-                  return module.exports.listKestradByKota(
-                    search,
-                    page,
-                    perPage,
-                    sort,
-                    usernameListed
-                  );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
-            } else if (role[0] === 'puskesmas') {
-              let getUser = knex('user_kestrad_additional')
-                .select('username_provinsi')
-                .where('username_provinsi', usernameLister)
-                .andWhere('username_puskesmas', usernameListed);
-
-              return getUser.first().then(provinsi => {
-                if (provinsi) {
-                  return module.exports.listKestradByPuskesmas(
-                    search,
-                    page,
-                    perPage,
-                    sort,
-                    usernameListed
-                  );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
-            }
+            throw new errors.Forbidden();
           }
-        } else if (usernameRole === 'kota') {
-          if (
-            role[0] === 'admin' ||
-            role[0] === 'provinsi' ||
-            role[0] === 'kota'
-          ) {
-            return new errors.Forbidden();
-          } else {
-            if (role[0] === 'puskesmas') {
-              let getUser = knex('user_kestrad_additional')
-                .select('username')
-                .where('username_kota', usernameLister)
-                .andWhere('username_puskesmas', usernameListed);
-
-              return getUser.first().then(kota => {
-                if (kota) {
-                  return module.exports.listKestradByPuskesmas(
-                    search,
-                    page,
-                    perPage,
-                    sort,
-                    usernameListed
-                  );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
-            } else {
-              return new errors.Forbidden();
-            }
+        } else if (usernameRole === "kota") {
+          if (role !== "puskesmas") {
+            throw new errors.Forbidden();
           }
+
+          const getUser = knex("user_kestrad_additional")
+            .first("username")
+            .where("username_kota", usernameLister)
+            .andWhere("username_puskesmas", usernameListed);
+
+          return getUser.then(kota => {
+            if (!kota) {
+              throw new errors.Forbidden();
+            }
+
+            return module.exports.listKestradByPuskesmas(
+              search,
+              page,
+              perPage,
+              sort,
+              usernameListed
+            );
+          });
+        } else {
+          throw new errors.Forbidden();
         }
-      } else {
-        return new errors.Forbidden();
-      }
-    });
-  },
+      }),
 
-  searchKestrad: (search, page, perPage, sort) => {
-    return knex
+  searchKestrad: (search, page, perPage, sort) =>
+    knex("user_kestrad")
       .select(
         kestradColumns
-          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .map(column => "user_kestrad." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('user_kestrad')
       .innerJoin(
-        'user_kestrad_additional',
-        'user_kestrad.username',
-        'user_kestrad_additional.username'
+        "user_kestrad_additional",
+        "user_kestrad.username",
+        "user_kestrad_additional.username"
       )
       .search(
         search,
-        kestradSearchableColumns.map(column => 'user_kestrad.' + column)
+        kestradSearchableColumns.map(column => "user_kestrad." + column)
       )
-      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, kestradColumns.concat(displayColumns)),
 
-  getKestradByUsername: username => {
-    return knex
-      .select(
+  getKestradByUsername: username =>
+    knex("user_kestrad")
+      .first(
         kestradColumns
-          .map(column => 'user_kestrad.' + column + ' as ' + column)
+          .map(column => "user_kestrad." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('user_kestrad')
       .innerJoin(
-        'user_kestrad_additional',
-        'user_kestrad.username',
-        'user_kestrad_additional.username'
+        "user_kestrad_additional",
+        "user_kestrad.username",
+        "user_kestrad_additional.username"
       )
-      .where('user_kestrad.username', username)
-      .first();
-  },
+      .where("user_kestrad.username", username),
 
-  updateKestrad: (username, kestradUpdates, username_puskesmas) => {
-    let promises = Promise.resolve();
-    promises = promises.then(() => {
-      return knex
-        .select()
-        .from('user_kestrad')
-        .where('username', username)
-        .andWhere('username_puskesmas', username_puskesmas)
-        .first();
-    });
+  updateKestrad: (username, kestradUpdates, username_puskesmas) =>
+    knex("user_kestrad")
+      .first()
+      .where("username", username)
+      .andWhere("username_puskesmas", username_puskesmas)
+      .then(kestrad => {
+        if (!kestrad) {
+          throw new errors.Forbidden();
+        }
 
-    return promises.then(kestrad => {
-      if (kestrad) {
-        kestradUpdates = _.pick(kestradUpdates, kestradAssignableColumns);
-        kestradUpdates.updated_at = new Date();
-        return knex('user_kestrad')
-          .update(kestradUpdates)
-          .where('username', username);
-      } else {
-        return 0;
-      }
-    });
-  },
+        let tempKestradUpdates = _.pick(
+          kestradUpdates,
+          kestradAssignableColumns
+        );
 
-  addLayanan: insertLayanan => {
-    let query = knex
-      .select('id_layanan')
-      .from('layanan')
+        tempKestradUpdates.updated_at = new Date();
+        return knex("user_kestrad")
+          .update(tempKestradUpdates)
+          .where("username", username);
+      }),
+
+  addLayanan: insertLayanan =>
+    knex("layanan")
+      .first("id_layanan")
       .where({
         username_kestrad: insertLayanan.username_kestrad,
         nama_layanan: insertLayanan.nama_layanan,
         id_subkategori: insertLayanan.id_subkategori
-      });
-
-    let newLayanan = _.pick(insertLayanan, insertLayananColumns);
-    newLayanan.created_at = newLayanan.updated_at = new Date();
-
-    return query
-      .first()
+      })
       .then(existinglayanan => {
         if (existinglayanan) {
-          throw new errors.Conflict('Layanan already exists.');
+          throw new errors.Conflict("Layanan already exists.");
         }
-      })
-      .then(kestradInsert => {
-        return knex('layanan').insert(newLayanan);
-      });
-  },
 
-  addHattra: insertHattra => {
-    let query = knex
-      .select('id_hattra')
-      .from('hattra')
+        let newLayanan = _.pick(insertLayanan, insertLayananColumns);
+        newLayanan.created_at = newLayanan.updated_at = new Date();
+
+        return newLayanan;
+      })
+      .then(newLayanan => knex("layanan").insert(newLayanan)),
+
+  addHattra: insertHattra =>
+    knex
+      .first("id_hattra")
+      .from("hattra")
       .where({
         id_layanan: insertHattra.id_layanan,
         nama: insertHattra.nama
-      });
-
-    let newHattra = _.pick(insertHattra, insertHattraColumns);
-    newHattra.created_at = newHattra.updated_at = new Date();
-
-    return query
-      .first()
+      })
       .then(existinghattra => {
         if (existinghattra) {
-          throw new errors.Conflict('Hattra already exists.');
+          throw new errors.Conflict("Hattra already exists.");
         }
+
+        let newHattra = _.pick(insertHattra, insertHattraColumns);
+        newHattra.created_at = newHattra.updated_at = new Date();
+
+        return newHattra;
       })
-      .then(kestradInsert => {
-        return knex('hattra').insert(newHattra);
-      });
-  }
+      .then(newHattra => knex("hattra").insert(newHattra))
 };

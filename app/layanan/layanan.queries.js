@@ -1,150 +1,141 @@
-'use strict';
+"use strict";
 
-var knex = require('../components/knex.js');
-var helper = require('../common/helper.js');
-const errors = require('http-errors');
-const bcrypt = require('bcryptjs');
-const _ = require('lodash');
+var knex = require("../components/knex.js");
+var helper = require("../common/helper.js");
+const errors = require("http-errors");
+const bcrypt = require("bcryptjs");
+const _ = require("lodash");
 
-const kategoriColumns = ['id_kategori', 'nama_kategori'];
+const kategoriColumns = ["id_kategori", "nama_kategori"];
 
-const kategoriSearchableColumns = ['nama_kategori'];
+const kategoriSearchableColumns = ["nama_kategori"];
 
 const subKategoriColumns = [
-  'id_subkategori',
-  'id_kategori',
-  'nama_subkategori'
+  "id_subkategori",
+  "id_kategori",
+  "nama_subkategori"
 ];
 
-const subKategoriSearchableColumns = ['nama_kategori', 'nama_subkategori'];
+const subKategoriSearchableColumns = ["nama_kategori", "nama_subkategori"];
 
 const layananColumns = [
-  'id_layanan',
-  'id_subkategori',
-  'username_kestrad',
-  'nama_layanan',
-  'verified',
-  'tanggal_verified',
-  'created_at',
-  'updated_at'
+  "id_layanan",
+  "id_subkategori",
+  "username_kestrad",
+  "nama_layanan",
+  "verified",
+  "tanggal_verified",
+  "created_at",
+  "updated_at"
 ];
 
 const displayColumns = [
-  'username_provinsi',
-  'username_kota',
-  'username_puskesmas',
-  'count_hattra_verified',
-  'count_hattra_not_verified'
+  "username_provinsi",
+  "username_kota",
+  "username_puskesmas",
+  "count_hattra_verified",
+  "count_hattra_not_verified"
 ];
 
-const layananSearchableColumns = ['nama_layanan', 'verified'];
+const layananSearchableColumns = ["nama_layanan", "verified"];
 
-const layananAssignableColumns = ['nama_layanan', 'verified'];
+const layananAssignableColumns = ["nama_layanan", "verified"];
 
 module.exports = {
   listLayanan: (search, page, perPage, sort) => {
-    return knex
+    return knex("layanan")
       .select(
         layananColumns
-          .map(column => 'layanan.' + column + ' as ' + column)
+          .map(column => "layanan." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('layanan')
       .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
       )
       .search(
         search,
-        layananSearchableColumns.map(column => 'layanan.' + column)
+        layananSearchableColumns.map(column => "layanan." + column)
       )
       .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
   },
 
-  getLayananForProvinsi: (search, page, perPage, sort, username) => {
-    return knex
+  getLayananForProvinsi: (search, page, perPage, sort, username) =>
+    knex("layanan")
       .select(
         layananColumns
-          .map(column => 'layanan.' + column + ' as ' + column)
+          .map(column => "layanan." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('layanan')
       .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
       )
-      .where('username_provinsi', username)
+      .where("username_provinsi", username)
       .search(
         search,
-        layananSearchableColumns.map(column => 'layanan.' + column)
+        layananSearchableColumns.map(column => "layanan." + column)
       )
-      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns)),
 
-  getLayananForKota: (search, page, perPage, sort, username) => {
-    return knex
+  getLayananForKota: (search, page, perPage, sort, username) =>
+    knex("layanan")
       .select(
         layananColumns
-          .map(column => 'layanan.' + column + ' as ' + column)
+          .map(column => "layanan." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('layanan')
       .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
       )
-      .where('username_kota', username)
+      .where("username_kota", username)
       .search(
         search,
-        layananSearchableColumns.map(column => 'layanan.' + column)
+        layananSearchableColumns.map(column => "layanan." + column)
       )
-      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns)),
 
-  getLayananForPuskesmas: (search, page, perPage, sort, username) => {
-    return knex
+  getLayananForPuskesmas: (search, page, perPage, sort, username) =>
+    knex("layanan")
       .select(
         layananColumns
-          .map(column => 'layanan.' + column + ' as ' + column)
+          .map(column => "layanan." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('layanan')
       .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
       )
-      .where('username_puskesmas', username)
+      .where("username_puskesmas", username)
       .search(
         search,
-        layananSearchableColumns.map(column => 'layanan.' + column)
+        layananSearchableColumns.map(column => "layanan." + column)
       )
-      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns)),
 
-  getLayananForKestrad: (search, page, perPage, sort, username) => {
-    return knex
+  getLayananForKestrad: (search, page, perPage, sort, username) =>
+    knex("layanan")
       .select(
         layananColumns
-          .map(column => 'layanan.' + column + ' as ' + column)
+          .map(column => "layanan." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('layanan')
       .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
       )
-      .where('layanan.username_kestrad', username)
+      .where("layanan.username_kestrad", username)
       .search(
         search,
-        layananSearchableColumns.map(column => 'layanan.' + column)
+        layananSearchableColumns.map(column => "layanan." + column)
       )
-      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns)),
 
   listLayananByUsername: (
     search,
@@ -154,17 +145,17 @@ module.exports = {
     usernameLister,
     usernameRole,
     usernameListed
-  ) => {
-    let promises = Promise.resolve();
-    promises = promises.then(() => {
-      return helper.getRole(usernameListed).map(function (row) {
-        return row.role;
-      });
-    });
-    return promises.then(role => {
-      if (role) {
-        if (usernameRole === 'admin') {
-          if (role[0] === 'provinsi') {
+  ) =>
+    helper
+      .getRole(usernameListed)
+      .then(row => row.role)
+      .then(role => {
+        if (!role) {
+          throw new errors.Forbidden();
+        }
+
+        if (usernameRole === "admin") {
+          if (role === "provinsi") {
             return module.exports.getLayananForProvinsi(
               search,
               page,
@@ -172,7 +163,7 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role[0] === 'kota') {
+          } else if (role === "kota") {
             return module.exports.getLayananForKota(
               search,
               page,
@@ -180,7 +171,7 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role[0] === 'puskesmas') {
+          } else if (role === "puskesmas") {
             return module.exports.getLayananForPuskesmas(
               search,
               page,
@@ -188,7 +179,7 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role[0] === 'kestrad') {
+          } else if (role === "kestrad") {
             return module.exports.getLayananForKestrad(
               search,
               page,
@@ -197,17 +188,17 @@ module.exports = {
               usernameListed
             );
           } else {
-            return new errors.Forbidden();
+            throw new errors.Forbidden();
           }
-        } else if (usernameRole === 'provinsi') {
-          if (role[0] === 'admin' || role[0] === 'provinsi') {
-            return new errors.Forbidden();
+        } else if (usernameRole === "provinsi") {
+          if (role === "admin" || role === "provinsi") {
+            throw new errors.Forbidden();
           } else {
-            if (role[0] === 'kota') {
-              let getUser = knex('layanan_additional')
-                .select('username_provinsi')
-                .where('username_provinsi', usernameLister)
-                .andWhere('username_kota', usernameListed);
+            if (role === "kota") {
+              let getUser = knex("layanan_additional")
+                .select("username_provinsi")
+                .where("username_provinsi", usernameLister)
+                .andWhere("username_kota", usernameListed);
 
               return getUser.then(provinsi => {
                 if (provinsi) {
@@ -219,17 +210,19 @@ module.exports = {
                     usernameListed
                   );
                 } else {
-                  return new errors.Forbidden();
+                  throw new errors.Forbidden();
                 }
               });
-            } else if (role[0] === 'puskesmas') {
-              let getUser = knex('layanan_additional')
-                .select('username_provinsi')
-                .where('username_provinsi', usernameLister)
-                .andWhere('username_puskesmas', usernameListed);
+            } else if (role === "puskesmas") {
+              return knex("layanan_additional")
+                .select("username_provinsi")
+                .where("username_provinsi", usernameLister)
+                .andWhere("username_puskesmas", usernameListed)
+                .then(provinsi => {
+                  if (!provinsi) {
+                    throw new errors.Forbidden();
+                  }
 
-              return getUser.then(provinsi => {
-                if (provinsi) {
                   return module.exports.getLayananForPuskesmas(
                     search,
                     page,
@@ -237,18 +230,17 @@ module.exports = {
                     sort,
                     usernameListed
                   );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
-            } else if (role[0] === 'kestrad') {
-              let getUser = knex('layanan_additional')
-                .select('username_provinsi')
-                .where('username_provinsi', usernameLister)
-                .andWhere('username_kestrad', usernameListed);
+                });
+            } else if (role === "kestrad") {
+              return knex("layanan_additional")
+                .select("username_provinsi")
+                .where("username_provinsi", usernameLister)
+                .andWhere("username_kestrad", usernameListed)
+                .then(provinsi => {
+                  if (!provinsi) {
+                    throw new errors.Forbidden();
+                  }
 
-              return getUser.then(provinsi => {
-                if (provinsi) {
                   return module.exports.getLayananForKestrad(
                     search,
                     page,
@@ -256,30 +248,25 @@ module.exports = {
                     sort,
                     usernameListed
                   );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
+                });
             } else {
-              return new errors.Forbidden();
+              throw new errors.Forbidden();
             }
           }
-        } else if (usernameRole === 'kota') {
-          if (
-            role[0] === 'admin' ||
-            role[0] === 'provinsi' ||
-            role[0] === 'kota'
-          ) {
-            return new errors.Forbidden();
+        } else if (usernameRole === "kota") {
+          if (role === "admin" || role === "provinsi" || role === "kota") {
+            throw new errors.Forbidden();
           } else {
-            if (role[0] === 'puskesmas') {
-              let getUser = knex('layanan_additional')
-                .select('username_kota')
-                .where('username_kota', usernameLister)
-                .andWhere('username_puskesmas', usernameListed);
+            if (role === "puskesmas") {
+              return knex("layanan_additional")
+                .select("username_kota")
+                .where("username_kota", usernameLister)
+                .andWhere("username_puskesmas", usernameListed)
+                .then(kota => {
+                  if (!kota) {
+                    throw new errors.Forbidden();
+                  }
 
-              return getUser.then(kota => {
-                if (kota) {
                   return module.exports.getLayananForPuskesmas(
                     search,
                     page,
@@ -287,18 +274,16 @@ module.exports = {
                     sort,
                     usernameListed
                   );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
-            } else if (role[0] === 'kestrad') {
-              let getUser = knex('layanan_additional')
-                .select('username_kota')
-                .where('username_kota', usernameLister)
-                .andWhere('username_kestrad', usernameListed);
-
-              return getUser.then(kota => {
-                if (kota) {
+                });
+            } else if (role === "kestrad") {
+              return knex("layanan_additional")
+                .select("username_kota")
+                .where("username_kota", usernameLister)
+                .andWhere("username_kestrad", usernameListed)
+                .then(kota => {
+                  if (!kota) {
+                    throw new errors.Forbidden();
+                  }
                   return module.exports.getLayananForKestrad(
                     search,
                     page,
@@ -306,167 +291,143 @@ module.exports = {
                     sort,
                     usernameListed
                   );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
+                });
             } else {
-              return new errors.Forbidden();
+              throw new errors.Forbidden();
             }
           }
-        } else if (usernameRole === 'puskesmas') {
-          if (role[0] !== 'kestrad') {
-            return new errors.Forbidden();
-          } else {
-            if (role[0] === 'kestrad') {
-              let getUser = knex('layanan_additional')
-                .select('username_puskesmas')
-                .where('username_puskesmas', usernameLister)
-                .andWhere('username_kestrad', usernameListed);
+        } else if (usernameRole === "puskesmas") {
+          if (role !== "kestrad") {
+            throw new errors.Forbidden();
+          }
 
-              return getUser.then(puskesmas => {
-                if (puskesmas) {
-                  return module.exports.getLayananForKestrad(
-                    search,
-                    page,
-                    perPage,
-                    sort,
-                    usernameListed
-                  );
-                } else {
-                  return new errors.Forbidden();
-                }
-              });
-            } else {
-              return new errors.Forbidden();
-            }
-          }
+          return knex("layanan_additional")
+            .select("username_puskesmas")
+            .where("username_puskesmas", usernameLister)
+            .andWhere("username_kestrad", usernameListed)
+            .then(puskesmas => {
+              if (!puskesmas) {
+                throw new errors.Forbidden();
+              }
+
+              return module.exports.getLayananForKestrad(
+                search,
+                page,
+                perPage,
+                sort,
+                usernameListed
+              );
+            });
         }
-      } else {
-        return new errors.Forbidden();
-      }
-    });
-  },
 
-  searchLayanan: (search, page, perPage, sort) => {
-    return knex
+        throw new errors.Forbidden();
+      }),
+
+  searchLayanan: (search, page, perPage, sort) =>
+    knex("layanan")
       .select(
         layananColumns
-          .map(column => 'layanan.' + column + ' as ' + column)
+          .map(column => "layanan." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('layanan')
       .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
       )
       .search(
         search,
-        layananSearchableColumns.map(column => 'layanan.' + column)
+        layananSearchableColumns.map(column => "layanan." + column)
       )
-      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns));
-  },
+      .pageAndSort(page, perPage, sort, layananColumns.concat(displayColumns)),
 
-  getSpecificLayanan: id => {
-    return knex
-      .select(
+  getSpecificLayanan: id =>
+    knex("layanan")
+      .first(
         layananColumns
-          .map(column => 'layanan.' + column + ' as ' + column)
+          .map(column => "layanan." + column + " as " + column)
           .concat(displayColumns)
       )
-      .from('layanan')
       .innerJoin(
-        'layanan_additional',
-        'layanan.id_layanan',
-        'layanan_additional.id_layanan'
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
       )
-      .where('layanan.id_layanan', id)
-      .first();
-  },
+      .where("layanan.id_layanan", id),
 
-  listKategori: (search, page, perPage, sort) => {
-    return knex
+  listKategori: (search, page, perPage, sort) =>
+    knex("kategori")
       .select(
-        kategoriColumns.map(column => 'kategori.' + column + ' as ' + column)
+        kategoriColumns.map(column => "kategori." + column + " as " + column)
       )
-      .from('kategori')
       .search(
         search,
-        kategoriSearchableColumns.map(column => 'kategori.' + column)
+        kategoriSearchableColumns.map(column => "kategori." + column)
       )
-      .pageAndSort(page, perPage, sort, kategoriColumns);
-  },
+      .pageAndSort(page, perPage, sort, kategoriColumns),
 
-  listSubKategori: (search, page, perPage, sort) => {
-    return knex
+  listSubKategori: (search, page, perPage, sort) =>
+    knex("subkategori")
       .select(
         subKategoriColumns
-          .map(column => 'subkategori.' + column + ' as ' + column)
+          .map(column => "subkategori." + column + " as " + column)
           .concat(kategoriColumns.slice(1))
       )
-      .from('subkategori')
-      .innerJoin('kategori', 'kategori.id_kategori', 'subkategori.id_kategori');
-  },
+      .innerJoin("kategori", "kategori.id_kategori", "subkategori.id_kategori"),
 
-  updateNamaLayanan: (id_layanan, layananUpdates, username) => {
-    let promises = Promise.resolve();
-    promises = promises.then(() => {
-      return knex()
-        .select()
-        .from('layanan')
-        .innerJoin(
-          'layanan_additional',
-          'layanan.id_layanan',
-          'layanan_additional.id_layanan'
-        )
-        .where('username_puskesmas', username)
-        .andWhere('layanan.id_layanan', id_layanan)
-        .first();
-    });
-
-    return promises.then(layanan => {
-      if (layanan) {
-        layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
-        return knex('layanan')
-          .update(layananUpdates)
-          .where('id_layanan', id_layanan);
-      } else {
-        return 0;
-      }
-    });
-  },
-
-  updateVerifikasiLayanan: (id_layanan, layananUpdates, username) => {
-    let promises = Promise.resolve();
-    promises = promises.then(() => {
-      return knex
-        .select()
-        .from('layanan')
-        .innerJoin(
-          'layanan_additional',
-          'layanan.id_layanan',
-          'layanan_additional.id_layanan'
-        )
-        .where('username_kota', username)
-        .andWhere('layanan.id_layanan', id_layanan)
-        .first();
-    });
-
-    return promises.then(layanan => {
-      if (layanan) {
-        layananUpdates = _.pick(layananUpdates, layananAssignableColumns);
-        if (layananUpdates.verified === 'active') {
-          layananUpdates.tanggal_verified = new Date();
-        } else {
-          layananUpdates.tanggal_verified = null;
+  updateNamaLayanan: (id_layanan, layananUpdates, username) =>
+    knex("layanan")
+      .first()
+      .innerJoin(
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
+      )
+      .where("username_puskesmas", username)
+      .andWhere("layanan.id_layanan", id_layanan)
+      .then(layanan => {
+        if (!layanan) {
+          throw new errors.NotFound();
         }
-        return knex('layanan')
-          .update(layananUpdates)
-          .where('id_layanan', id_layanan);
-      } else {
-        return 0;
-      }
-    });
-  }
+
+        const tempLayananUpdates = _.pick(
+          layananUpdates,
+          layananAssignableColumns
+        );
+
+        return knex("layanan")
+          .update(tempLayananUpdates)
+          .where("id_layanan", id_layanan);
+      }),
+
+  updateVerifikasiLayanan: (id_layanan, layananUpdates, username) =>
+    knex("layanan")
+      .first()
+      .innerJoin(
+        "layanan_additional",
+        "layanan.id_layanan",
+        "layanan_additional.id_layanan"
+      )
+      .where("username_kota", username)
+      .andWhere("layanan.id_layanan", id_layanan)
+      .then(layanan => {
+        if (!layanan) {
+          throw new errors.NotFound("Layanan not found!");
+        }
+
+        let tempLayananUpdates = _.pick(
+          layananUpdates,
+          layananAssignableColumns
+        );
+
+        if (tempLayananUpdates.verified === "active") {
+          tempLayananUpdates.tanggal_verified = new Date();
+        } else {
+          tempLayananUpdates.tanggal_verified = null;
+        }
+
+        return knex("layanan")
+          .update(tempLayananUpdates)
+          .where("id_layanan", id_layanan);
+      })
 };

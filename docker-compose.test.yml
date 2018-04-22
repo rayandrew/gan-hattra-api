@@ -1,0 +1,40 @@
+# Docker Compose file for development
+
+version: "3"
+services:
+  app:
+    build: .
+    command: yarn test
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - .:/usr/src/e-gov-jabar:rw
+      - /usr/src/e-gov-jabar/node_modules
+    environment:
+      NODE_ENV: test
+      EGOV_API_PORT: 3000
+      EGOV_API_SECRET: "[e-gov_jabar_secret_test]"
+      MYSQL_HOST: mysql
+      MYSQL_USER: egov-jabar
+      MYSQL_PASSWORD: "[mysql_password_test]"
+      MYSQL_DATABASE: egov-jabar
+      RETHINKDB_HOST: rethinkdb
+      RETHINKDB_PORT: 28015
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    restart: "no"
+  mysql:
+    image: "mariadb"
+    environment:
+      MYSQL_ROOT_PASSWORD: "[ mysql_root_password_test ]"
+      MYSQL_DATABASE: egov-jabar
+      MYSQL_USER: egov-jabar
+      MYSQL_PASSWORD: "[mysql_password_test]"
+    restart: "no"
+  redis:
+    image: "redis:alpine"
+    restart: "no"
+  rethinkdb:
+    image: rethinkdb
+    restart: "no"
