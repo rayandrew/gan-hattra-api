@@ -21,9 +21,6 @@ addons:
   token:
     secure: "36fdc78f300df354526104f8be3835c87351af59"
 
-script:
-  - sonar-scanner
-
 cache:
   yarn: true
   directories:
@@ -36,19 +33,20 @@ env:
     - EGOV_API_PORT=3000
     - EGOV_API_SECRET=[e-gov_jabar_secret_test]
     - MYSQL_HOST=localhost
-    - MYSQL_USER=travis
+    - MYSQL_USER=root
     - MYSQL_PASSWORD=
-    - MYSQL_DATABASE=egov-jabar
+    - MYSQL_DATABASE=egov_jabar
     - RETHINKDB_HOST=localhost
     - RETHINKDB_PORT=28015
     - REDIS_HOST=localhost
     - REDIS_PORT=6379
 
 before_install:
-  - mysql -e 'CREATE DATABASE egov-jabar;'
+  - mysql -e 'CREATE DATABASE egov_jabar;'
 
 script:
   - yarn test
 
 after_success:
   - yarn coverage
+  - sonar-scanner
