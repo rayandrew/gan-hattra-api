@@ -18,8 +18,7 @@ addons:
   mariadb: '10.2'
   sonarcloud:
     organization: "datafreaks"
-    token:
-      secure: "cn16LzkhnUSns8a94V1WNqe8EtCFXKmJjfp4gyQ1WvVr2XKjEn6nXlhwuwccjT6vmgB4qPafdslMKhrjHy1whPH11Xr7IX8pw2qut6VdxvExkyvyA+jRk6w7yQcEk3f0ImHX1m1fObMC4yYoHda0GO5ntJpDlf/ANc4UkUMrsG1qwH9AW93qthFJQ///TYfw9+dNIwjKDUgMPEMmkhI/SCYvmUbz9sutWoUUusEx03xoGzKU5JBQXtHixLp0O2pWXmFV7kC8rKkRRvpjbv3c1usSM/Qc/jfAkbdaEObTLhZR1k8po0ftRNqCm5Uk1j6NrntNLOJLr+9jYGKwORMG0IizSzonZdPduurmtUWaURtdsNrUc0xe+6YTIa6TY3hV3WVsM7v9RwGlzjAn4hoB5j/d9FW/NaU0aBPxCRwSx1921LJjDL8pb2gNx4WF4u9EIz5skoOFHC76TrShC503yX8c8Jk19YymWixNXHeoHyoFh/M3NS6VziMVKshJNzbbQTZMSenkv9g8oWcTzy4BdhgfHXlrNkC99xi+hu4ojMjGGnt12ZoTJUIBkUABoZKAKzBPEhsPlI1EdzDRqh5q8CXT0Gg6bxUCel6dyY7A/ubu/yZIFCRkGuTtkutU3ohBmBeyy6ycwO6BEpGimd1PZ7YooFuNoOuktuHO5Cwy9iY="
+    token: $SONAR_TOKEN
 
 cache:
   yarn: true
