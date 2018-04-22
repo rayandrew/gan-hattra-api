@@ -48,4 +48,4 @@ script:
 
 after_success:
   - yarn coverage
-  - sonar-scanner
+  - sonar-scanner -Dsonar.host.url=https://sonarcloud.io
