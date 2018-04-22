@@ -7,7 +7,7 @@
     "connection": {
         "host"     : "127.0.0.1",
         "user"     : "egov-jabar",
-        "password" : "[ mysql_password ]",
+        "password" : "",
         "database" : "egov-jabar",
         "charset"  : "utf8"
     },

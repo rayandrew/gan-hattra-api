@@ -17,7 +17,7 @@ addons:
   rethinkdb: '2.3.4'
   mariadb: '10.2'
   sonarcloud:
-  organization: "dataFreaks"
+  organization: "datafreaks"
   token:
     secure: "36fdc78f300df354526104f8be3835c87351af59"
 
@@ -34,7 +34,6 @@ env:
     - EGOV_API_SECRET=[e-gov_jabar_secret_test]
     - MYSQL_HOST=localhost
     - MYSQL_USER=root
-    - MYSQL_PASSWORD=
     - MYSQL_DATABASE=egov_jabar
     - RETHINKDB_HOST=localhost
     - RETHINKDB_PORT=28015
