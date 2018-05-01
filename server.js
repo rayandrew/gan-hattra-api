@@ -14,8 +14,6 @@ const winston = require("./app/components/winston");
 const app = require("./app/app");
 
 /** Another dependecies */
-const io = require("socket.io").listen(server);
-
 const { conn, rethink } = require("./app/components/rethinkdb");
 const last = require("lodash/last");
 
@@ -24,6 +22,7 @@ const port = normalizePort(config.get("port"));
 
 /** The HTTP server. */
 const server = http.createServer(app).listen(port);
+const io = require("socket.io").listen(server);
 
 // Listen on provided port, on all network interfaces.
 server.on("error", onError);
