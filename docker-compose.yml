@@ -26,7 +26,7 @@ services:
       REDIS_PORT: 6379 # Using default redis image port
     restart: 'no' # TODO: change this to 'always' on production
   mysql:
-    image: "mysql"
+    image: "mariadb"
     volumes:
       - ./dump:/docker-entrypoint-initdb.d
     environment:

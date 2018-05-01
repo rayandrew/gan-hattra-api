@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const auth = require('../components/auth.js');
-const validators = require('./kota.validators.js');
-const errors = require('http-errors');
-const queries = require('./kota.queries.js');
-const config = require('config');
+const express = require("express");
+const errors = require("http-errors");
+const auth = require("../components/auth.js");
+const validators = require("./kota.validators.js");
+const queries = require("./kota.queries.js");
+
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing user is this user or (provinsi and higher). */
@@ -28,7 +28,7 @@ const isOwnerOrProvinsiAndHigher = auth.createMiddlewareFromPredicate(
  * @route {GET} /kota
  */
 router.get(
-  '/kota',
+  "/kota",
   auth.middleware.isProvinsiOrHigher,
   validators.listKota,
   (req, res, next) => {
@@ -45,20 +45,19 @@ router.get(
           return res.json(kota);
         })
         .catch(next);
-    } else {
-      return queries
-        .getKotaForProvinsi(
-          req.query.search,
-          req.query.page,
-          req.query.perPage,
-          req.query.sort,
-          req.user.username
-        )
-        .then(kota => {
-          return res.json(kota);
-        })
-        .catch(next);
     }
+    return queries
+      .getKotaForProvinsi(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username
+      )
+      .then(kota => {
+        return res.json(kota);
+      })
+      .catch(next);
   }
 );
 
@@ -68,7 +67,7 @@ router.get(
  * @route {GET} /hattra
  */
 router.get(
-  '/kota/byUser/:username',
+  "/kota/byUser/:username",
   auth.middleware.isPuskesmasOrHigher,
   (req, res, next) => {
     return queries
@@ -94,7 +93,7 @@ router.get(
  * @route {GET} /users/search
  */
 router.get(
-  '/kota/search',
+  "/kota/search",
   auth.middleware.isProvinsiOrHigher,
   (req, res, next) => {
     return queries
@@ -116,11 +115,11 @@ router.get(
  * @name Get kota info
  * @route {GET} /kota/:username
  */
-router.get('/kota/:username', isOwnerOrProvinsiAndHigher, (req, res, next) => {
+router.get("/kota/:username", isOwnerOrProvinsiAndHigher, (req, res, next) => {
   return queries
     .getSpecificKota(req.params.username)
     .then(kota => {
-      if (!kota) return next(new errors.NotFound('Kota not found.'));
+      if (!kota) return next(new errors.NotFound("Kota not found."));
       return res.json(kota);
     })
     .catch(next);
@@ -131,8 +130,8 @@ router.get('/kota/:username', isOwnerOrProvinsiAndHigher, (req, res, next) => {
  * @name Update kota
  * @route {PATCH} /kota/:username
  */
-router.patch('/kota/:username', isOwnerOrAdmin, (req, res, next) => {
-  let kotaUpdates = {
+router.patch("/kota/:username", isOwnerOrAdmin, (req, res, next) => {
+  const kotaUpdates = {
     nama: req.body.nama,
     kepala_dinas: req.body.kepala_dinas,
     alamat: req.body.alamat
@@ -140,7 +139,7 @@ router.patch('/kota/:username', isOwnerOrAdmin, (req, res, next) => {
   return queries
     .updateKota(req.params.username, kotaUpdates)
     .then(affectedRowCount => {
-      return res.json({ affectedRowCount: affectedRowCount });
+      return res.json({ affectedRowCount });
     })
     .catch(next);
 });

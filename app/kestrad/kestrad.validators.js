@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
-const validation = require('../components/validation.js');
-const commonSchemas = require('../common/schemas.js');
+const _ = require("lodash");
+const validation = require("../components/validation.js");
+const commonSchemas = require("../common/schemas.js");
 
 const schemas = {
   listKestrad: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -15,7 +15,7 @@ const schemas = {
   },
 
   listKategori: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -24,7 +24,7 @@ const schemas = {
   },
 
   listSubkategori: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -33,7 +33,7 @@ const schemas = {
   },
 
   listLayanan: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -42,7 +42,7 @@ const schemas = {
   },
 
   createKestrad: {
-    type: 'object',
+    type: "object",
     properties: {
       username: commonSchemas.username,
       username_puskesmas: commonSchemas.varchar(),
@@ -50,32 +50,32 @@ const schemas = {
       kepala_dinas: commonSchemas.varchar(),
       alamat: commonSchemas.text
     },
-    anyOf: [{ required: ['username'] }]
+    anyOf: [{ required: ["username"] }]
   },
 
   createLayanan: {
-    type: 'object',
+    type: "object",
     properties: {
       id_subkategori: commonSchemas.auto_id,
       nama_layanan: commonSchemas.varchar(),
       username_kestrad: commonSchemas.username,
       verified: commonSchemas.varchar()
     },
-    required: ['id_subkategori', 'nama_layanan', 'username_kestrad']
+    required: ["id_subkategori", "nama_layanan", "username_kestrad"]
   },
 
   createHattra: {
-    type: 'object',
+    type: "object",
     properties: {
       id_layanan: commonSchemas.auto_id,
       nama: commonSchemas.varchar(),
       ijin_hattra: commonSchemas.varchar()
     },
-    required: ['id_layanan', 'nama']
+    required: ["id_layanan", "nama"]
   },
 
   updateKestrad: {
-    type: 'object',
+    type: "object",
     properties: {
       nama: commonSchemas.varchar(),
       penanggung_jawab: commonSchemas.varchar(),

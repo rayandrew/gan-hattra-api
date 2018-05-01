@@ -1,27 +1,31 @@
+/* eslint-env node, mocha */
 /* eslint-disable no-unused-expressions */
 "use strict";
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const sinonChai = require("sinon-chai");
+
 chai.use(chaiHttp);
 chai.use(sinonChai);
 const expect = chai.expect;
 const routes = require("../app");
 const knex = require("../components/knex");
 
-describe("provinsi handling", function() {
+describe("Provinsi handling", () => {
   beforeEach(() =>
     knex.migrate
       .rollback()
       .then(() => knex.migrate.latest())
       .then(() => knex.seed.run()));
 
-  describe("Provinsi handling", function() {
-    let provinsi = {
+  after(() => knex.migrate.rollback());
+
+  describe("Existing provinsi entries", () => {
+    const provinsi = {
       username: "test1"
     };
 
-    // get/provinsi
+    // Get/provinsi
     it("should not get list of provinsi if provinsi or higher is not logged in", done => {
       chai
         .request(routes)
@@ -35,7 +39,7 @@ describe("provinsi handling", function() {
         });
     });
 
-    // get /provinsi/search
+    // Get /provinsi/search
     it("should not get list of provinsi by searching if provinsi or higher is not logged in", done => {
       chai
         .request(routes)
@@ -49,7 +53,7 @@ describe("provinsi handling", function() {
         });
     });
 
-    // get /provinsi/:username
+    // Get /provinsi/:username
     it("should not get spesific kota if user is not logged in", done => {
       chai
         .request(routes)
@@ -62,7 +66,7 @@ describe("provinsi handling", function() {
         });
     });
 
-    // patch /provinsi/:username
+    // Patch /provinsi/:username
     it("should not edit kota if kota or higher is not logged in", done => {
       chai
         .request(routes)

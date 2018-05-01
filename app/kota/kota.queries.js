@@ -1,24 +1,9 @@
 "use strict";
 
-var knex = require("../components/knex.js");
-var helper = require("../common/helper.js");
 const errors = require("http-errors");
-const bcrypt = require("bcryptjs");
 const _ = require("lodash");
-const BCRYPT_STRENGTH = 8;
-
-const ensureOldPasswordIsCorrect = (username, password) =>
-  knex("users")
-    .first("username", "password")
-    .where("username", username)
-    .then(user => {
-      if (!user) throw new errors.Unauthorized("Wrong username or password.");
-      return bcrypt.compare(password, user.password);
-    })
-    .then(result => {
-      if (!result) throw new errors.Unauthorized("Wrong username or password.");
-      return Promise.resolve();
-    });
+const knex = require("../components/knex.js");
+const helper = require("../common/helper.js");
 
 const kotaColumns = [
   "username",
@@ -172,13 +157,12 @@ module.exports = {
             sort,
             usernameListed
           );
-        } else {
-          throw new errors.Forbidden();
         }
+        throw new errors.Forbidden();
       }),
 
   updateKota: (username, kotaUpdates) => {
-    let tempKotaUpdates = _.pick(kotaUpdates, kotaUpdateableColumns);
+    const tempKotaUpdates = _.pick(kotaUpdates, kotaUpdateableColumns);
     kotaUpdates.updated_at = new Date();
     return knex("user_kota")
       .update(tempKotaUpdates)

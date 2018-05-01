@@ -1,11 +1,11 @@
 "use strict";
 
 const express = require("express");
+const errors = require("http-errors");
 const auth = require("../components/auth.js");
 const validators = require("./puskesmas.validators.js");
-const errors = require("http-errors");
 const queries = require("./puskesmas.queries.js");
-const config = require("config");
+
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing puskesmas is this puskesmas's owner or a supervisor. */
@@ -21,12 +21,6 @@ const isOwnerOrKotaAndHigher = auth.createMiddlewareFromPredicate(
     );
   }
 );
-
-/** custom username generator */
-const usernameGenerator = (pred, name) => {
-  const nameArr = name.split(" ").map(val => val.toLowerCase());
-  return (pred + "_" + nameArr.join("")).substring(0, 255);
-};
 
 /**
  * Get a list of puskesmas.
@@ -51,7 +45,8 @@ router.get(
           return res.json(puskesmas);
         })
         .catch(next);
-    } else if (auth.predicates.isProvinsi(req.user)) {
+    }
+    if (auth.predicates.isProvinsi(req.user)) {
       return queries
         .getPuskesmasForProvinsi(
           req.query.search,
@@ -64,20 +59,19 @@ router.get(
           return res.json(puskesmas);
         })
         .catch(next);
-    } else {
-      return queries
-        .getPuskesmasForKota(
-          req.query.search,
-          req.query.page,
-          req.query.perPage,
-          req.query.sort,
-          req.user.username
-        )
-        .then(puskesmas => {
-          return res.json(puskesmas);
-        })
-        .catch(next);
     }
+    return queries
+      .getPuskesmasForKota(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username
+      )
+      .then(puskesmas => {
+        return res.json(puskesmas);
+      })
+      .catch(next);
   }
 );
 
@@ -163,7 +157,7 @@ router.patch(
     return queries
       .updatePuskesmas(req.params.username, puskesmasUpdates)
       .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+        return res.json({ affectedRowCount });
       })
       .catch(next);
   }

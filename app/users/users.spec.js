@@ -1,24 +1,28 @@
+/* eslint-env node, mocha */
 /* eslint-disable no-unused-expressions */
 "use strict";
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const sinonChai = require("sinon-chai");
+
 chai.use(chaiHttp);
 chai.use(sinonChai);
 const expect = chai.expect;
 const routes = require("../app");
 const knex = require("../components/knex");
 
-describe("User handling", function() {
+describe("User handling", () => {
   beforeEach(() =>
     knex.migrate
       .rollback()
       .then(() => knex.migrate.latest())
       .then(() => knex.seed.run()));
 
-  describe("new user", function() {
-    let createNewUser = {
+  after(() => knex.migrate.rollback());
+
+  describe("new user", () => {
+    const createNewUser = {
       username: "raydreww",
       email: "raydreww@gmail.com",
       password: "hello123"
@@ -60,15 +64,14 @@ describe("User handling", function() {
     });
 
     it("should not delete user if user is not logged in", done => {
-      expect(err).to.be.null;
       chai
         .request(routes)
         .get("/api/users/" + createNewUser.username)
         .end((errfromget, resfromget) => {
           expect(errfromget).to.be.null;
           expect(resfromget).to.have.status(200);
-          expect(res.body.username).to.equal("raydreww");
-          expect(err).to.be.false;
+          expect(resfromget.body.username).to.equal("raydreww");
+          expect(errfromget).to.be.null;
           chai
             .request(routes)
             .delete("/api/users/" + createNewUser.username)

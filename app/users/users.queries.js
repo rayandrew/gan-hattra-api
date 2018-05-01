@@ -1,9 +1,9 @@
 "use strict";
 
-const knex = require("../components/knex.js");
 const errors = require("http-errors");
 const bcrypt = require("bcryptjs");
 const _ = require("lodash");
+const knex = require("../components/knex.js");
 
 const BCRYPT_STRENGTH = 8;
 
@@ -128,11 +128,15 @@ module.exports = {
   },
 
   createUser: (user, parent) => {
-    let newUser = _.pick(user, userAssignableColumns);
-    newUser.created_at = newUser.updated_at = new Date();
+    const newUser = Object.assign({}, _.pick(user, userAssignableColumns), {
+      created_at: new Date(),
+      updated_at: new Date()
+    });
 
-    let specificUser = _.pick(user, specificUserColumns);
-    specificUser.created_at = specificUser.updated_at = new Date();
+    const specificUser = Object.assign({}, _.pick(user, specificUserColumns), {
+      created_at: new Date(),
+      updated_at: new Date()
+    });
 
     return knex("users")
       .first("username")
@@ -146,15 +150,14 @@ module.exports = {
       })
       .then(hash => {
         newUser.password = hash;
+        const queries = knex("users")
+          .insert(newUser)
+          .then(insertedIds =>
+            Object.assign(newUser, {
+              password: ""
+            })
+          );
         if (newUser.role !== "admin" && newUser.role !== "user") {
-          const queries = knex("users")
-            .insert(newUser)
-            .then(insertedIds =>
-              Object.assign(newUser, {
-                password: ""
-              })
-            );
-
           if (newUser.role === "provinsi") {
             return queries
               .then(userAdded => {
@@ -163,7 +166,8 @@ module.exports = {
               .then(insertedMiddle => {
                 return specificUser;
               });
-          } else if (newUser.role === "kota") {
+          }
+          if (newUser.role === "kota") {
             specificUser.username_provinsi = parent;
             return queries
               .then(userAdded => {
@@ -172,7 +176,8 @@ module.exports = {
               .then(insertedMiddle => {
                 return specificUser;
               });
-          } else if (newUser.role === "puskesmas") {
+          }
+          if (newUser.role === "puskesmas") {
             specificUser.username_kota = parent;
             return queries
               .then(userAdded => {
@@ -181,19 +186,17 @@ module.exports = {
               .then(insertedMiddle => {
                 return specificUser;
               });
-          } else {
-            specificUser.username_puskesmas = parent;
-            return queries
-              .then(userAdded => {
-                return knex("user_kestrad").insert(specificUser);
-              })
-              .then(insertedMiddle => {
-                return specificUser;
-              });
           }
-        } else {
-          return queries;
+          specificUser.username_puskesmas = parent;
+          return queries
+            .then(userAdded => {
+              return knex("user_kestrad").insert(specificUser);
+            })
+            .then(insertedMiddle => {
+              return specificUser;
+            });
         }
+        return queries;
       });
   },
 
@@ -221,7 +224,8 @@ module.exports = {
             "user_provinsi_additional.username"
           )
           .where("users.username", username);
-      } else if (role === "kota") {
+      }
+      if (role === "kota") {
         return knex("users")
           .first(getKotaTable)
           .innerJoin("user_kota", "users.username", "user_kota.username")
@@ -231,7 +235,8 @@ module.exports = {
             "user_kota_additional.username"
           )
           .where("users.username", username);
-      } else if (role === "puskesmas") {
+      }
+      if (role === "puskesmas") {
         return knex("users")
           .first(getPuskesmasTable)
           .innerJoin(
@@ -245,7 +250,8 @@ module.exports = {
             "user_puskesmas_additional.username"
           )
           .where("users.username", username);
-      } else if (role === "kestrad") {
+      }
+      if (role === "kestrad") {
         return knex("users")
           .first(getKestradTable)
           .innerJoin("user_kestrad", "users.username", "user_kestrad.username")
@@ -255,11 +261,10 @@ module.exports = {
             "user_kestrad_additional.username"
           )
           .where("users.username", username);
-      } else {
-        return knex("users")
-          .first(userColumns)
-          .where("username", username);
       }
+      return knex("users")
+        .first(userColumns)
+        .where("username", username);
     });
   },
 
@@ -304,19 +309,20 @@ module.exports = {
           return knex("user_provinsi")
             .delete()
             .where("username", username);
-        } else if (role === "kota") {
+        }
+        if (role === "kota") {
           return knex("user_kota")
             .delete()
             .where("username", username);
-        } else if (role === "puskesmas") {
+        }
+        if (role === "puskesmas") {
           return knex("user_puskesmas")
             .delete()
             .where("username", username);
-        } else {
-          return knex("user_kestrad")
-            .delete()
-            .where("username", username);
         }
+        return knex("user_kestrad")
+          .delete()
+          .where("username", username);
       })
       .then(affectedRowCount => {
         return knex("users")
@@ -326,7 +332,7 @@ module.exports = {
       });
   },
 
-  resetPassword: (userUpdates, username, username_changer, changer_role) => {
+  resetPassword: (userUpdates, username, usernameChanger, changerRole) => {
     if (!userUpdates.password) throw new errors.UnprocessableEntity();
 
     const promises = bcrypt.hash(userUpdates.password, BCRYPT_STRENGTH);
@@ -336,14 +342,15 @@ module.exports = {
       .where("username", username)
       .then(row => row.role);
 
-    if (changer_role === "admin") {
+    if (changerRole === "admin") {
       return promises.then(hash => {
         userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
         return knex("users")
           .update(userUpdates)
           .where("username", username);
       });
-    } else if (changer_role === "provinsi") {
+    }
+    if (changerRole === "provinsi") {
       return promises.then(hash => {
         userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
         return promises2.then(role => {
@@ -353,7 +360,7 @@ module.exports = {
 
           return knex("user_kota")
             .first("username_provinsi")
-            .where("username_provinsi", username_changer)
+            .where("username_provinsi", usernameChanger)
             .andWhere("username", username)
             .then(provinsi => {
               if (!provinsi) {
@@ -366,7 +373,8 @@ module.exports = {
             });
         });
       });
-    } else if (changer_role === "kota") {
+    }
+    if (changerRole === "kota") {
       return promises.then(hash => {
         userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
         return promises2.then(role => {
@@ -376,7 +384,7 @@ module.exports = {
 
           return knex("user_puskesmas")
             .select("username_kota")
-            .where("username_kota", username_changer)
+            .where("username_kota", usernameChanger)
             .andWhere("username", username)
             .first()
             .then(kota => {
@@ -390,29 +398,28 @@ module.exports = {
             });
         });
       });
-    } else {
-      return promises.then(hash => {
-        userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
-        return promises2.then(role => {
-          if (role !== "kestrad") {
-            throw new errors.Forbidden();
-          }
-
-          return knex("user_kestrad")
-            .first("username_puskesmas")
-            .where("username_puskesmas", username_changer)
-            .andWhere("username", username)
-            .then(puskesmas => {
-              if (!puskesmas) {
-                throw new errors.Forbidden();
-              }
-
-              return knex("users")
-                .where("username", username)
-                .update(userUpdates);
-            });
-        });
-      });
     }
+    return promises.then(hash => {
+      userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
+      return promises2.then(role => {
+        if (role !== "kestrad") {
+          throw new errors.Forbidden();
+        }
+
+        return knex("user_kestrad")
+          .first("username_puskesmas")
+          .where("username_puskesmas", usernameChanger)
+          .andWhere("username", username)
+          .then(puskesmas => {
+            if (!puskesmas) {
+              throw new errors.Forbidden();
+            }
+
+            return knex("users")
+              .where("username", username)
+              .update(userUpdates);
+          });
+      });
+    });
   }
 };

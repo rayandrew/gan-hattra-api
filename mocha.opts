@@ -1,0 +1,5 @@
+--ui bdd
+--reporter mochawesome
+--reporter-options reportDir=reports/test,reportFilename=index.html
+--exit
+--timeout 10000

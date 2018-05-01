@@ -1,16 +1,16 @@
-'use strict';
+"use strict";
 
 /**
  * @module app/components/validation
  */
 
-const Ajv = require('ajv');
-const errors = require('http-errors');
+const Ajv = require("ajv");
+const errors = require("http-errors");
 
 const ajv = new Ajv({
   coerceTypes: true,
   removeAdditional: true,
-  format: 'full' // Full mode for date-time validation, i.e. not only regex
+  format: "full" // Full mode for date-time validation, i.e. not only regex
 });
 
 module.exports = {
@@ -23,15 +23,15 @@ module.exports = {
     const validate = ajv.compile(schema);
     return (req, res, next) => {
       let dataToValidate;
-      if (req.method.toUpperCase() === 'GET') {
+      if (req.method.toUpperCase() === "GET") {
         dataToValidate = req.query;
       } else {
         dataToValidate = req.body;
       }
-      let valid = validate(dataToValidate);
+      const valid = validate(dataToValidate);
       if (!valid) {
         return next(
-          new errors.UnprocessableEntity('Validation error.', validate.errors)
+          new errors.UnprocessableEntity("Validation error.", validate.errors)
         );
       }
       return next();

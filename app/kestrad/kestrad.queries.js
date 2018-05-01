@@ -1,9 +1,9 @@
 "use strict";
 
-var knex = require("../components/knex.js");
-var helper = require("../common/helper.js");
 const errors = require("http-errors");
 const _ = require("lodash");
+const knex = require("../components/knex.js");
+const helper = require("../common/helper.js");
 
 const kestradColumns = [
   "username",
@@ -144,7 +144,8 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role === "kota") {
+          }
+          if (role === "kota") {
             return module.exports.listKestradByKota(
               search,
               page,
@@ -152,7 +153,8 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role === "puskesmas") {
+          }
+          if (role === "puskesmas") {
             return module.exports.listKestradByPuskesmas(
               search,
               page,
@@ -160,9 +162,8 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else {
-            throw new errors.Forbidden();
           }
+          throw new errors.Forbidden();
         } else if (usernameRole === "provinsi") {
           if (role === "kota") {
             const getUser = knex("user_kestrad_additional")
@@ -183,7 +184,8 @@ module.exports = {
                 usernameListed
               );
             });
-          } else if (role === "puskesmas") {
+          }
+          if (role === "puskesmas") {
             const getUser = knex("user_kestrad_additional")
               .first("username_provinsi")
               .where("username_provinsi", usernameLister)
@@ -202,9 +204,8 @@ module.exports = {
                 usernameListed
               );
             });
-          } else {
-            throw new errors.Forbidden();
           }
+          throw new errors.Forbidden();
         } else if (usernameRole === "kota") {
           if (role !== "puskesmas") {
             throw new errors.Forbidden();
@@ -265,17 +266,17 @@ module.exports = {
       )
       .where("user_kestrad.username", username),
 
-  updateKestrad: (username, kestradUpdates, username_puskesmas) =>
+  updateKestrad: (username, kestradUpdates, usernamePuskesmas) =>
     knex("user_kestrad")
       .first()
       .where("username", username)
-      .andWhere("username_puskesmas", username_puskesmas)
+      .andWhere("username_puskesmas", usernamePuskesmas)
       .then(kestrad => {
         if (!kestrad) {
           throw new errors.Forbidden();
         }
 
-        let tempKestradUpdates = _.pick(
+        const tempKestradUpdates = _.pick(
           kestradUpdates,
           kestradAssignableColumns
         );
@@ -299,10 +300,10 @@ module.exports = {
           throw new errors.Conflict("Layanan already exists.");
         }
 
-        let newLayanan = _.pick(insertLayanan, insertLayananColumns);
-        newLayanan.created_at = newLayanan.updated_at = new Date();
-
-        return newLayanan;
+        return Object.assign({}, _.pick(insertLayanan, insertLayananColumns), {
+          created_at: new Date(),
+          updated_at: new Date()
+        });
       })
       .then(newLayanan => knex("layanan").insert(newLayanan)),
 
@@ -319,10 +320,10 @@ module.exports = {
           throw new errors.Conflict("Hattra already exists.");
         }
 
-        let newHattra = _.pick(insertHattra, insertHattraColumns);
-        newHattra.created_at = newHattra.updated_at = new Date();
-
-        return newHattra;
+        return Object.assign({}, _.pick(insertHattra, insertHattraColumns), {
+          created_at: new Date(),
+          updated_at: new Date()
+        });
       })
       .then(newHattra => knex("hattra").insert(newHattra))
 };

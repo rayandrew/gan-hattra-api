@@ -1,10 +1,9 @@
 "use strict";
 
-var knex = require("../components/knex.js");
-var helper = require("../common/helper.js");
 const errors = require("http-errors");
-const bcrypt = require("bcryptjs");
 const _ = require("lodash");
+const knex = require("../components/knex.js");
+const helper = require("../common/helper.js");
 
 const kategoriColumns = ["id_kategori", "nama_kategori"];
 
@@ -15,8 +14,6 @@ const subKategoriColumns = [
   "id_kategori",
   "nama_subkategori"
 ];
-
-const subKategoriSearchableColumns = ["nama_kategori", "nama_subkategori"];
 
 const layananColumns = [
   "id_layanan",
@@ -163,7 +160,8 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role === "kota") {
+          }
+          if (role === "kota") {
             return module.exports.getLayananForKota(
               search,
               page,
@@ -171,7 +169,8 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role === "puskesmas") {
+          }
+          if (role === "puskesmas") {
             return module.exports.getLayananForPuskesmas(
               search,
               page,
@@ -179,7 +178,8 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else if (role === "kestrad") {
+          }
+          if (role === "kestrad") {
             return module.exports.getLayananForKestrad(
               search,
               page,
@@ -187,15 +187,14 @@ module.exports = {
               sort,
               usernameListed
             );
-          } else {
-            throw new errors.Forbidden();
           }
+          throw new errors.Forbidden();
         } else if (usernameRole === "provinsi") {
           if (role === "admin" || role === "provinsi") {
             throw new errors.Forbidden();
           } else {
             if (role === "kota") {
-              let getUser = knex("layanan_additional")
+              const getUser = knex("layanan_additional")
                 .select("username_provinsi")
                 .where("username_provinsi", usernameLister)
                 .andWhere("username_kota", usernameListed);
@@ -209,11 +208,11 @@ module.exports = {
                     sort,
                     usernameListed
                   );
-                } else {
-                  throw new errors.Forbidden();
                 }
+                throw new errors.Forbidden();
               });
-            } else if (role === "puskesmas") {
+            }
+            if (role === "puskesmas") {
               return knex("layanan_additional")
                 .select("username_provinsi")
                 .where("username_provinsi", usernameLister)
@@ -231,7 +230,8 @@ module.exports = {
                     usernameListed
                   );
                 });
-            } else if (role === "kestrad") {
+            }
+            if (role === "kestrad") {
               return knex("layanan_additional")
                 .select("username_provinsi")
                 .where("username_provinsi", usernameLister)
@@ -249,9 +249,8 @@ module.exports = {
                     usernameListed
                   );
                 });
-            } else {
-              throw new errors.Forbidden();
             }
+            throw new errors.Forbidden();
           }
         } else if (usernameRole === "kota") {
           if (role === "admin" || role === "provinsi" || role === "kota") {
@@ -275,7 +274,8 @@ module.exports = {
                     usernameListed
                   );
                 });
-            } else if (role === "kestrad") {
+            }
+            if (role === "kestrad") {
               return knex("layanan_additional")
                 .select("username_kota")
                 .where("username_kota", usernameLister)
@@ -292,9 +292,8 @@ module.exports = {
                     usernameListed
                   );
                 });
-            } else {
-              throw new errors.Forbidden();
             }
+            throw new errors.Forbidden();
           }
         } else if (usernameRole === "puskesmas") {
           if (role !== "kestrad") {
@@ -375,7 +374,7 @@ module.exports = {
       )
       .innerJoin("kategori", "kategori.id_kategori", "subkategori.id_kategori"),
 
-  updateNamaLayanan: (id_layanan, layananUpdates, username) =>
+  updateNamaLayanan: (idLayanan, layananUpdates, username) =>
     knex("layanan")
       .first()
       .innerJoin(
@@ -384,7 +383,7 @@ module.exports = {
         "layanan_additional.id_layanan"
       )
       .where("username_puskesmas", username)
-      .andWhere("layanan.id_layanan", id_layanan)
+      .andWhere("layanan.id_layanan", idLayanan)
       .then(layanan => {
         if (!layanan) {
           throw new errors.NotFound();
@@ -397,10 +396,10 @@ module.exports = {
 
         return knex("layanan")
           .update(tempLayananUpdates)
-          .where("id_layanan", id_layanan);
+          .where("id_layanan", idLayanan);
       }),
 
-  updateVerifikasiLayanan: (id_layanan, layananUpdates, username) =>
+  updateVerifikasiLayanan: (idLayanan, layananUpdates, username) =>
     knex("layanan")
       .first()
       .innerJoin(
@@ -409,13 +408,13 @@ module.exports = {
         "layanan_additional.id_layanan"
       )
       .where("username_kota", username)
-      .andWhere("layanan.id_layanan", id_layanan)
+      .andWhere("layanan.id_layanan", idLayanan)
       .then(layanan => {
         if (!layanan) {
           throw new errors.NotFound("Layanan not found!");
         }
 
-        let tempLayananUpdates = _.pick(
+        const tempLayananUpdates = _.pick(
           layananUpdates,
           layananAssignableColumns
         );
@@ -428,6 +427,6 @@ module.exports = {
 
         return knex("layanan")
           .update(tempLayananUpdates)
-          .where("id_layanan", id_layanan);
+          .where("id_layanan", idLayanan);
       })
 };

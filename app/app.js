@@ -5,20 +5,23 @@
  * @module app/app
  */
 /* Load dependencies */
-const listFiles = require("fs-readdir-recursive");
 const path = require("path");
+const listFiles = require("fs-readdir-recursive");
 const config = require("config");
 const express = require("express");
+const bodyParser = require("body-parser");
+const methodOverride = require("method-override");
 const errorHandler = require("api-error-handler");
+const winston = require("./components/winston.js");
+const session = require("./components/session.js");
+const passport = require("./components/passport.js");
 
 /* Create app and logger */
 
-var app = express();
+const app = express();
 global.appDirectory = __dirname;
 
 /* Create the logger */
-
-const winston = require("./components/winston.js");
 
 winston.log(":: gan-hattra-api ::");
 winston.log("NODE_ENV: %s\n", process.env.NODE_ENV);
@@ -26,11 +29,6 @@ winston.log("NODE_ENV: %s\n", process.env.NODE_ENV);
 /* Set up Express middleware */
 
 winston.log("verbose", "Setting up Express middleware...");
-
-const bodyParser = require("body-parser");
-const methodOverride = require("method-override");
-const session = require("./components/session.js");
-const passport = require("./components/passport.js");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

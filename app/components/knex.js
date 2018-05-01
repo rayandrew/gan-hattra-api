@@ -29,16 +29,18 @@ Object.getPrototypeOf(Knex.Client.prototype).filter = function(
 ) {
   return this.where(function() {
     let query = this;
-    for (let filterName in filters) {
-      let filterField = filters[filterName].field || filterName;
-      if (filterQuery[filterName] !== undefined) {
-        let filterOperator = filters[filterName].operator || "contains";
-        let filterValue = filterQuery[filterName];
-        if (filterOperator === "contains") {
-          filterOperator = "like";
-          filterValue = "%" + filterValue + "%";
+    for (const filterName in filters) {
+      if ({}.hasOwnProperty.call(filters, filterName)) {
+        const filterField = filters[filterName].field || filterName;
+        if (filterQuery[filterName] !== undefined) {
+          let filterOperator = filters[filterName].operator || "contains";
+          let filterValue = filterQuery[filterName];
+          if (filterOperator === "contains") {
+            filterOperator = "like";
+            filterValue = "%" + filterValue + "%";
+          }
+          query = query.where(filterField, filterOperator, filterValue);
         }
-        query = query.where(filterField, filterOperator, filterValue);
       }
     }
   });
@@ -57,7 +59,7 @@ Object.getPrototypeOf(Knex.Client.prototype).search = function(
     let query = this;
     if (search) {
       let first = true;
-      for (let searchFieldIndex in searchFields) {
+      for (const searchFieldIndex in searchFields) {
         if (first) {
           query = query.where(
             searchFields[searchFieldIndex],
@@ -96,7 +98,7 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function(
 ) {
   let query = this;
   sort = sort && typeof sort === "string" ? sort.split(/\s*,\s*/) : []; // Split comma-delimited values
-  let sortFields = [];
+  const sortFields = [];
   if (!_.isArray) sortableFields = false;
   for (let i = 0; i < sort.length; i++) {
     let sortField = sort[i];
@@ -115,10 +117,10 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function(
     }
   }
 
-  page = +page || 1;
+  page = Number(page) || 1;
   if (page < 1) page = 1;
-  perPage = +perPage || 20;
-  let offset = (page - 1) * perPage;
+  perPage = Number(perPage) || 20;
+  const offset = (page - 1) * perPage;
 
   return Promise.all([
     knex
@@ -126,15 +128,15 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function(
       .count("* as count")
       .first(), // WARNING: need to find some way to get a Knex instance from the current query instead.
     query.offset(offset).limit(perPage)
-  ]).then(function(values) {
-    let totalCount = values[0].count;
-    let rows = values[1];
+  ]).then(values => {
+    const totalCount = values[0].count;
+    const rows = values[1];
     return {
       data: rows,
       currentPage: page,
-      perPage: perPage,
+      perPage,
       lastPage: Math.ceil(totalCount / perPage),
-      totalCount: totalCount,
+      totalCount,
       sort: sortFields
     };
   });

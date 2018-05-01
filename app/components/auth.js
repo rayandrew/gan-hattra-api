@@ -128,7 +128,7 @@ const middleware = {
 };
 
 module.exports = {
-  predicates: predicates,
-  createMiddlewareFromPredicate: createMiddlewareFromPredicate,
-  middleware: middleware
+  predicates,
+  createMiddlewareFromPredicate,
+  middleware
 };

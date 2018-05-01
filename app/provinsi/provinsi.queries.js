@@ -1,8 +1,7 @@
 "use strict";
 
-var knex = require("../components/knex.js");
-const errors = require("http-errors");
 const _ = require("lodash");
+const knex = require("../components/knex.js");
 const user = require("../users/users.queries.js");
 
 const provinsiColumns = ["username", "nama", "kepala_dinas", "alamat"];
@@ -20,7 +19,7 @@ const displayColumns = [
   "count_hattra_verified",
   "count_hattra_not_verified"
 ];
-// const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
+// Const userSortableColumns = ['username', 'email', 'role', 'status', 'created_at', 'updated_at'];
 
 module.exports = {
   listProvinsi: (search, page, perPage, sort) => {
@@ -92,7 +91,7 @@ module.exports = {
   },
 
   updateProvinsi: (username, userUpdates) => {
-    let tempUserUpdates = _.pick(userUpdates, provinsiUpdatableColumns);
+    const tempUserUpdates = _.pick(userUpdates, provinsiUpdatableColumns);
     tempUserUpdates.updated_at = new Date();
     return knex("user_provinsi")
       .update(tempUserUpdates)

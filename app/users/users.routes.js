@@ -1,15 +1,15 @@
 "use strict";
 
 const express = require("express");
+const errors = require("http-errors");
+const config = require("config");
 const auth = require("../components/auth.js");
 const validators = require("./users.validators.js");
-const errors = require("http-errors");
 const queries = require("./users.queries.js");
-const config = require("config");
 
 const router = express.Router();
 
-/** custom username generator */
+/** Custom username generator */
 const usernameGenerator = (pred, name) => {
   const nameArr = name.split(" ").map(val => val.toLowerCase());
   return (pred + "_" + nameArr.join("")).substring(0, 255);
@@ -136,7 +136,7 @@ router.patch(
   isOwnerOrAdmin,
   validators.updateUser,
   (req, res, next) => {
-    let userUpdates = {
+    const userUpdates = {
       email: req.body.email,
       password: req.body.newPassword
     };
@@ -155,9 +155,7 @@ router.patch(
         requireOldPasswordCheck,
         req.body.oldPassword
       )
-      .then(affectedRowCount =>
-        res.json({ affectedRowCount: affectedRowCount })
-      )
+      .then(affectedRowCount => res.json({ affectedRowCount }))
       .catch(next);
   }
 );
@@ -170,7 +168,7 @@ router.patch(
 router.delete("/users/:username", auth.middleware.isAdmin, (req, res, next) => {
   return queries
     .deleteUser(req.params.username)
-    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
+    .then(affectedRowCount => res.json({ affectedRowCount }))
     .catch(next);
 });
 
@@ -183,7 +181,7 @@ router.patch(
   "/users/:username/resetpassword",
   auth.middleware.isPuskesmasOrHigher,
   (req, res, next) => {
-    let userUpdates = {
+    const userUpdates = {
       password: req.params.username
     };
 
@@ -195,9 +193,7 @@ router.patch(
           req.user.username,
           req.user.role
         )
-        .then(affectedRowCount =>
-          res.status(200).json({ affectedRowCount: affectedRowCount })
-        )
+        .then(affectedRowCount => res.status(200).json({ affectedRowCount }))
         .catch(next);
     }
   }

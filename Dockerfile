@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:9-alpine
 
 RUN yarn config set no-progress true
 

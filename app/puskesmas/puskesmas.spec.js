@@ -1,27 +1,32 @@
+/* eslint-env node, mocha */
+/* eslint-disable no-unused-expressions */
 "use strict";
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const sinonChai = require("sinon-chai");
+
 chai.use(chaiHttp);
 chai.use(sinonChai);
 const expect = chai.expect;
 const routes = require("../app");
 const knex = require("../components/knex");
 
-describe("Puskesmas handling", function() {
+describe("Puskesmas handling", () => {
   beforeEach(() =>
     knex.migrate
       .rollback()
       .then(() => knex.migrate.latest())
       .then(() => knex.seed.run()));
 
-  describe("Puskesmas isInactive", function() {
-    let puskesmas = {
+  after(() => knex.migrate.rollback());
+
+  describe("Existing puskesmas entries", () => {
+    const puskesmas = {
       username: "puskesmas_tasik"
     };
 
-    // get /puskesmas
+    // Get /puskesmas
     it("should not get list of puskesmas if user is not logged in", done => {
       chai
         .request(routes)
@@ -35,7 +40,7 @@ describe("Puskesmas handling", function() {
         });
     });
 
-    // get /puskesmas/search
+    // Get /puskesmas/search
     it("should not get list of puskesmas by searching if user is not logged in", done => {
       chai
         .request(routes)
@@ -49,7 +54,7 @@ describe("Puskesmas handling", function() {
         });
     });
 
-    // get /puskesmas/:username
+    // Get /puskesmas/:username
     it("should not get spesific puskesmas if user is not logged in", done => {
       chai
         .request(routes)
@@ -63,7 +68,7 @@ describe("Puskesmas handling", function() {
         });
     });
 
-    // patch /puskesmas/:username
+    // Patch /puskesmas/:username
     it("should not update puskesmas information if user is not logged in", done => {
       chai
         .request(routes)

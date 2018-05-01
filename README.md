@@ -10,6 +10,9 @@
   <a href="https://codecov.io/gh/rayandrews/gan-hattra-api">
     <img src="https://codecov.io/gh/rayandrews/gan-hattra-api/branch/master/graph/badge.svg" />
   </a>
+  <a href="https://github.com/xojs/xo">
+    <img src="https://img.shields.io/badge/code_style-XO-5ed9c7.svg" alt="XO Code Style">
+  </a>
   <a href="https://github.com/Flet/semistandard"><img src="https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square" alt="JS Semistandard Style"></a>
 </p>
 
@@ -20,6 +23,7 @@
 <p align="center">
   Code Quality : <a href="https://sonarcloud.io/dashboard?id=gan-hattra-api">SonarQube</a>
 </p>
+
 ---
 
 ## Installation

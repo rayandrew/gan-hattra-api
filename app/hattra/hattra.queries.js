@@ -1,9 +1,9 @@
 "use strict";
 
-var knex = require("../components/knex.js");
-var helper = require("../common/helper.js");
 const errors = require("http-errors");
 const _ = require("lodash");
+const knex = require("../components/knex.js");
+const helper = require("../common/helper.js");
 
 const hattraColumns = [
   "id_hattra",
@@ -136,7 +136,8 @@ module.exports = {
                 sort,
                 usernameListed
               );
-            } else if (role === "kota") {
+            }
+            if (role === "kota") {
               return module.exports.listHattraByKota(
                 search,
                 page,
@@ -144,7 +145,8 @@ module.exports = {
                 sort,
                 usernameListed
               );
-            } else if (role === "puskesmas") {
+            }
+            if (role === "puskesmas") {
               return module.exports.listHattraByPuskesmas(
                 search,
                 page,
@@ -152,7 +154,8 @@ module.exports = {
                 sort,
                 usernameListed
               );
-            } else if (role === "kestrad") {
+            }
+            if (role === "kestrad") {
               return module.exports.listHattraByKestrad(
                 search,
                 page,
@@ -160,9 +163,9 @@ module.exports = {
                 sort,
                 usernameListed
               );
-            } else {
-              throw new errors.Forbidden();
             }
+            /* istanbul ignore next */
+            throw new errors.Forbidden();
           } else if (usernameRole === "provinsi") {
             if (role === "kota") {
               const getUser = knex("hattra_additional")
@@ -171,9 +174,8 @@ module.exports = {
                 .andWhere("username_kota", usernameListed);
 
               return getUser.then(provinsi => {
-                if (!provinsi) {
-                  throw new errors.Forbidden();
-                }
+                /* istanbul ignore if */
+                if (!provinsi) throw new errors.NotFound();
 
                 return module.exports.listHattraByKota(
                   search,
@@ -183,16 +185,16 @@ module.exports = {
                   usernameListed
                 );
               });
-            } else if (role === "puskesmas") {
+            }
+            if (role === "puskesmas") {
               const getUser = knex("hattra_additional")
                 .select("username_provinsi")
                 .where("username_provinsi", usernameLister)
                 .andWhere("username_puskesmas", usernameListed);
 
               return getUser.then(provinsi => {
-                if (!provinsi) {
-                  throw new errors.Forbidden();
-                }
+                /* istanbul ignore if */
+                if (!provinsi) throw new errors.NotFound();
 
                 return module.exports.listHattraByPuskesmas(
                   search,
@@ -202,16 +204,16 @@ module.exports = {
                   usernameListed
                 );
               });
-            } else if (role === "kestrad") {
+            }
+            if (role === "kestrad") {
               const getUser = knex("hattra_additional")
                 .select("username_provinsi")
                 .where("username_provinsi", usernameLister)
                 .andWhere("username_kestrad", usernameListed);
 
               return getUser.then(provinsi => {
-                if (!provinsi) {
-                  throw new errors.Forbidden();
-                }
+                /* istanbul ignore if */
+                if (!provinsi) throw new errors.NotFound();
 
                 return module.exports.listHattraByKestrad(
                   search,
@@ -221,9 +223,9 @@ module.exports = {
                   usernameListed
                 );
               });
-            } else {
-              throw new errors.Forbidden();
             }
+            /* istanbul ignore next */
+            throw new errors.Forbidden();
           } else if (usernameRole === "kota") {
             if (role === "puskesmas") {
               const getUser = knex("hattra_additional")
@@ -232,9 +234,8 @@ module.exports = {
                 .andWhere("username_puskesmas", usernameListed);
 
               return getUser.then(kota => {
-                if (!kota) {
-                  throw new errors.Forbidden();
-                }
+                /* istanbul ignore if */
+                if (!kota) throw new errors.NotFound();
 
                 return module.exports.listHattraByPuskesmas(
                   search,
@@ -244,16 +245,16 @@ module.exports = {
                   usernameListed
                 );
               });
-            } else if (role === "kestrad") {
+            }
+            if (role === "kestrad") {
               const getUser = knex("hattra_additional")
                 .select("username_kota")
                 .where("username_kota", usernameLister)
                 .andWhere("username_kestrad", usernameListed);
 
               return getUser.then(kota => {
-                if (!kota) {
-                  throw new errors.Forbidden();
-                }
+                /* istanbul ignore if */
+                if (!kota) throw new errors.NotFound();
 
                 return module.exports.listHattraByKestrad(
                   search,
@@ -263,13 +264,11 @@ module.exports = {
                   usernameListed
                 );
               });
-            } else {
-              throw new errors.Forbidden();
             }
+            /* istanbul ignore next */
+            throw new errors.Forbidden();
           } else if (usernameRole === "puskesmas") {
-            if (role !== "kestrad") {
-              throw new errors.Forbidden();
-            }
+            if (role !== "kestrad") throw new errors.Forbidden();
 
             const getUser = knex("hattra_additional")
               .select("username_puskesmas")
@@ -277,9 +276,8 @@ module.exports = {
               .andWhere("username_kestrad", usernameListed);
 
             return getUser.then(puskesmas => {
-              if (!puskesmas) {
-                throw new errors.Forbidden();
-              }
+              /* istanbul ignore if */
+              if (!puskesmas) throw new errors.NotFound();
 
               return module.exports.listHattraByKestrad(
                 search,
@@ -291,6 +289,7 @@ module.exports = {
             });
           }
         } else {
+          /* istanbul ignore next */
           throw new errors.Forbidden();
         }
       }),
@@ -326,7 +325,7 @@ module.exports = {
       .search(search, hattraSearchableColumns.map(column => "hattra." + column))
       .limit(20),
 
-  searchHattraForKestrad: search =>
+  searchHattraForKestrad: (search, username) =>
     knex("hattra")
       .select(
         hattraColumns
@@ -338,6 +337,7 @@ module.exports = {
         "hattra.id_hattra",
         "hattra_additional.id_hattra"
       )
+      .where("hattra_additional.username_kestrad", username)
       .search(search, hattraSearchableColumns.map(column => "hattra." + column))
       .limit(20),
 
@@ -353,7 +353,7 @@ module.exports = {
         "hattra.id_hattra",
         "hattra_additional.id_hattra"
       )
-      .where("username_puskesmas", username)
+      .where("hattra_additional.username_puskesmas", username)
       .search(search, hattraSearchableColumns.map(column => "hattra." + column))
       .limit(20),
 
@@ -369,7 +369,7 @@ module.exports = {
         "hattra.id_hattra",
         "hattra_additional.id_hattra"
       )
-      .where("user_puskesmas.username_kota", username)
+      .where("hattra_additional.username_kota", username)
       .search(search, hattraSearchableColumns.map(column => "hattra." + column))
       .limit(20),
 
@@ -385,7 +385,7 @@ module.exports = {
         "hattra.id_hattra",
         "hattra_additional.id_hattra"
       )
-      .where("user_kota.username_provinsi", username)
+      .where("hattra_additional.username_provinsi", username)
       .search(search, hattraSearchableColumns.map(column => "hattra." + column))
       .limit(20),
 
@@ -403,7 +403,7 @@ module.exports = {
       )
       .where("hattra.id_hattra", id),
 
-  updateNamaHattra: (id_hattra, hattraUpdates, username) =>
+  updateNamaHattra: (idHattra, hattraUpdates, username) =>
     knex("hattra")
       .first()
       .innerJoin(
@@ -413,9 +413,8 @@ module.exports = {
       )
       .where("username_puskesmas", username)
       .then(hattra => {
-        if (!hattra) {
-          throw new errors.NotFound();
-        }
+        /* istanbul ignore if */
+        if (!hattra) throw new errors.NotFound();
 
         const tempHattraUpdates = _.pick(
           hattraUpdates,
@@ -424,10 +423,10 @@ module.exports = {
 
         return knex("hattra")
           .update(tempHattraUpdates)
-          .where("id_hattra", id_layanan);
+          .where("id_hattra", idHattra);
       }),
 
-  updateVerifikasiHattra: (id_hattra, hattraUpdates, username) =>
+  updateVerifikasiHattra: (idHattra, hattraUpdates, username) =>
     knex("hattra")
       .first()
       .innerJoin(
@@ -437,17 +436,19 @@ module.exports = {
       )
       .where("username_kota", username)
       .then(hattra => {
-        if (!hattra) {
-          throw new errors.NotFound();
-        }
+        /* istanbul ignore if */
+        if (!hattra) throw new errors.NotFound();
 
-        let tempHattraUpdates = _.pick(hattraUpdates, hattraAssignableColumns);
+        const tempHattraUpdates = _.pick(
+          hattraUpdates,
+          hattraAssignableColumns
+        );
         if (tempHattraUpdates.verified === "active") {
           tempHattraUpdates.tanggal_verified = new Date();
         }
 
         return knex("hattra")
           .update(tempHattraUpdates)
-          .where("id_hattra", id_hattra);
+          .where("id_hattra", idHattra);
       })
 };

@@ -1,10 +1,9 @@
 "use strict";
 
-var knex = require("../components/knex.js");
-var helper = require("../common/helper.js");
 const errors = require("http-errors");
-const bcrypt = require("bcryptjs");
 const _ = require("lodash");
+const knex = require("../components/knex.js");
+const helper = require("../common/helper.js");
 
 const puskesmasColumns = [
   "username",
@@ -34,7 +33,6 @@ const puskesmasSearchableColumns = [
   "kepala_dinas",
   "alamat"
 ];
-const puskesmasSortableColumns = ["username", "kepala_dinas", "alamat"];
 
 module.exports = {
   listPuskesmas: (search, page, perPage, sort) => {
@@ -61,7 +59,7 @@ module.exports = {
       );
   },
 
-  searchPuskesmas: search => {
+  searchPuskesmas: (search, page, perPage, sort) => {
     return knex("user_puskesmas")
       .select(
         puskesmasColumns.map(
@@ -177,7 +175,8 @@ module.exports = {
                 sort,
                 usernameListed
               );
-            } else if (role === "kota") {
+            }
+            if (role === "kota") {
               return module.exports.getPuskesmasForKota(
                 search,
                 page,
@@ -185,32 +184,29 @@ module.exports = {
                 sort,
                 usernameListed
               );
-            } else {
-              throw new errors.Forbidden();
             }
+            throw new errors.Forbidden();
           } else if (usernameRole === "provinsi") {
             if (role === "admin" || role === "provinsi") {
               throw new errors.Forbidden();
-            } else {
-              if (role === "kota") {
-                return knex("user_kestrad_additional")
-                  .first("username_provinsi")
-                  .where("username_provinsi", usernameLister)
-                  .andWhere("username_kota", usernameListed)
-                  .then(provinsi => {
-                    if (!provinsi) {
-                      throw new errors.Forbidden();
-                    }
+            } else if (role === "kota") {
+              return knex("user_kestrad_additional")
+                .first("username_provinsi")
+                .where("username_provinsi", usernameLister)
+                .andWhere("username_kota", usernameListed)
+                .then(provinsi => {
+                  if (!provinsi) {
+                    throw new errors.Forbidden();
+                  }
 
-                    return module.exports.getPuskesmasForKota(
-                      search,
-                      page,
-                      perPage,
-                      sort,
-                      usernameListed
-                    );
-                  });
-              }
+                  return module.exports.getPuskesmasForKota(
+                    search,
+                    page,
+                    perPage,
+                    sort,
+                    usernameListed
+                  );
+                });
             }
           }
         } else {
@@ -220,7 +216,7 @@ module.exports = {
   },
 
   updatePuskesmas: (username, puskesmasUpdates) => {
-    let tempPuskesmasUpdates = _.pick(
+    const tempPuskesmasUpdates = _.pick(
       puskesmasUpdates,
       puskesmasUpdateableColumns
     );

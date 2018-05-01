@@ -1,12 +1,10 @@
 "use strict";
 
 const express = require("express");
+const errors = require("http-errors");
 const auth = require("../components/auth.js");
 const validators = require("./provinsi.validators.js");
-const validatorUser = require("../users/users.validators.js");
-const errors = require("http-errors");
 const queries = require("./provinsi.queries.js");
-const config = require("config");
 
 const router = express.Router();
 
@@ -72,15 +70,14 @@ router.get(
           return res.json(result);
         })
         .catch(next);
-    } else {
-      return queries
-        .getProvinsi(req.user.username)
-        .then(result => {
-          if (!result) return next(new errors.NotFound("User not found."));
-          return res.json(result);
-        })
-        .catch(next);
     }
+    return queries
+      .getProvinsi(req.user.username)
+      .then(result => {
+        if (!result) return next(new errors.NotFound("User not found."));
+        return res.json(result);
+      })
+      .catch(next);
   }
 );
 
@@ -118,7 +115,7 @@ router.patch(
     return queries
       .updateProvinsi(req.params.username, userUpdates)
       .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+        return res.json({ affectedRowCount });
       })
       .catch(next);
   }

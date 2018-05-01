@@ -137,7 +137,7 @@ exports.seed = (knex, Promise) => {
             email: 'pusk_tasik@e-gov.id',
             password:
               '$2y$10$kCo/K2BzBYizhFrvdS0vOePkIiQ28j3Dndk.0eVV1GsbpZTy1euCm',
-            role: 'pusk_smas',
+            role: 'puskesmas',
             status: 'active'
           } // Password: admin
         ];

@@ -1,27 +1,32 @@
+/* eslint-env node, mocha */
+/* eslint-disable no-unused-expressions */
 "use strict";
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const sinonChai = require("sinon-chai");
+
 chai.use(chaiHttp);
 chai.use(sinonChai);
 const expect = chai.expect;
 const routes = require("../app");
 const knex = require("../components/knex");
 
-describe("Kestrad handling", function() {
+describe("Kestrad handling", () => {
   beforeEach(() =>
     knex.migrate
       .rollback()
       .then(() => knex.migrate.latest())
       .then(() => knex.seed.run()));
 
-  describe("Kestrad isInactive", function() {
-    let kestrad = {
+  after(() => knex.migrate.rollback());
+
+  describe("Kestrad isInactive", () => {
+    const kestrad = {
       username: "kestrad_tasik"
     };
 
-    // get /puskesmas
+    // Get /puskesmas
     it("should not get list of kestrad if user is not logged in", done => {
       chai
         .request(routes)
@@ -35,7 +40,7 @@ describe("Kestrad handling", function() {
         });
     });
 
-    // get /kestrad/search
+    // Get /kestrad/search
     it("should not get list of kestrad by searching if user is not logged in", done => {
       chai
         .request(routes)
@@ -49,7 +54,7 @@ describe("Kestrad handling", function() {
         });
     });
 
-    // get /kestrad/:username
+    // Get /kestrad/:username
     it("should not get spesific kestrad if user is not logged in", done => {
       chai
         .request(routes)
@@ -63,7 +68,7 @@ describe("Kestrad handling", function() {
         });
     });
 
-    // patch /kestrad/:username
+    // Patch /kestrad/:username
     it("should not update kestrad information if user is not logged in", done => {
       chai
         .request(routes)
@@ -78,7 +83,7 @@ describe("Kestrad handling", function() {
         });
     });
 
-    // patch /kestrad/verification/:username
+    // Patch /kestrad/verification/:username
     it("should not update kestrad information if user is not logged in", done => {
       chai
         .request(routes)
