@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
-const validation = require('../components/validation.js');
-const commonSchemas = require('../common/schemas.js');
+const _ = require("lodash");
+const validation = require("../components/validation.js");
+const commonSchemas = require("../common/schemas.js");
 
 const schemas = {
   listUsers: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -15,7 +15,7 @@ const schemas = {
   },
 
   createUser: {
-    type: 'object',
+    type: "object",
     properties: {
       username: commonSchemas.username,
       nama: commonSchemas.varchar(25),
@@ -24,11 +24,11 @@ const schemas = {
       email: commonSchemas.email,
       status: commonSchemas.userStatus
     },
-    anyOf: [{ required: ['username', 'password'] }, { required: ['nama'] }]
+    anyOf: [{ required: ["username", "password"] }, { required: ["nama"] }]
   },
 
   updateUser: {
-    type: 'object',
+    type: "object",
     properties: {
       email: commonSchemas.email,
       password: commonSchemas.password,

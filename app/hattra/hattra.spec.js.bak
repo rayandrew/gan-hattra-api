@@ -1,0 +1,972 @@
+/* eslint-disable no-unused-expressions */
+"use strict";
+const config = require("config");
+const chai = require("chai");
+chai.use(require("chai-http"));
+chai.use(require("sinon-chai"));
+const routes = require("../app");
+const knex = require("../components/knex");
+
+const expect = chai.expect;
+
+describe("Hattra handling", () => {
+  const hattra = {
+    id_hattra: 1,
+    id_layanan: 1,
+    nama: "Ray Andrew",
+    ijin_hattra: "654321",
+    wrong_id_hattra: 999,
+    wrong_id_layanan: 999
+  };
+
+  const paginateProps = [
+    "data",
+    "currentPage",
+    "perPage",
+    "lastPage",
+    "totalCount",
+    "sort"
+  ];
+
+  const hattraColumns = [
+    "id_hattra",
+    "id_layanan",
+    "nama",
+    "ijin_hattra",
+    "verified",
+    "tanggal_verified",
+    "created_at",
+    "updated_at"
+  ];
+
+  const username = {
+    provinsi: "prov_jawabarat",
+    kota: "kota_tasik",
+    puskesmas: "pusk_tasik",
+    kestrad: "kestrad_tasik"
+  };
+
+  const authenticatedTest = [
+    {
+      credentials: {
+        username: "prov_jawabarat",
+        password: "prov_jawabarat"
+      },
+      tests: [
+        {
+          description: "get list of hattra ",
+          property: "data"
+        }
+      ]
+    }
+  ];
+
+  // hattra api test by not logged in user
+  describe("not logged in", () => {
+    before(() =>
+      knex.migrate
+        .rollback()
+        .then(() => knex.migrate.latest())
+        .then(() => knex.seed.run())
+    );
+
+    after(() => knex.migrate.rollback());
+
+    // get /hattra
+    it("should not get list of hattra if kestrad or higher is not logged in", () =>
+      chai
+        .request(routes)
+        .get(`${config.get("routePrefix")}/hattra`)
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res.body.message).to.equal("Unauthorized");
+          expect(res.body.name).to.equal("UnauthorizedError");
+        }));
+
+    // get /hattra/search
+    it("should not get list of hattra by searching if user is not logged in", () =>
+      chai
+        .request(routes)
+        .get(`${config.get("routePrefix")}/hattra/search`)
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res.body.message).to.equal("Not logged in.");
+          expect(res.body.name).to.equal("UnauthorizedError");
+        }));
+
+    // get /hattra/:id_hattra
+    it("should unauthorized to get details of specific hattra by not logged in user", () =>
+      chai
+        .request(routes)
+        .get(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res.body.message).to.equal("Unauthorized");
+          expect(res.body.name).to.equal("UnauthorizedError");
+        }));
+
+    // get /hattra/byLayanan/:id_layanan
+    it("should unauthorized to get list of hattras based on id of layanan by not logged in user", () =>
+      chai
+        .request(routes)
+        .get(
+          `${config.get("routePrefix")}/hattra/byLayanan/${hattra.id_layanan}`
+        )
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res.body.message).to.equal("Unauthorized");
+          expect(res.body.name).to.equal("UnauthorizedError");
+        }));
+
+    // patch /hattra/:id_hattra
+    it("should not edit hattra if puskesmas is not logged in", () =>
+      chai
+        .request(routes)
+        .patch(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+        .send(hattra)
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res.body.message).to.equal("Unauthorized");
+          expect(res.body.name).to.equal("UnauthorizedError");
+        }));
+
+    // patch /hattra/:id_hattra/verification
+    it("should unauthorized to verify hattra by not logged in user", () =>
+      chai
+        .request(routes)
+        .patch(
+          `${config.get("routePrefix")}/hattra/${
+            hattra.id_hattra
+          }/verification/unverify`
+        )
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res.body.message).to.equal("Unauthorized");
+          expect(res.body.name).to.equal("UnauthorizedError");
+        }));
+  });
+
+  // hattra api test by role administrator
+  describe("authenticated role: administrator", () => {
+    const authenticated = chai.request.agent(routes);
+
+    before(() =>
+      knex.migrate
+        .rollback()
+        .then(() => knex.migrate.latest())
+        .then(() => knex.seed.run())
+        .then(() =>
+          authenticated.post(`${config.get("routePrefix")}/session`).send({
+            username: "administrator",
+            password: "administrator"
+          })
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.ownProperty("username");
+          expect(res.body).to.have.ownProperty("status");
+        })
+    );
+
+    after(() =>
+      authenticated.del(`${config.get("routePrefix")}/session`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an("object");
+        expect(res.body.message).to.equal("Logged out successfully.");
+      })
+    );
+
+    // get /hattra
+    it("should get list of hattra if administrator is logged in", () =>
+      authenticated.get(`${config.get("routePrefix")}/hattra`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.ownProperty("data");
+        expect(res.body.data).to.be.an("array");
+        expect(res.body).to.have.all.keys(paginateProps);
+      }));
+
+    // get /hattra/search
+    it("should get list of hattra by searching if administrator is logged in", () =>
+      authenticated
+        .get(`${config.get("routePrefix")}/hattra/search?search=ray`)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("array");
+        }));
+
+    // get /hattra/:id_hattra
+    describe("details of specific hattra by administrator", () => {
+      it("should get no details of specific wrong id of hattra because resource not found", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.wrong_id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(404);
+            expect(res.body.message).to.equal("Hattra not found.");
+            expect(res.body.name).to.equal("NotFoundError");
+          }));
+
+      it("should get details of specific correct id of hattra", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(hattraColumns);
+          }));
+    });
+
+    // get /hattra/byUser/:username
+    describe("get list of hattras based on username of user by administrator", () => {
+      it("should get list of hattras based on username of provinsi", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.provinsi}`
+          )
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+
+      it("should get list of hattras based on username of kota", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kota}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+
+      it("should get list of hattras based on username of puskesmas", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.puskesmas}`
+          )
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+
+      it("should get list of hattras based on username of kestrad", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kestrad}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+    });
+
+    // get /hattra/byLayanan/:id_layanan
+    it("should get list of hattras based on id of layanan by administrator", () =>
+      authenticated
+        .get(
+          `${config.get("routePrefix")}/hattra/byLayanan/${hattra.id_layanan}`
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.include.all.keys(paginateProps);
+        }));
+
+    // patch /hattra/:id_hattra
+    it("should not edit hattra if administrator is logged in", () =>
+      authenticated
+        .patch(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+        .send(hattra)
+        .then(res => {
+          expect(res).to.have.status(403);
+          expect(res.body.message).to.equal("Forbidden");
+          expect(res.body.name).to.equal("ForbiddenError");
+        }));
+
+    // patch /hattra/:id_hattra/verification
+    describe("hattra verification by administrator", () => {
+      it("should not verify hattra if administrator is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not unverify hattra if administrator is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification/unverify`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+    });
+  });
+
+  // hattra api test by role provinsi
+  describe("authenticated role: provinsi", () => {
+    const authenticated = chai.request.agent(routes);
+
+    before(() =>
+      knex.migrate
+        .rollback()
+        .then(() => knex.migrate.latest())
+        .then(() => knex.seed.run())
+        .then(() =>
+          authenticated.post(`${config.get("routePrefix")}/session`).send({
+            username: "prov_jawabarat",
+            password: "prov_jawabarat"
+          })
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.ownProperty("username");
+          expect(res.body).to.have.ownProperty("status");
+        })
+    );
+
+    after(() =>
+      authenticated.del(`${config.get("routePrefix")}/session`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an("object");
+        expect(res.body.message).to.equal("Logged out successfully.");
+      })
+    );
+
+    // get /hattra
+    it("should get list of hattra if provinsi is logged in", () =>
+      authenticated.get(`${config.get("routePrefix")}/hattra`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.ownProperty("data");
+        expect(res.body.data).to.be.an("array");
+        expect(res.body).to.have.all.keys(paginateProps);
+      }));
+
+    // get /hattra/search
+    it("should get list of hattra by searching if provinsi is logged in", () =>
+      authenticated
+        .get(`${config.get("routePrefix")}/hattra/search?search=ray`)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("array");
+        }));
+
+    // get /hattra/:id_hattra
+    describe("details of specific hattra by provinsi", () => {
+      it("should get no details of specific wrong id of hattra because resource not found", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.wrong_id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(404);
+            expect(res.body.message).to.equal("Hattra not found.");
+            expect(res.body.name).to.equal("NotFoundError");
+          }));
+
+      it("should get details of specific correct id of hattra", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(hattraColumns);
+          }));
+    });
+
+    // get /hattra/byUser/:username
+    describe("get list of hattras based on username of user by provinsi", () => {
+      it("should not get list of hattras based on username of provinsi", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.provinsi}`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should get list of hattras based on username of kota", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kota}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+
+      it("should get list of hattras based on username of puskesmas", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.puskesmas}`
+          )
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+
+      it("should get list of hattras based on username of kestrad", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kestrad}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+    });
+
+    // get /hattra/byLayanan/:id_layanan
+    it("should get list of hattras based on id of layanan by provinsi", () =>
+      authenticated
+        .get(
+          `${config.get("routePrefix")}/hattra/byLayanan/${hattra.id_layanan}`
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.include.all.keys(paginateProps);
+        }));
+
+    // patch /hattra/:id_hattra
+    it("should not edit hattra if provinsi is logged in", () =>
+      authenticated
+        .patch(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+        .send(hattra)
+        .then(res => {
+          expect(res).to.have.status(403);
+          expect(res.body.message).to.equal("Forbidden");
+          expect(res.body.name).to.equal("ForbiddenError");
+        }));
+
+    // patch /hattra/:id_hattra/verification
+    describe("hattra verification by provinsi", () => {
+      it("should not verify hattra if provinsi is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not unverify hattra if provinsi is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification/unverify`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+    });
+  });
+
+  // hattra api test by role kota
+  describe("authenticated role: kota", () => {
+    const authenticated = chai.request.agent(routes);
+
+    before(() =>
+      knex.migrate
+        .rollback()
+        .then(() => knex.migrate.latest())
+        .then(() => knex.seed.run())
+        .then(() =>
+          authenticated.post(`${config.get("routePrefix")}/session`).send({
+            username: "kota_tasik",
+            password: "kota_tasik"
+          })
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.ownProperty("username");
+          expect(res.body).to.have.ownProperty("status");
+        })
+    );
+
+    after(() =>
+      authenticated.del(`${config.get("routePrefix")}/session`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an("object");
+        expect(res.body.message).to.equal("Logged out successfully.");
+      })
+    );
+
+    // get /hattra
+    it("should get list of hattra if kota is logged in", () =>
+      authenticated.get(`${config.get("routePrefix")}/hattra`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.ownProperty("data");
+        expect(res.body.data).to.be.an("array");
+        expect(res.body).to.have.all.keys(paginateProps);
+      }));
+
+    // get /hattra/search
+    it("should get list of hattra by searching if kota is logged in", () =>
+      authenticated
+        .get(`${config.get("routePrefix")}/hattra/search?search=ray`)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("array");
+        }));
+
+    // get /hattra/:id_hattra
+    describe("details of specific hattra by kota", () => {
+      it("should get no details of specific wrong id of hattra because resource not found", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.wrong_id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(404);
+            expect(res.body.message).to.equal("Hattra not found.");
+            expect(res.body.name).to.equal("NotFoundError");
+          }));
+
+      it("should get details of specific correct id of hattra", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(hattraColumns);
+          }));
+    });
+
+    // get /hattra/byUser/:username
+    describe("get list of hattras based on username of user by kota", () => {
+      it("should not get list of hattras based on username of provinsi", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.provinsi}`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not get list of hattras based on username of kota", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kota}`)
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should get list of hattras based on username of puskesmas", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.puskesmas}`
+          )
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+
+      it("should get list of hattras based on username of kestrad", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kestrad}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+    });
+
+    // get /hattra/byLayanan/:id_layanan
+    it("should get list of hattras based on id of layanan by kota", () =>
+      authenticated
+        .get(
+          `${config.get("routePrefix")}/hattra/byLayanan/${hattra.id_layanan}`
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.include.all.keys(paginateProps);
+        }));
+
+    // patch /hattra/:id_hattra
+    it("should not edit hattra if kota is logged in", () =>
+      authenticated
+        .patch(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+        .send(hattra)
+        .then(res => {
+          expect(res).to.have.status(403);
+          expect(res.body.message).to.equal("Forbidden");
+          expect(res.body.name).to.equal("ForbiddenError");
+        }));
+
+    // patch /hattra/:id_hattra/verification
+    describe("hattra verification by kota", () => {
+      it("should verify hattra if kota is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification`
+          )
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body.affectedRowCount).to.equal(1);
+          }));
+
+      it("should unverify hattra if kota is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification/unverify`
+          )
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body.affectedRowCount).to.equal(1);
+          }));
+    });
+  });
+
+  // Hattra API Test by role puskesmas
+  describe("authenticated role: puskesmas", () => {
+    const authenticated = chai.request.agent(routes);
+
+    before(() =>
+      knex.migrate
+        .rollback()
+        .then(() => knex.migrate.latest())
+        .then(() => knex.seed.run())
+        .then(() =>
+          authenticated.post(`${config.get("routePrefix")}/session`).send({
+            username: "pusk_tasik",
+            password: "pusk_tasik"
+          })
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.ownProperty("username");
+          expect(res.body).to.have.ownProperty("status");
+        })
+    );
+
+    after(() =>
+      authenticated.del(`${config.get("routePrefix")}/session`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an("object");
+        expect(res.body.message).to.equal("Logged out successfully.");
+      })
+    );
+
+    // get /hattra
+    it("should get list of hattra if puskesmas is logged in", () =>
+      authenticated.get(`${config.get("routePrefix")}/hattra`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.ownProperty("data");
+        expect(res.body.data).to.be.an("array");
+        expect(res.body).to.have.all.keys(paginateProps);
+      }));
+
+    // get /hattra/search
+    it("should get list of hattra by searching if puskesmas is logged in", () =>
+      authenticated
+        .get(`${config.get("routePrefix")}/hattra/search?search=ray`)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("array");
+        }));
+
+    // get /hattra/:id_hattra
+    describe("details of specific hattra by puskesmas", () => {
+      it("should get no details of specific wrong id of hattra because resource not found", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.wrong_id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(404);
+            expect(res.body.message).to.equal("Hattra not found.");
+            expect(res.body.name).to.equal("NotFoundError");
+          }));
+
+      it("should get details of specific correct id of hattra", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(hattraColumns);
+          }));
+    });
+
+    // get /hattra/byUser/:username
+    describe("get list of hattras based on username of user by puskesmas", () => {
+      it("should not get list of hattras based on username of provinsi", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.provinsi}`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not get list of hattras based on username of kota", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kota}`)
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not get list of hattras based on username of puskesmas", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.puskesmas}`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should get list of hattras based on username of kestrad", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kestrad}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(paginateProps);
+          }));
+    });
+
+    // get /hattra/byLayanan/:id_layanan
+    it("should get list of hattras based on id of layanan by puskesmas", () =>
+      authenticated
+        .get(
+          `${config.get("routePrefix")}/hattra/byLayanan/${hattra.id_layanan}`
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.include.all.keys(paginateProps);
+        }));
+
+    // patch /hattra/:id_hattra
+    it("should edit hattra if puskesmas is logged in", () =>
+      authenticated
+        .patch(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+        .send(hattra)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body.affectedRowCount).to.equal(1);
+        }));
+
+    // patch /hattra/:id_hattra/verification
+    describe("hattra verification by puskesmas", () => {
+      it("should not verify hattra if puskesmas is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not unverify hattra if puskesmas is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification/unverify`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+    });
+  });
+
+  // hattra api test by role kestrad
+  describe("authenticated role: kestrad", () => {
+    const authenticated = chai.request.agent(routes);
+
+    before(() =>
+      knex.migrate
+        .rollback()
+        .then(() => knex.migrate.latest())
+        .then(() => knex.seed.run())
+        .then(() =>
+          authenticated.post(`${config.get("routePrefix")}/session`).send({
+            username: "kestrad_tasik",
+            password: "kestrad_tasik"
+          })
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.ownProperty("username");
+          expect(res.body).to.have.ownProperty("status");
+        })
+    );
+
+    after(() =>
+      authenticated.del(`${config.get("routePrefix")}/session`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an("object");
+        expect(res.body.message).to.equal("Logged out successfully.");
+      })
+    );
+
+    // get /hattra
+    it("should get list of hattra if kestrad is logged in", () =>
+      authenticated.get(`${config.get("routePrefix")}/hattra`).then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.ownProperty("data");
+        expect(res.body.data).to.be.an("array");
+        expect(res.body).to.have.all.keys(paginateProps);
+      }));
+
+    // get /hattra/search
+    it("should get list of hattra by searching if kestrad is logged in", () =>
+      authenticated
+        .get(`${config.get("routePrefix")}/hattra/search?search=ray`)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("array");
+        }));
+
+    // get /hattra/:id_hattra
+    describe("details of specific hattra by kestrad", () => {
+      it("should get no details of specific wrong id of hattra because resource not found", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.wrong_id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(404);
+            expect(res.body.message).to.equal("Hattra not found.");
+            expect(res.body.name).to.equal("NotFoundError");
+          }));
+
+      it("should get details of specific correct id of hattra", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an("object");
+            expect(res.body).to.include.all.keys(hattraColumns);
+          }));
+    });
+
+    // get /hattra/byUser/:username
+    describe("get list of hattras based on username of user by kestrad", () => {
+      it("should not get list of hattras based on username of provinsi", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.provinsi}`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not get list of hattras based on username of kota", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kota}`)
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not get list of hattras based on username of puskesmas", () =>
+        authenticated
+          .get(
+            `${config.get("routePrefix")}/hattra/byUser/${username.puskesmas}`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not get list of hattras based on username of kestrad", () =>
+        authenticated
+          .get(`${config.get("routePrefix")}/hattra/byUser/${username.kestrad}`)
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+    });
+
+    // get /hattra/byLayanan/:id_layanan
+    it("should get list of hattras based on id of layanan by kestrad", () =>
+      authenticated
+        .get(
+          `${config.get("routePrefix")}/hattra/byLayanan/${hattra.id_layanan}`
+        )
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.include.all.keys(paginateProps);
+        }));
+    // patch /hattra/:id_hattra
+    it("should not edit hattra if kestrad is logged in", () =>
+      authenticated
+        .patch(`${config.get("routePrefix")}/hattra/${hattra.id_hattra}`)
+        .send(hattra)
+        .then(res => {
+          expect(res).to.have.status(403);
+          expect(res.body.message).to.equal("Forbidden");
+          expect(res.body.name).to.equal("ForbiddenError");
+        }));
+
+    // patch /hattra/:id_hattra/verification
+    describe("hattra verification by kestrad", () => {
+      it("should not verify hattra if kestrad is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+
+      it("should not unverify hattra if kestrad is logged in", () =>
+        authenticated
+          .patch(
+            `${config.get("routePrefix")}/hattra/${
+              hattra.id_hattra
+            }/verification/unverify`
+          )
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res.body.message).to.equal("Forbidden");
+            expect(res.body.name).to.equal("ForbiddenError");
+          }));
+    });
+  });
+});

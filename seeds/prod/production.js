@@ -143,5 +143,5 @@ exports.seed = (knex, Promise) => {
     .then(adminQuery)
     .then(provinsiQuery)
     .then(kategoriQuery)
-    .then(subkategoriQuery)
+    .then(subkategoriQuery);
 };

@@ -1,10 +1,8 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const { conn, rethink } = require('../components/rethinkdb');
-const auth = require('../components/auth.js');
-const config = require('config');
-const _ = require('lodash');
+const express = require("express");
+const { conn, rethink } = require("../components/rethinkdb");
+const auth = require("../components/auth.js");
 
 const router = express.Router();
 
@@ -13,7 +11,7 @@ const router = express.Router();
  * @name Get notifications
  * @route {GET} /notifications
  */
-router.get('/notification', auth.middleware.isLoggedIn, (req, res, next) => {
+router.get("/notification", auth.middleware.isLoggedIn, (req, res, next) => {
   const skip = req.query.page ? req.query.page : 0;
   const limit = req.query.limit ? req.query.limit : 10;
   const end = skip * limit + limit;
@@ -21,10 +19,10 @@ router.get('/notification', auth.middleware.isLoggedIn, (req, res, next) => {
   conn
     .then(connection => {
       rethink
-        .table('notifications')
+        .table("notifications")
         .filter({ username: req.user.username })
-        .withFields('notifications')
-        .merge(row => row('notifications').orderBy(rethink.desc('timestamp')))
+        .withFields("notifications")
+        .merge(row => row("notifications").orderBy(rethink.desc("timestamp")))
         .slice(skip * limit, end)
         .run(connection)
         .then(cursor => {
@@ -33,7 +31,7 @@ router.get('/notification', auth.middleware.isLoggedIn, (req, res, next) => {
         .then(result => {
           const [resultInArray] = result;
           if (result.length > 0) return res.json(resultInArray);
-          else return res.json(result);
+          return res.json(result);
         })
         .catch(next);
     })

@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
 /**
  * @module app/users/routes
  */
 
-const express = require('express');
-const passport = require('../components/passport.js');
-const auth = require('../components/auth.js');
-const validators = require('./session.validators.js');
+const express = require("express");
+const passport = require("../components/passport");
+const auth = require("../components/auth");
+const validators = require("./session.validators");
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ const router = express.Router();
  * @name Get current session
  * @route {GET} /session
  */
-router.get('/session', auth.middleware.isLoggedIn, (req, res) => {
+router.get("/session", auth.middleware.isLoggedIn, (req, res) => {
   return res.json(req.user);
 });
 
@@ -28,18 +28,18 @@ router.get('/session', auth.middleware.isLoggedIn, (req, res) => {
  * @return {object} The current user information if login is successful, HTTP 401 otherwise.
  */
 router.post(
-  '/session',
+  "/session",
   validators.createSession,
-  passport.authenticate('local'),
+  passport.authenticate("local"),
   (req, res) => {
     return res.json(req.user);
   }
 );
 
 /* Logout */
-router.delete('/session', (req, res) => {
+router.delete("/session", (req, res) => {
   req.logout();
-  return res.json({ message: 'Logged out successfully.' });
+  return res.json({ message: "Logged out successfully." });
 });
 
 module.exports = router;

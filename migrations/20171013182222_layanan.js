@@ -5,10 +5,8 @@ exports.up = (knex, Promise) => {
       table
         .integer('id_subkategori')
         .unsigned()
-        .references('subkategori.id_subkategori')
-      table
-        .string('username_kestrad')
-        .references('user_kestrad.username')
+        .references('subkategori.id_subkategori');
+      table.string('username_kestrad').references('user_kestrad.username');
       table.string('nama_layanan');
       table.string('verified');
       table.timestamp('tanggal_verified').nullable();

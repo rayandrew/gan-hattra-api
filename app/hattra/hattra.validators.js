@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
-const validation = require('../components/validation.js');
-const commonSchemas = require('../common/schemas.js');
+const _ = require("lodash");
+const validation = require("../components/validation.js");
+const commonSchemas = require("../common/schemas.js");
 
 const schemas = {
   listHattra: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -15,7 +15,7 @@ const schemas = {
   },
 
   updateNamaHattra: {
-    type: 'object',
+    type: "object",
     properties: {
       nama: commonSchemas.varchar(25),
       ijin_hattra: commonSchemas.varchar(25)
@@ -23,7 +23,7 @@ const schemas = {
   },
 
   updateVerifikasiHattra: {
-    type: 'object',
+    type: "object",
     properties: {
       verified: commonSchemas.varchar(25)
     }

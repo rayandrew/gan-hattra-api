@@ -1,0 +1,6 @@
+**/node_modules
+**/dump
+**/.vscode
+**/etc
+**/reports
+**/nyc_outputs

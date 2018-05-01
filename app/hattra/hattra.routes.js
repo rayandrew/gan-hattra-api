@@ -1,31 +1,18 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const auth = require('../components/auth.js');
-const validators = require('./hattra.validators.js');
-const errors = require('http-errors');
-const queries = require('./hattra.queries.js');
-const config = require('config');
+const express = require("express");
+const errors = require("http-errors");
+const auth = require("../components/auth.js");
+const validators = require("./hattra.validators.js");
+const queries = require("./hattra.queries.js");
+
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing kestrad is this kestrad's owner or a supervisor. */
-const isOwnerOrPuskesmasAndHigher = auth.createMiddlewareFromPredicate(
-  (user, req) => {
-    return (
-      user.username === req.params.username ||
-      auth.predicates.isPuskesmasOrHigher(user)
-    );
-  }
-);
-
-/** Custom auth middleware that checks whether the accessing kestrad is this kestrad's owner or a supervisor. */
 const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
-  (user, req) => {
-    return (
-      user.username === req.params.username ||
-      auth.predicates.isKestradOrHigher(user)
-    );
-  }
+  (user, req) =>
+    user.username === req.params.username ||
+    auth.predicates.isKestradOrHigher(user)
 );
 
 /**
@@ -34,12 +21,11 @@ const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
  * @route {GET} /hattra
  */
 router.get(
-  '/hattra',
+  "/hattra",
   auth.middleware.isKestradOrHigher,
   validators.listHattra,
   (req, res, next) => {
-    const isAdmin = auth.predicates.isAdmin(req.user);
-    if (isAdmin) {
+    if (auth.predicates.isAdmin(req.user)) {
       return queries
         .listHattra(
           req.query.search,
@@ -51,7 +37,8 @@ router.get(
           return res.json(kestrad);
         })
         .catch(next);
-    } else if (auth.predicates.isProvinsi(req.user)) {
+    }
+    if (auth.predicates.isProvinsi(req.user)) {
       return queries
         .listHattraByProvinsi(
           req.query.search,
@@ -64,7 +51,8 @@ router.get(
           return res.json(kestrad);
         })
         .catch(next);
-    } else if (auth.predicates.isKota(req.user)) {
+    }
+    if (auth.predicates.isKota(req.user)) {
       return queries
         .listHattraByKota(
           req.query.search,
@@ -77,7 +65,8 @@ router.get(
           return res.json(kestrad);
         })
         .catch(next);
-    } else if (auth.predicates.isPuskesmas(req.user)) {
+    }
+    if (auth.predicates.isPuskesmas(req.user)) {
       return queries
         .listHattraByPuskesmas(
           req.query.search,
@@ -90,7 +79,8 @@ router.get(
           return res.json(kestrad);
         })
         .catch(next);
-    } else {
+    }
+    if (auth.predicates.isKestrad(req.user)) {
       return queries
         .listHattraByKestrad(
           req.query.search,
@@ -113,8 +103,8 @@ router.get(
  * @route {GET} /hattra
  */
 router.get(
-  '/hattra/byUser/:username',
-  auth.middleware.isKestradOrHigher,
+  "/hattra/byUser/:username",
+  auth.middleware.isPuskesmasOrHigher,
   (req, res, next) => {
     return queries
       .listHattraByUsername(
@@ -138,13 +128,47 @@ router.get(
  * @name Search hattra
  * @route {GET} /hattra/search
  */
-router.get('/hattra/search', auth.middleware.isLoggedIn, (req, res, next) => {
-  return queries
-    .searchHattra(req.query.search)
-    .then(result => {
-      return res.json(result);
-    })
-    .catch(next);
+router.get("/hattra/search", auth.middleware.isLoggedIn, (req, res, next) => {
+  if (auth.predicates.isAdmin(req.user)) {
+    return queries
+      .searchHattra(req.query.search)
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+  if (auth.predicates.isProvinsi(req.user)) {
+    return queries
+      .searchHattraForProvinsi(req.query.search, req.user.username)
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+  if (auth.predicates.isKota(req.user)) {
+    return queries
+      .searchHattraForKota(req.query.search, req.user.username)
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+  if (auth.predicates.isPuskesmas(req.user)) {
+    return queries
+      .searchHattraForPuskesmas(req.query.search, req.user.username)
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
+  if (auth.predicates.isKestrad(req.user)) {
+    return queries
+      .searchHattraForKestrad(req.query.search, req.user.username)
+      .then(result => {
+        return res.json(result);
+      })
+      .catch(next);
+  }
 });
 
 /**
@@ -152,11 +176,11 @@ router.get('/hattra/search', auth.middleware.isLoggedIn, (req, res, next) => {
  * @name Get hattra info.
  * @route {GET} /hattra/:id
  */
-router.get('/hattra/:id', isOwnerOrKestradAndHigher, (req, res, next) => {
+router.get("/hattra/:id", isOwnerOrKestradAndHigher, (req, res, next) => {
   return queries
     .getSpecificHattra(req.params.id)
     .then(user => {
-      if (!user) return next(new errors.NotFound('id not found.'));
+      if (!user) throw new errors.NotFound("Hattra not found.");
       return res.json(user);
     })
     .catch(next);
@@ -168,19 +192,19 @@ router.get('/hattra/:id', isOwnerOrKestradAndHigher, (req, res, next) => {
  * @route {PATCH} /hattra/:id
  */
 router.patch(
-  '/hattra/:id_hattra',
+  "/hattra/:id_hattra",
   auth.middleware.isPuskesmas,
   validators.updateNamaHattra,
   (req, res, next) => {
-    let hattraUpdates = {
-      nama: req.body.hattra.nama,
-      ijin_hattra: req.body.hattra.ijin_hattra
+    const hattraUpdates = {
+      nama: req.body.nama,
+      ijin_hattra: req.body.ijin_hattra
     };
 
     return queries
-      .updateNamaHattra(req.params.id_hatra, hattraUpdates, req.user.username)
+      .updateNamaHattra(req.params.id_hattra, hattraUpdates, req.user.username)
       .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+        return res.json({ affectedRowCount });
       })
       .catch(next);
   }
@@ -192,7 +216,7 @@ router.patch(
  * @route {GET} /hattra/byLayanan/:id
  */
 router.get(
-  '/hattra/byLayanan/:id',
+  "/hattra/byLayanan/:id",
   auth.middleware.isKestradOrHigher,
   validators.listHattra,
   (req, res, next) => {
@@ -205,9 +229,6 @@ router.get(
         req.params.id
       )
       .then(kestrad => {
-        if (!kestrad) {
-          return next(new errors.NotFound('Hattra not found'));
-        }
         return res.json(kestrad);
       })
       .catch(next);
@@ -221,7 +242,7 @@ router.get(
  */
 
 router.patch(
-  '/hattra/:id_hattra/verification/:unverify?',
+  "/hattra/:id_hattra/verification/:unverify?",
   auth.middleware.isKota,
   validators.updateVerifikasiHattra,
   (req, res, next) => {
@@ -229,13 +250,13 @@ router.patch(
 
     if (!req.params.unverify) {
       hattraUpdates = {
-        verified: 'active'
+        verified: "active"
       };
     }
 
-    if (req.params.unverify && req.params.unverify === 'unverify') {
+    if (req.params.unverify && req.params.unverify === "unverify") {
       hattraUpdates = {
-        verified: 'disabled'
+        verified: "disabled"
       };
     }
 
@@ -246,7 +267,7 @@ router.patch(
         req.user.username
       )
       .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+        return res.json({ affectedRowCount });
       })
       .catch(next);
   }

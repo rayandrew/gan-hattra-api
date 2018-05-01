@@ -1,12 +1,10 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const auth = require('../components/auth.js');
-const validators = require('./provinsi.validators.js');
-const validatorUser = require('../users/users.validators.js');
-const errors = require('http-errors');
-const queries = require('./provinsi.queries.js');
-const config = require('config');
+const express = require("express");
+const errors = require("http-errors");
+const auth = require("../components/auth.js");
+const validators = require("./provinsi.validators.js");
+const queries = require("./provinsi.queries.js");
 
 const router = express.Router();
 
@@ -31,7 +29,7 @@ const isOwnerOrAdmin = auth.createMiddlewareFromPredicate((user, req) => {
  * @route {GET} /provinsi
  */
 router.get(
-  '/provinsi/search',
+  "/provinsi/search",
   auth.middleware.isLoggedIn,
   isUserProvinsiOrHigher,
   (req, res, next) => {
@@ -55,7 +53,7 @@ router.get(
  * @route {GET} /provinsi
  */
 router.get(
-  '/provinsi',
+  "/provinsi",
   isUserProvinsiOrHigher,
   validators.listProvinsi,
   (req, res, next) => {
@@ -72,37 +70,30 @@ router.get(
           return res.json(result);
         })
         .catch(next);
-    } else {
-      return queries
-        .getProvinsi(req.user.username)
-        .then(result => {
-          if (!result) return next(new errors.NotFound('User not found.'));
-          return res.json(result);
-        })
-        .catch(next);
     }
+    return queries
+      .getProvinsi(req.user.username)
+      .then(result => {
+        if (!result) return next(new errors.NotFound("User not found."));
+        return res.json(result);
+      })
+      .catch(next);
   }
 );
 
 /**
- * Get specific user information for the specified username.
- * @name Get user info.
+ * Get specific provinsi for the specified username.
+ * @name Get provinsi info.
  * @route {GET} /provinsi/:username
  */
-router.get('/provinsi/:username', isUserProvinsiOrHigher, (req, res, next) => {
-  const isAdmin = auth.predicates.isAdmin(req.user);
-  const isTheSameProvinsi = auth.createMiddlewareFromPredicate(() => {
-    return user.username === req.params.username;
-  });
-  if (isAdmin || isTheSameProvinsi) {
-    return queries
-      .getProvinsi(req.params.username)
-      .then(user => {
-        if (!user) return next(new errors.NotFound('User not found.'));
-        return res.json(user);
-      })
-      .catch(next);
-  }
+router.get("/provinsi/:username", isUserProvinsiOrHigher, (req, res, next) => {
+  return queries
+    .getProvinsi(req.params.username)
+    .then(user => {
+      if (!user) return next(new errors.NotFound("User not found."));
+      return res.json(user);
+    })
+    .catch(next);
 });
 
 /**
@@ -111,13 +102,12 @@ router.get('/provinsi/:username', isUserProvinsiOrHigher, (req, res, next) => {
  * @route {PATCH} /provinsi/:username
  */
 router.patch(
-  '/provinsi/:username',
+  "/provinsi/:username",
   isOwnerOrAdmin,
   validators.updateProvinsi,
   (req, res, next) => {
-    let userUpdates = {
+    const userUpdates = {
       nama: req.body.nama,
-      nama_dinas: req.body.nama_dinas,
       kepala_dinas: req.body.kepala_dinas,
       alamat: req.body.alamat
     };
@@ -125,7 +115,7 @@ router.patch(
     return queries
       .updateProvinsi(req.params.username, userUpdates)
       .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+        return res.json({ affectedRowCount });
       })
       .catch(next);
   }

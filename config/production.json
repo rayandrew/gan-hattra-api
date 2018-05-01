@@ -1,6 +1,5 @@
 {
-  "port": 3000,
-  "secret": "[ Insert secret test here ]",
+  "secret": "[ Insert secret prod here ]",
 
   "knex": {
     "client": "mysql",
@@ -12,7 +11,7 @@
         "charset"  : "utf8"
     },
     "seeds": {
-      "directory": "./seeds/dev"
+      "directory": "./seeds/prod"
     },
     "debug": false
   }

@@ -1,0 +1,50 @@
+dist: trusty
+sudo: required
+
+language: node_js
+
+node_js:
+  - "9"
+  - "8"
+
+jdk:
+  - oraclejdk8
+
+services:
+  - redis-server
+
+addons:
+  rethinkdb: '2.3.4'
+  mariadb: '10.2'
+  sonarcloud:
+    organization: "datafreaks"
+    token: $SONAR_TOKEN
+
+cache:
+  yarn: true
+  directories:
+  - node_modules/
+  - '$HOME/.sonar/cache'
+
+env:
+  global:
+    - NODE_ENV=test
+    - EGOV_API_PORT=3000
+    - EGOV_API_SECRET=[e-gov_jabar_secret_test]
+    - MYSQL_HOST=localhost
+    - MYSQL_USER=root
+    - MYSQL_DATABASE=egov_jabar
+    - RETHINKDB_HOST=localhost
+    - RETHINKDB_PORT=28015
+    - REDIS_HOST=localhost
+    - REDIS_PORT=6379
+
+before_install:
+  - mysql -e 'CREATE DATABASE egov_jabar;'
+
+script:
+  - yarn test
+
+after_success:
+  - yarn coverage
+  - sonar-scanner

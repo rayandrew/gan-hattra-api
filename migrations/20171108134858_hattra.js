@@ -5,7 +5,7 @@ exports.up = (knex, Promise) => {
       table
         .integer('id_layanan')
         .unsigned()
-        .references('layanan.id_layanan')
+        .references('layanan.id_layanan');
       table.string('nama');
       table.string('ijin_hattra');
       table.string('verified');

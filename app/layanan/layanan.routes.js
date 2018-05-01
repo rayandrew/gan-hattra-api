@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const auth = require('../components/auth.js');
-const validators = require('./layanan.validators.js');
-const errors = require('http-errors');
-const queries = require('./layanan.queries.js');
-const config = require('config');
+const express = require("express");
+const errors = require("http-errors");
+const auth = require("../components/auth.js");
+const validators = require("./layanan.validators.js");
+const queries = require("./layanan.queries.js");
+
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing layanan is this layanan's owner or a supervisor. */
@@ -18,19 +18,13 @@ const isOwnerOrKestradAndHigher = auth.createMiddlewareFromPredicate(
   }
 );
 
-/** custom username generator */
-const usernameGenerator = (pred, name) => {
-  const nameArr = name.split(' ').map(val => val.toLowerCase());
-  return (pred + '_' + nameArr.join('')).substring(0, 255);
-};
-
 /**
  * Get a list of layanan.
  * @name Get layanan
  * @route {GET} /layanan
  */
 router.get(
-  '/layanan',
+  "/layanan",
   auth.middleware.isKestradOrHigher,
   validators.listLayanan,
   (req, res, next) => {
@@ -47,7 +41,8 @@ router.get(
           return res.json(layanan);
         })
         .catch(next);
-    } else if (auth.predicates.isProvinsi(req.user)) {
+    }
+    if (auth.predicates.isProvinsi(req.user)) {
       return queries
         .getLayananForProvinsi(
           req.query.search,
@@ -58,12 +53,13 @@ router.get(
         )
         .then(layanan => {
           if (!layanan) {
-            return next(new errors.NotFound('layanan not found'));
+            return next(new errors.NotFound("layanan not found"));
           }
           return res.json(layanan);
         })
         .catch(next);
-    } else if (auth.predicates.isKota(req.user)) {
+    }
+    if (auth.predicates.isKota(req.user)) {
       return queries
         .getLayananForKota(
           req.query.search,
@@ -74,12 +70,13 @@ router.get(
         )
         .then(layanan => {
           if (!layanan) {
-            return next(new errors.NotFound('layanan not found'));
+            return next(new errors.NotFound("layanan not found"));
           }
           return res.json(layanan);
         })
         .catch(next);
-    } else if (auth.predicates.isPuskesmas(req.user)) {
+    }
+    if (auth.predicates.isPuskesmas(req.user)) {
       return queries
         .getLayananForPuskesmas(
           req.query.search,
@@ -90,29 +87,28 @@ router.get(
         )
         .then(layanan => {
           if (!layanan) {
-            return next(new errors.NotFound('layanan not found'));
-          }
-          return res.json(layanan);
-        })
-        .catch(next);
-    } else {
-      // isKestrad
-      return queries
-        .getLayananForKestrad(
-          req.query.search,
-          req.query.page,
-          req.query.perPage,
-          req.query.sort,
-          req.user.username
-        )
-        .then(layanan => {
-          if (!layanan) {
-            return next(new errors.NotFound('layanan not found'));
+            return next(new errors.NotFound("layanan not found"));
           }
           return res.json(layanan);
         })
         .catch(next);
     }
+    // IsKestrad
+    return queries
+      .getLayananForKestrad(
+        req.query.search,
+        req.query.page,
+        req.query.perPage,
+        req.query.sort,
+        req.user.username
+      )
+      .then(layanan => {
+        if (!layanan) {
+          return next(new errors.NotFound("layanan not found"));
+        }
+        return res.json(layanan);
+      })
+      .catch(next);
   }
 );
 
@@ -122,7 +118,7 @@ router.get(
  * @route {GET} /hattra
  */
 router.get(
-  '/layanan/byUser/:username',
+  "/layanan/byUser/:username",
   auth.middleware.isKestradOrHigher,
   (req, res, next) => {
     return queries
@@ -147,7 +143,7 @@ router.get(
  * @name Search layanan
  * @route {GET} /layanan/search
  */
-router.get('/layanan/search', auth.middleware.isLoggedIn, (req, res, next) => {
+router.get("/layanan/search", auth.middleware.isLoggedIn, (req, res, next) => {
   return queries
     .searchLayanan(
       req.query.search,
@@ -167,7 +163,7 @@ router.get('/layanan/search', auth.middleware.isLoggedIn, (req, res, next) => {
  * @route {GET} /layanan/listKategori
  */
 router.get(
-  '/layanan/listKategori',
+  "/layanan/listKategori",
   auth.middleware.isKestradOrHigher,
   validators.listLayanan,
   (req, res, next) => {
@@ -191,7 +187,7 @@ router.get(
  * @route {GET} /layanan/listSubkategori
  */
 router.get(
-  '/layanan/listSubkategori',
+  "/layanan/listSubkategori",
   auth.middleware.isKestradOrHigher,
   validators.listLayanan,
   (req, res, next) => {
@@ -214,11 +210,11 @@ router.get(
  * @name Get layanan info.
  * @route {GET} /layanan/:nama
  */
-router.get('/layanan/:id', isOwnerOrKestradAndHigher, (req, res, next) => {
+router.get("/layanan/:id", isOwnerOrKestradAndHigher, (req, res, next) => {
   return queries
     .getSpecificLayanan(req.params.id)
     .then(user => {
-      if (!user) return next(new errors.NotFound('Layanan not found.'));
+      if (!user) return next(new errors.NotFound("Layanan not found."));
       return res.json(user);
     })
     .catch(next);
@@ -230,11 +226,11 @@ router.get('/layanan/:id', isOwnerOrKestradAndHigher, (req, res, next) => {
  * @route {PATCH} /layanan/:nama
  */
 router.patch(
-  '/layanan/:id_layanan',
+  "/layanan/:id_layanan",
   auth.middleware.isPuskesmas,
   validators.updateNamaLayanan,
   (req, res, next) => {
-    let layananUpdates = {
+    const layananUpdates = {
       nama_layanan: req.body.nama_layanan
     };
 
@@ -245,7 +241,7 @@ router.patch(
         req.user.username
       )
       .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+        return res.json({ affectedRowCount });
       })
       .catch(next);
   }
@@ -257,20 +253,20 @@ router.patch(
  * @route {PATCH} /layanan/:id_layanan
  */
 router.patch(
-  '/layanan/:id_layanan/verification/:unverify?',
+  "/layanan/:id_layanan/verification/:unverify?",
   auth.middleware.isKota,
   validators.updateVerifikasiLayanan,
   (req, res, next) => {
     let layananUpdates;
     if (!req.params.unverify) {
       layananUpdates = {
-        verified: 'active'
+        verified: "active"
       };
     }
 
-    if (req.params.unverify && req.params.unverify === 'unverify') {
+    if (req.params.unverify && req.params.unverify === "unverify") {
       layananUpdates = {
-        verified: 'disabled'
+        verified: "disabled"
       };
     }
 
@@ -281,7 +277,7 @@ router.patch(
         req.user.username
       )
       .then(affectedRowCount => {
-        return res.json({ affectedRowCount: affectedRowCount });
+        return res.json({ affectedRowCount });
       })
       .catch(next);
   }

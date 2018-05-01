@@ -1,87 +1,80 @@
+/* eslint-env node, mocha */
 /* eslint-disable no-unused-expressions */
-'use strict';
+"use strict";
 
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const sinonChai = require('sinon-chai');
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const sinonChai = require("sinon-chai");
+
 chai.use(chaiHttp);
 chai.use(sinonChai);
 const expect = chai.expect;
-const routes = require('../app');
-const knex = require('../components/knex');
+const routes = require("../app");
+const knex = require("../components/knex");
 
-describe('User handling', function () {
-  beforeEach(done => {
+describe("User handling", () => {
+  beforeEach(() =>
     knex.migrate
       .rollback()
       .then(() => knex.migrate.latest())
-      .then(() => knex.seed.run())
-      .then(() => done());
-  });
+      .then(() => knex.seed.run()));
 
-  after(done => {
-    knex.migrate
-      .rollback()
-      .then(() => knex.migrate.latest())
-      .then(() => knex.seed.run())
-      .then(() => done());
-  });
+  after(() => knex.migrate.rollback());
 
-  describe('new user', function () {
-    let createNewUser = {
-      username: 'raydreww',
-      email: 'raydreww@gmail.com',
-      password: 'hello123'
+  describe("new user", () => {
+    const createNewUser = {
+      username: "raydreww",
+      email: "raydreww@gmail.com",
+      password: "hello123"
     };
 
-    it('should return 201 after creating new user', done => {
+    it("should return 201 after creating new user", done => {
       chai
         .request(routes)
-        .post('/api/users')
+        .post("/api/users")
         .send(createNewUser)
         .end((err, res) => {
           expect(err).to.be.false;
           expect(res).to.have.status(201);
-          expect(res).to.be.a('object');
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.haveOwnProperty('created_at');
-          expect(res.body.username).to.equal('raydreww');
+          expect(res).to.be.a("object");
+          expect(res.body).to.be.a("object");
+          expect(res.body).to.haveOwnProperty("created_at");
+          expect(res.body.username).to.equal("raydreww");
           done();
         });
     });
 
-    it('should not get list of users if user is not logged in', done => {
+    it("should not get list of users if user is not logged in", done => {
       chai
         .request(routes)
-        .post('/api/users')
+        .post("/api/users")
         .send(createNewUser)
         .end((err, res) => {
           expect(err).to.be.false;
           chai
             .request(routes)
-            .get('/api/users/' + createNewUser.username)
+            .get("/api/users/" + createNewUser.username)
             .end((errfromget, resfromget) => {
               expect(errfromget).to.be.null;
               expect(resfromget).to.have.status(200);
-              expect(res.body.username).to.equal('raydreww');
+              expect(res.body.username).to.equal("raydreww");
               done();
             });
         });
     });
 
-    it('should not delete user if user is not logged in', done => {
-      expect(err).to.be.null;
+    it("should not delete user if user is not logged in", done => {
       chai
         .request(routes)
-        .get('/api/users/' + createNewUser.username)
+        .get("/api/users/" + createNewUser.username)
         .end((errfromget, resfromget) => {
           expect(errfromget).to.be.null;
           expect(resfromget).to.have.status(200);
-          expect(res.body.username).to.equal('raydreww');
-          expect(err).to.be.false;
+          expect(resfromget.body.username).to.equal("raydreww");
+          expect(errfromget).to.be.null;
           chai
             .request(routes)
-            .delete('/api/users/' + createNewUser.username)
+            .delete("/api/users/" + createNewUser.username)
             .end((errfromdel, resfromdel) => {
               expect(errfromdel).to.be.null;
               expect(resfromdel).to.have.status(200);
@@ -91,16 +84,16 @@ describe('User handling', function () {
         });
     });
 
-    it('should not edit user if user is not logged in', done => {
+    it("should not edit user if user is not logged in", done => {
       chai
         .request(routes)
-        .post('/api/users')
+        .post("/api/users")
         .send(createNewUser)
         .end((err, res) => {
           expect(err).to.be.false;
           chai
             .request(routes)
-            .patch('/api/users/' + createNewUser.username)
+            .patch("/api/users/" + createNewUser.username)
             .send({ username: 13515074 })
             .end((errfromdel, resfromdel) => {
               expect(errfromdel).to.be.null;

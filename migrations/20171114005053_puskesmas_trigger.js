@@ -88,7 +88,7 @@ exports.up = (knex, Promise) => {
 exports.down = (knex, Promise) => {
   return Promise.all([
     knex.raw('DROP TRIGGER IF EXISTS after_user_puskesmas_insert;'),
-    knex.raw('DROP TRIGGER IF EXISTS before_user_puskesmas_delete;'),    
+    knex.raw('DROP TRIGGER IF EXISTS before_user_puskesmas_delete;'),
     knex.raw('DROP TRIGGER IF EXISTS after_user_puskesmas_delete;')
   ]);
 };

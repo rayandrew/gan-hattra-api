@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
-const validation = require('../components/validation.js');
-const commonSchemas = require('../common/schemas.js');
+const _ = require("lodash");
+const validation = require("../components/validation.js");
+const commonSchemas = require("../common/schemas.js");
 
 const schemas = {
   listPuskesmas: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -15,7 +15,7 @@ const schemas = {
   },
 
   createPuskesmas: {
-    type: 'object',
+    type: "object",
     properties: {
       username: commonSchemas.username,
       username_kota: commonSchemas.varchar(25),
@@ -23,11 +23,11 @@ const schemas = {
       kepala_dinas: commonSchemas.varchar(),
       alamat: commonSchemas.text
     },
-    anyOf: [{ required: ['username'] }]
+    anyOf: [{ required: ["username"] }]
   },
 
   updatePuskesmas: {
-    type: 'object',
+    type: "object",
     properties: {
       username: commonSchemas.username,
       username_kota: commonSchemas.varchar(25),

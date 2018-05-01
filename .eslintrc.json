@@ -1,0 +1,13 @@
+{
+    "extends": ["standard", "plugin:prettier/recommended"],
+    "plugins": ["mocha"],
+    "rules": {
+        "semi": [2, "always"],
+        "no-extra-semi": 2,
+        "prettier/prettier": "error",
+        "mocha/no-exclusive-tests": "error"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2017
+    }
+}

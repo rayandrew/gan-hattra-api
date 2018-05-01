@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
-const validation = require('../components/validation.js');
-const commonSchemas = require('../common/schemas.js');
+const _ = require("lodash");
+const validation = require("../components/validation.js");
+const commonSchemas = require("../common/schemas.js");
 
 const schemas = {
   listProvinsi: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -15,7 +15,7 @@ const schemas = {
   },
 
   updateProvinsi: {
-    type: 'object',
+    type: "object",
     properties: {
       nama_provinsi: commonSchemas.varchar(),
       kepala_dinas: commonSchemas.varchar(),

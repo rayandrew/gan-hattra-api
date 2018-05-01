@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
-const validation = require('../components/validation.js');
-const commonSchemas = require('../common/schemas.js');
+const _ = require("lodash");
+const validation = require("../components/validation.js");
+const commonSchemas = require("../common/schemas.js");
 
 const schemas = {
   listLayanan: {
-    type: 'object',
+    type: "object",
     properties: Object.assign(
       {},
       commonSchemas.pagingAndSortingProperties,
@@ -15,14 +15,14 @@ const schemas = {
   },
 
   updateNamaLayanan: {
-    type: 'object',
+    type: "object",
     properties: {
       nama_layanan: commonSchemas.varchar(255)
     }
   },
 
   updateVerifikasiLayanan: {
-    type: 'object',
+    type: "object",
     properties: {
       verified: commonSchemas.varchar(255)
     }

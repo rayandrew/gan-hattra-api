@@ -1,16 +1,17 @@
-'use strict';
+"use strict";
 
 /**
  * @module app/components/session
  */
 
-const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
-const config = require('config');
-const redisClient = require('./redis.js');
+const session = require("express-session");
+const RedisStore = require("connect-redis")(session);
+const config = require("config");
+const redisClient = require("./redis.js");
+
 const sessionStore = new RedisStore({
   client: redisClient,
-  prefix: 'gan-hattra:session:'
+  prefix: "gan-hattra:session:"
 });
 
 /**
@@ -20,6 +21,6 @@ const sessionStore = new RedisStore({
 module.exports = session({
   resave: false,
   saveUninitialized: false,
-  secret: config.get('secret'),
+  secret: config.get("secret"),
   store: sessionStore
 });
